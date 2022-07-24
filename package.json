@@ -1,0 +1,25 @@
+{
+  "name": "js-utils",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "test": "npm run testUT",
+    "testUT": "export CONFIG_ENV=Testing && export LOG_LEVEL=SILENT && mocha ./test/**/*.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "mocha": "^10.0.0"
+  },
+  "dependencies": {
+    "fluture": "^14.0.0",
+    "lodash": "^4.17.21",
+    "loglevel": "^1.8.0",
+    "node-fetch": "^3.2.9",
+    "ramda": "^0.28.0",
+    "stream": "^0.0.2",
+    "stream-transform": "^3.2.0"
+  }
+}
