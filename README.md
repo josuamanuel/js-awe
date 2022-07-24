@@ -1,2 +1,3 @@
-# js-utils
+# ext.js
+
 javascript utilities and extensions
