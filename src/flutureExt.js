@@ -1,8 +1,8 @@
 
-import * as fluture from 'fluture'
+import * as F from 'fluture'
 import fetchImproved from './fetchImproved.js'
 
-const { attemptP, Future } = fluture
+const { attemptP, Future } = F
 
 const fletch = ({url, options} = {}) => attemptP(() => fetchImproved(url, options))
 
@@ -10,7 +10,7 @@ const promiseFunToFutureFun = (futurizePromFun) => (...input) => attemptP(() => 
 
 
 /*
-const {  pipe, fork } = fluture
+const {  pipe, fork } = F
 
 const ffletch = ffletchMaker([
   {
@@ -90,5 +90,4 @@ function ffletchMaker(fetchsDef, delay) {
   return ffletch
 }
 
-export default fluture
-export { fletch, promiseFunToFutureFun, ffletchMaker }
+export { F, fletch, promiseFunToFutureFun, ffletchMaker }

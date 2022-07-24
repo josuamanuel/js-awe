@@ -1,6 +1,6 @@
 
 import stream from 'stream'
-import transform from 'stream-transform'
+import { transform } from 'stream-transform'
 import util from 'util'
 import fs from 'fs'
 

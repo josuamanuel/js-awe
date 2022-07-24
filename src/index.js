@@ -1,12 +1,13 @@
-export * from './anonymize';
-export * from './bundleUtils';
-export * from './chrono';
-export * from './fetchImproved';
-export * from './jsUtils';
-export * from './logLevelExtension';
-export * from './ramdaExt';
-export * from './sanitizer';
-export * from './streamUtils';
+export * from './anonymize.js';
+export * from './bundleUtils.js';
+export * from './chrono.js';
+export * from './fetchImproved.js';
+export * from './flutureExt.js'
+export * from './jsUtils.js';
+export * from './logLevelExtension.js';
+export * from './ramdaExt.js';
+export * from './sanitizer.js';
+export * from './streamUtils.js';
 
 // import * as number from './number';
 // import * as date from './date';
