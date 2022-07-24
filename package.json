@@ -1,6 +1,6 @@
 {
-  "name": "ext.js",
-  "version": "1.0.0",
+  "name": "js-awe",
+  "version": "1.0.1",
   "description": "",
   "main": "src/index.js",
   "type": "module",

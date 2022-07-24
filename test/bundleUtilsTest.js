@@ -1,7 +1,7 @@
 import { strict as assert } from 'assert'
 
-import { traverse, getValueAtPath, setValueAtPath, wildcardToRegExp, cloneCopy, promiseAll, CustomError, _, } from '../src/bundleUtils.js'
-
+import { wildcardToRegExp, cloneCopy, promiseAll, _, } from '../src/bundleUtils.js'
+import { traverse, getValueAtPath, setValueAtPath } from '../src/jsUtils.js'
 
 describe('bundleUtils', () => {
 

@@ -1,3 +1,3 @@
-# ext.js
+# js-awe
 
 javascript utilities and extensions
