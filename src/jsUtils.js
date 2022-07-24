@@ -2,7 +2,7 @@
 import pkg from 'lodash';
 const { cloneDeep } = pkg;
 
-const log = (title, displayFunc) => (message) => {
+const logWithPrefix = (title, displayFunc) => (message) => {
 
   let finalMessage = message
 
@@ -1399,7 +1399,7 @@ function processExit(error) {
 }
 
 const jsUtils = {
-  log,
+  logWithPrefix,
   firstCapital,
   varSubsDoubleBracket,
   queryObjToStr,
@@ -1457,7 +1457,7 @@ const jsUtils = {
 
 export default jsUtils
 export {
-  log,
+  logWithPrefix,
   firstCapital,
   varSubsDoubleBracket,
   queryObjToStr,

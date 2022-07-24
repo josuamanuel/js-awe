@@ -1,7 +1,6 @@
 'use strict'
 import _ from 'lodash'
 import jsUtils from './jsUtils.js'
-import { log } from './logLevelExtension.js'
 
 function reviverPromiseForCloneDeep(value) {
   if (jsUtils.isPromise(value)) return value
@@ -92,4 +91,3 @@ function promiseAll(obj) {
 }
 
 export { cloneCopy, wildcardToRegExp, promiseAll, _ }
-export * from './jsUtils.js'
