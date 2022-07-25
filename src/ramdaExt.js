@@ -776,9 +776,6 @@ RE.findSolution = findSolution
 RE.something = something
 RE.uncurry = uncurry
 
-
-export default RE
-
 export {
   R,
   RE,

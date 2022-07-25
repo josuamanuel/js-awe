@@ -5,10 +5,10 @@ const dict = {
   numbers: [0,1,2,3,4,5,6,7,8,9]
 }
 
-function anonymize(str)
+function anonymize(toAnonymize)
 {
   let changes = 0
-  const result = str
+  const result = toAnonymize
     .split('')
     .map(char => {
       let toReturn
@@ -23,7 +23,7 @@ function anonymize(str)
     })
     .join('')
 
-  if(changes < str.length/2) return Array.from({length: result.length}).fill('*').join('')
+  if(changes < toAnonymize.length/2) return Array.from({length: result.length}).fill('*').join('')
   
   return result
 }

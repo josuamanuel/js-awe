@@ -1,9 +1,9 @@
 import { strict as assert } from 'assert'
 
-import { wildcardToRegExp, cloneCopy, promiseAll, _, } from '../src/bundleUtils.js'
+import { wildcardToRegExp, cloneCopy, promiseAll, _, } from '../src/lodashExt.js'
 import { traverse, getValueAtPath, setValueAtPath } from '../src/jsUtils.js'
 
-describe('bundleUtils', () => {
+describe('lodashExt', () => {
 
   //getValueAtPath()
   const getValueAtPathSubject = {
