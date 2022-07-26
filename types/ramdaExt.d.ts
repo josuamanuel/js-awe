@@ -31,7 +31,7 @@ declare function mergeFields(left?:any,right?:any):any
 type mergeFieldsType = typeof mergeFields
 
 interface objCalc {
-[fieldCalc:string]: mergeFieldsType
+  [fieldCalc:string]: mergeFieldsType
 }
 
 /**
@@ -42,8 +42,8 @@ interface objCalc {
 * @param mergeFieldsObject Object with fields and how to calculate the new value
 */
 declare function groupByWithCalc(
-groupBy:(row:any)=>any,
-calc:objCalc
+  groupBy:(row:any)=>any,
+  calc:objCalc
 ):([]) => []
 
 export { groupByWithCalc }
