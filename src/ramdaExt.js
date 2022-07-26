@@ -30,21 +30,21 @@ const groupByWithCalcUnc = (cond, keyOp) => data => {
 
 const groupByWithCalc = R.curryN(2, groupByWithCalcUnc)
 RE.groupByWithCalc = groupByWithCalc
-RE.groupByWithCalc(
-  (row) => row.date,
-  {
-    total:(l,r) => (l??0) + r,
-    count:(l,r) => (l??0) + 1
-  },
-)(
-  [
-    {date:'2020-01-02', total:6}, 
-    {date:'2020-01-03', total:5}, 
-    {date:'2020-01-02', total:11}, 
-    {date:'2020-01-03', total:6}, 
-    {date:'2020-01-02', total:-5}
-  ]
-)//?
+// RE.groupByWithCalc(
+//   (row) => row.date,
+//   {
+//     total:(l,r) => (l??0) + r,
+//     count:(l,r) => (l??0) + 1
+//   },
+// )(
+//   [
+//     {date:'2020-01-02', total:6}, 
+//     {date:'2020-01-03', total:5}, 
+//     {date:'2020-01-02', total:11}, 
+//     {date:'2020-01-03', total:6}, 
+//     {date:'2020-01-02', total:-5}
+//   ]
+// )//?
 
 const innerRightJoinWithUnc = (joinCond, transform = (k, l, r) => r, left, right) => {
 
@@ -65,16 +65,16 @@ const innerRightJoinWithUnc = (joinCond, transform = (k, l, r) => r, left, right
 }
 const innerRightJoinWith = R.curryN(4, innerRightJoinWithUnc)
 RE.innerRightJoinWith = innerRightJoinWith
-// RE.innerRightJoinWith(
-//   (l,r) => l.date === r.date,
-//   (k, l, r) => k==='total' 
-//     ? l + r
-//     : r,
-//   [{date:'2020-01-02', total:6}, {date:'2020-01-03', total:5}]
-// )
-// (
-//   [{date:'2020-01-02', total:11}, {date:'2020-01-03', total:6}]
-// )//?
+RE.innerRightJoinWith(
+  (l,r) => l.date === r.date,
+  (k, l, r) => k==='total' 
+    ? l + r
+    : r,
+  [{date:'2020-01-02', total:6},  {date:'2020-01-08', total:8}, {date:'2020-01-03', total:5}]
+)
+(
+  [{date:'2020-01-02', total:11},  {date:'2020-01-09', total:9}, {date:'2020-01-03', total:6}]
+)//?
 
 function unionWithHashKeysUnc(isAsc, hashAddNoDups, addNoDupsToTheEnd, hashMaster, master) {
   const union = new Map()

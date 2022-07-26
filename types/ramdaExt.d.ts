@@ -48,7 +48,49 @@ declare function groupByWithCalc(
 
 export { groupByWithCalc }
 
-export const innerRightJoinWith: any;
+
+/**
+* Returns true if records need to be merged
+* @param leftRow row form left data to match
+* @param rightRow row from right data to match
+* @return true if merge is required
+*/
+declare function leftRightMatchingD(leftRow?:any, rightRow?:any):boolean
+
+/**
+* update matched records
+* @param key each of the fields for a match record
+* @param leftValue left value of the key
+* @param rightValue right value of the key
+* @return the new value to be assigned to the key
+*/
+declare function updateD(key?:string, leftValue?:any, rightValue?:any):any
+
+/**
+* introduce the rightData to join
+* @param rightData each of the fields for a match record
+* @return the final result for the innerRightJoinWith
+*/
+declare function injectRightDataD(rightData:[]):[]
+
+/**
+* Right join using condition and merge function by keys.
+* last chain function call is to introduce right Data.
+* It keeps records from the right and update with
+* the left data
+* @param leftRightMatching matchinf function
+* @param update update function
+* @param leftData leftData
+* @return a function ready to receive rightData
+*/
+declare function innerRightJoinWith(
+  leftRightMatching:typeof leftRightMatchingD,
+  update:typeof updateD,
+  leftData:[]
+):typeof injectRightDataD
+
+export { innerRightJoinWith }
+
 export const unionWithHashKeys: any;
 export const updateWithHashKeys: any;
 export const between: any;
