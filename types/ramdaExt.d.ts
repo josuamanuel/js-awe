@@ -26,7 +26,7 @@ export namespace RE {
 * will have the accumulation. Use (left??0) for safety.
 * @param right value of the field to merge.
 */
-function mergeFields(left?:any,right?:any):any
+declare function mergeFields(left?:any,right?:any):any
 
 type mergeFieldsType = typeof mergeFields
 
@@ -41,7 +41,7 @@ interface objCalc {
 * @param groupBy hash function of the input row
 * @param mergeFieldsObject Object with fields and how to calculate the new value
 */
-function groupByWithCalc(
+declare function groupByWithCalc(
 groupBy:(row:any)=>any,
 calc:objCalc
 ):([]) => []
