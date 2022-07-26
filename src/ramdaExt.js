@@ -30,12 +30,21 @@ const groupByWithCalcUnc = (cond, keyOp) => data => {
 
 const groupByWithCalc = R.curryN(2, groupByWithCalcUnc)
 RE.groupByWithCalc = groupByWithCalc
-// RE.groupByWithCalc(
-//   (row) => row.date,
-//   {total:(l,r) => (l??0)+r}
-// )(
-//   [{date:'2020-01-02', total:6}, {date:'2020-01-03', total:5}, {date:'2020-01-02', total:11}, {date:'2020-01-03', total:6}]
-// )//?
+RE.groupByWithCalc(
+  (row) => row.date,
+  {
+    total:(l,r) => (l??0) + r,
+    count:(l,r) => (l??0) + 1
+  },
+)(
+  [
+    {date:'2020-01-02', total:6}, 
+    {date:'2020-01-03', total:5}, 
+    {date:'2020-01-02', total:11}, 
+    {date:'2020-01-03', total:6}, 
+    {date:'2020-01-02', total:-5}
+  ]
+)//?
 
 const innerRightJoinWithUnc = (joinCond, transform = (k, l, r) => r, left, right) => {
 
@@ -764,14 +773,14 @@ RE.mergeArrayOfObjectsRenamingProps = mergeArrayOfObjectsRenamingProps
 // )//?
 
 
-function log(prefix) {
+function Rlog(prefix) {
   return (...obj) => {
     console.log(prefix, ...obj)
     return R.last(obj)
   }
 }
 
-RE.log = log
+RE.log = Rlog
 RE.findSolution = findSolution
 RE.something = something
 RE.uncurry = uncurry
@@ -791,7 +800,7 @@ export {
   mapWithPrevious,
   pipeWithChain,
   runFunctionsInParallel,
-  log,
+  Rlog,
   findSolution,
   something,
   pickPaths,

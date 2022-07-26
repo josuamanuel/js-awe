@@ -1,6 +1,6 @@
 
 import * as F from 'fluture'
-import fetchImproved from './fetchImproved.js'
+import { fetchImproved } from './fetchImproved.js'
 
 const { attemptP, Future } = F
 

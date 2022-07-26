@@ -1,6 +1,6 @@
 import { arraySorter, pushUniqueKeyOrChange, sorterByPaths, pushUniqueKey } from './jsUtils.js';
 import { sleepWithFunction } from './jsUtils.js';
-import { groupByWithCalc, log, R, RE } from './ramdaExt.js';
+import { groupByWithCalc, R, RE } from './ramdaExt.js';
 
 function Chrono() {
 

@@ -7,6 +7,4 @@ async function fetchImproved(...args) {
   return { status: result.status, body }
 }
 
-export default fetchImproved
-
-export { fetch }
+export { fetch, fetchImproved }
