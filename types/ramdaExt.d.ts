@@ -71,7 +71,9 @@ declare function updateD(key?:string, leftValue?:any, rightValue?:any):any
 * @param rightData each of the fields for a match record
 * @return the final result for the innerRightJoinWith
 */
-declare function injectRightDataD(rightData:[]):[]
+declare function injectRightDataD(rightData:any[]):any[]
+
+declare function injectLeftData(leftData:any[]):injectRightDataD
 
 /**
 * Right join using condition and merge function by keys.
@@ -88,6 +90,21 @@ declare function innerRightJoinWith(
   update:typeof updateD,
   leftData:any[]
 ):typeof injectRightDataD
+
+/**
+* Right join using condition and merge function by keys.
+* Data is introduce calling in sequence 3 times first 
+* the params 2nd with left data and 3rd with right data.
+* @param leftRightMatching matchinf function
+* @param update update function
+* @return a function ready to receive rightData that when 
+* invoke returns a function ready to receive leftData. Last
+* invaction with leftData will get the final result.
+*/
+declare function innerRightJoinWith(
+  leftRightMatching:typeof leftRightMatchingD,
+  update:typeof updateD
+):typeof injectLeftData
 
 export { innerRightJoinWith }
 
