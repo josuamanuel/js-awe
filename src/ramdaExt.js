@@ -780,7 +780,7 @@ function Rlog(prefix) {
   }
 }
 
-RE.log = Rlog
+RE.Rlog = Rlog
 RE.findSolution = findSolution
 RE.something = something
 RE.uncurry = uncurry

@@ -44,7 +44,7 @@ interface objCalc {
 declare function groupByWithCalc(
   groupBy:(row:any)=>any,
   calc:objCalc
-):([]) => []
+):(data:any[]) => any[]
 
 export { groupByWithCalc }
 
@@ -86,7 +86,7 @@ declare function injectRightDataD(rightData:[]):[]
 declare function innerRightJoinWith(
   leftRightMatching:typeof leftRightMatchingD,
   update:typeof updateD,
-  leftData:[]
+  leftData:any[]
 ):typeof injectRightDataD
 
 export { innerRightJoinWith }
