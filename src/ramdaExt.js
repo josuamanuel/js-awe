@@ -357,6 +357,32 @@ function findSolution(solutionToFind, solutions) {
   )(solutions)
 }
 
+function partialAtPos(fun, pos) { 
+  return (...paramValues) => {
+    let funAcum = fun
+    let count = 0
+    if(pos === 0) return funAcum(...paramValues)
+
+    const iteFun = (...params) => {
+      if(count >= pos)  return funAcum(...paramValues)(...params)
+
+      funAcum = funAcum(...params)
+      count = count + params.length
+
+      if(count >= pos)  return funAcum(...paramValues)
+
+      return iteFun
+    }
+
+    return iteFun
+  }
+}
+RE.partialAtPos = partialAtPos
+// const nestedFun = (a,b) => c => (d,e) => f => console.log(a,b,c,d,e,f)
+// partialAtPos(nestedFun, 3)('jose','Luchi')('a','b')('c')('d')
+// partialAtPos(nestedFun, 5)('jose')('a','b')('c')('d','e')
+
+
 function uncurry(withLog = false) {
   return function uncurryWithOrWithoutLog(funcParam) {
     let prevConsumedUpTo = 0
@@ -805,6 +831,7 @@ export {
   something,
   pickPaths,
   mergeArrayOfObjectsRenamingProps,
-  uncurry
+  uncurry,
+  partialAtPos
 }
 
