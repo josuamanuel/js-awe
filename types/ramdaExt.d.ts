@@ -17,6 +17,7 @@ export namespace RE {
   export { findSolution };
   export { something };
   export { uncurry };
+  export { partialAtPos };
 }
 
 
@@ -73,7 +74,7 @@ declare function updateD(key?:string, leftValue?:any, rightValue?:any):any
 */
 declare function injectRightDataD(rightData:any[]):any[]
 
-declare function injectLeftData(leftData:any[]):injectRightDataD
+declare function injectLeftData(leftData:any[]):typeof injectRightDataD
 
 /**
 * Right join using condition and merge function by keys.
@@ -124,6 +125,7 @@ export function something(lib: any): (...args: any[]) => any;
 export const pickPaths: any;
 export const mergeArrayOfObjectsRenamingProps: any;
 export function uncurry(withLog?: boolean): (funcParam: any) => (...args: any[]) => any;
+export function partialAtPos(fun: any, pos: any): (...paramValues: any[]) => any;
 import * as R from 'ramda';
 export { R };
 //# sourceMappingURL=ramdaExt.d.ts.map
