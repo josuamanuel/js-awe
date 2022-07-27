@@ -65,16 +65,16 @@ const innerRightJoinWithUnc = (joinCond, transform = (k, l, r) => r, left, right
 }
 const innerRightJoinWith = R.curryN(4, innerRightJoinWithUnc)
 RE.innerRightJoinWith = innerRightJoinWith
-RE.innerRightJoinWith(
-  (l,r) => l.date === r.date,
-  (k, l, r) => k==='total' 
-    ? l + r
-    : r,
-  [{date:'2020-01-02', total:6},  {date:'2020-01-08', total:8}, {date:'2020-01-03', total:5}]
-)
-(
-  [{date:'2020-01-02', total:11},  {date:'2020-01-09', total:9}, {date:'2020-01-03', total:6}]
-)//?
+// RE.innerRightJoinWith(
+//   (l,r) => l.date === r.date,
+//   (k, l, r) => k==='total' 
+//     ? l + r
+//     : r,
+//   [{date:'2020-01-02', total:6},  {date:'2020-01-08', total:8}, {date:'2020-01-03', total:5}]
+// )
+// (
+//   [{date:'2020-01-02', total:11},  {date:'2020-01-09', total:9}, {date:'2020-01-03', total:6}]
+// )//?
 
 function unionWithHashKeysUnc(isAsc, hashAddNoDups, addNoDupsToTheEnd, hashMaster, master) {
   const union = new Map()
@@ -501,7 +501,7 @@ RE.pipeWithChain = pipeWithChain
 //   x => resolve([x[0] +2, x[1] + 4]),
 //   x => x.filter(elem => elem > 15)
 // )(5, 6)
-// .pipe(fork(log('pipeWithChain-Ex1-Err: '))(log('pipeWithChain-Ex1-OK: ')))
+// .pipe(fork(Rlog('pipeWithChain-Ex1-Err: '))(Rlog('pipeWithChain-Ex1-OK: ')))
 
 // // //
 // // // Example with Array monad
@@ -523,7 +523,7 @@ RE.pipeWithChain = pipeWithChain
 //     )
 //   )
 // )(resolve([1,2,3,4,56]))
-// .pipe(fork(log('pipeWithChain-Ex2-Err: '))(log('pipeWithChain-Ex2-OK: ')))
+// .pipe(fork(Rlog('pipeWithChain-Ex2-Err: '))(Rlog('pipeWithChain-Ex2-OK: ')))
 
 // // Example with error
 // RE.pipeWithChain(
@@ -532,7 +532,7 @@ RE.pipeWithChain = pipeWithChain
 //   x => new Error('My controlled error...'),
 //   x => x.filter(elem => elem > 15)
 // )(5, 6)
-// .pipe(fork(log('pipeWithChain-Ex3-Err: '))(log('pipeWithChain-Ex3-OK: ')))
+// .pipe(fork(Rlog('pipeWithChain-Ex3-Err: '))(Rlog('pipeWithChain-Ex3-OK: ')))
 
 // RE.pipeWithChain(
 //   (x,y) => x+y,
@@ -545,7 +545,7 @@ RE.pipeWithChain = pipeWithChain
 //   x => reject('my error...'),
 //   x=>x+3
 // )(5, 6)
-// .pipe(fork(log('pipeWithChain-Ex4-Err: '))(log('pipeWithChain-Ex4-OK: ')))
+// .pipe(fork(Rlog('pipeWithChain-Ex4-Err: '))(Rlog('pipeWithChain-Ex4-OK: ')))
 
 // // Example with throw error
 // RE.pipeWithChain(
@@ -555,21 +555,21 @@ RE.pipeWithChain = pipeWithChain
 //   x => {throw new Error('aaaa')},
 //   x => x.filter(elem => elem > 15)
 // )(5, 6)
-// .pipe(fork(log('pipeWithChain-Ex5-Err: '))(log('pipeWithChain-Ex5-OK: ')))
+// .pipe(fork(Rlog('pipeWithChain-Ex5-Err: '))(Rlog('pipeWithChain-Ex5-OK: ')))
 
 // // Example with throw error
 // RE.pipeWithChain(
 //   (x,y) => x,
 //   x => x +2,
 // )(5, reject(10))
-// .pipe(fork(log('pipeWithChain-Ex6-Err: '))(log('pipeWithChain-Ex6-OK: ')))
+// .pipe(fork(Rlog('pipeWithChain-Ex6-Err: '))(Rlog('pipeWithChain-Ex6-OK: ')))
 
 // // Passing a Future as a parameter. Remember this must be the last one.
 // RE.pipeWithChain(
 //   (x,y) => x + y,
 //   x => x + ' --- The End!!! ---',
 // )('the value after 5ms is: ', after(5)('5'))
-// .pipe(fork(log('pipeWithChain-Ex7-Err: '))(log('pipeWithChain-Ex7-OK: ')))
+// .pipe(fork(Rlog('pipeWithChain-Ex7-Err: '))(Rlog('pipeWithChain-Ex7-OK: ')))
 
 // // Example with throw error
 // RE.pipeWithChain(
@@ -601,7 +601,7 @@ RE.runFunctionsInParallel = runFunctionsInParallel
 //       (data) => after(15)(data + 3), //8
 //       (data) => after(15)(data + 4), //9
 //     ]
-//   )(5).pipe(fork(log('1: Err runFunctionsInParallel'))(log('1: OK runFunctionsInParallel')))
+//   )(5).pipe(fork(Rlog('1: Err runFunctionsInParallel'))(Rlog('1: OK runFunctionsInParallel')))
 
 // example of race to update variable
 // RE.pipeWithChain(
@@ -614,7 +614,7 @@ RE.runFunctionsInParallel = runFunctionsInParallel
 //         (data) => map(() => data.varToRaceChanges = data.varToRaceChanges * 3)(after(10)())
 //       ]
 //     ),
-// )(resolve({ varToRaceChanges: 5 })).pipe(fork(log('2: Err runFunctionsInParallel'))(log('2: OK runFunctionsInParallel')))
+// )(resolve({ varToRaceChanges: 5 })).pipe(fork(Rlog('2: Err runFunctionsInParallel'))(Rlog('2: OK runFunctionsInParallel')))
 
 
 /**
@@ -697,8 +697,8 @@ function planBivariate(piper, callValues) {
 //     { sum:(a,b)=> a+b },
 //     { by2: a=>after(100)(a*2) },
 //     { minus3: a=>a-3 }
-//   ).fork(log('plan Err'), log('plan OK'), {by2:8}) // plan OK 5
-//   //.fork(log('plan Err'), log('plan OK')) // plan OK 7
+//   ).fork(Rlog('plan Err'), Rlog('plan OK'), {by2:8}) // plan OK 5
+//   //.fork(Rlog('plan Err'), Rlog('plan OK')) // plan OK 7
 
 
 function pickPathsUnc(pickTransformations, obj) {
