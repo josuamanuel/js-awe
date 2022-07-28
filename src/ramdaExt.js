@@ -333,6 +333,11 @@ function something(lib) {
     )(lib)
 }
 
+/* Returns:
+[ { fun: 'applySpec', sign: '(object)(object)' },
+  { fun: 'juxt', sign: '(object)(object)' } ]
+*/
+//findSolution([{a:2},{a:2,b:2}, 7], something(R)([obj=>obj,obj=>({...obj, b:2}), obj=>obj.a+5], {a:2})) //?
 
 /*
   findSolution(solution, something(R)(param1, param2, param3))
