@@ -1,7 +1,8 @@
 // ts-check
 import * as R from 'ramda';
 import { sorterByPaths, repeat } from './jsUtils.js'
-import { fork, reject, resolve, after, both, pap, chain, map, parallel } from 'fluture';
+import { fork, reject, resolve, after, both, pap, chain, map, parallel, isFuture } from 'fluture';
+import { isBooleanObject } from 'util/types';
 
 
 const RE = {}
@@ -349,6 +350,14 @@ function something(lib) {
 */
 //const Rsomething = something(R)
 //findSolution(7, Rsomething(4, 3)) //?
+//
+// findSolution(
+//   [[true,false],[1,{a:2},3]], 
+//   something(R)(
+//     (elem)=> typeof elem === 'boolean'?0:1,
+//     [true, 1, {a:2},false,3]
+//   )
+// ) //? [ { fun: 'collectBy', sign: '(function,object)' } ]
 
 function findSolution(solutionToFind, solutions) {
   return R.tryCatch(
@@ -617,7 +626,15 @@ const runFunctionsInParallel =
           (numberOfThreads)
           (
             R.map
-              (funToRunInParallel => funToRunInParallel(data))
+              (
+                funToRunInParallel => {
+                  let toReturn = funToRunInParallel(data)
+
+                  return isFuture(toReturn)
+                    ? toReturn
+                    : resolve(toReturn)
+                }
+              )
               (functionsToRunInParallel)
           )
       }
@@ -646,6 +663,17 @@ RE.runFunctionsInParallel = runFunctionsInParallel
 //       ]
 //     ),
 // )(resolve({ varToRaceChanges: 5 })).pipe(fork(RLog('2: Err runFunctionsInParallel'))(RLog('2: OK runFunctionsInParallel')))
+//
+// Mixing Futures with non Futures.
+// runFunctionsInParallel
+//   ()
+//   (
+//     [
+//       (data) => after(15)(data + 2), //7
+//       data => data + 3, //8
+//       (data) => after(15)(data + 4), //9
+//     ]
+//   )(5).pipe(fork(RLog('1: Err runFunctionsInParallel'))(RLog('1: OK runFunctionsInParallel')))
 
 
 /**
