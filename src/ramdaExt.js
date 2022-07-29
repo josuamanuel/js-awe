@@ -362,19 +362,19 @@ function findSolution(solutionToFind, solutions) {
   )(solutions)
 }
 
-function partialAtPos(fun, pos) { 
+function partialAtPos(fun, pos) {
   return (...paramValues) => {
     let funAcum = fun
     let count = 0
-    if(pos === 0) return funAcum(...paramValues)
+    if (pos === 0) return funAcum(...paramValues)
 
     const iteFun = (...params) => {
-      if(count >= pos)  return funAcum(...paramValues)(...params)
+      if (count >= pos) return funAcum(...paramValues)(...params)
 
       funAcum = funAcum(...params)
       count = count + params.length
 
-      if(count >= pos)  return funAcum(...paramValues)
+      if (count >= pos) return funAcum(...paramValues)
 
       return iteFun
     }
@@ -532,7 +532,7 @@ RE.pipeWithChain = pipeWithChain
 //   x => resolve([x[0] +2, x[1] + 4]),
 //   x => x.filter(elem => elem > 15)
 // )(5, 6)
-// .pipe(fork(Rlog('pipeWithChain-Ex1-Err: '))(Rlog('pipeWithChain-Ex1-OK: ')))
+// .pipe(fork(RLog('pipeWithChain-Ex1-Err: '))(RLog('pipeWithChain-Ex1-OK: ')))
 
 // // //
 // // // Example with Array monad
@@ -554,7 +554,7 @@ RE.pipeWithChain = pipeWithChain
 //     )
 //   )
 // )(resolve([1,2,3,4,56]))
-// .pipe(fork(Rlog('pipeWithChain-Ex2-Err: '))(Rlog('pipeWithChain-Ex2-OK: ')))
+// .pipe(fork(RLog('pipeWithChain-Ex2-Err: '))(RLog('pipeWithChain-Ex2-OK: ')))
 
 // // Example with error
 // RE.pipeWithChain(
@@ -563,7 +563,7 @@ RE.pipeWithChain = pipeWithChain
 //   x => new Error('My controlled error...'),
 //   x => x.filter(elem => elem > 15)
 // )(5, 6)
-// .pipe(fork(Rlog('pipeWithChain-Ex3-Err: '))(Rlog('pipeWithChain-Ex3-OK: ')))
+// .pipe(fork(RLog('pipeWithChain-Ex3-Err: '))(RLog('pipeWithChain-Ex3-OK: ')))
 
 // RE.pipeWithChain(
 //   (x,y) => x+y,
@@ -576,7 +576,7 @@ RE.pipeWithChain = pipeWithChain
 //   x => reject('my error...'),
 //   x=>x+3
 // )(5, 6)
-// .pipe(fork(Rlog('pipeWithChain-Ex4-Err: '))(Rlog('pipeWithChain-Ex4-OK: ')))
+// .pipe(fork(RLog('pipeWithChain-Ex4-Err: '))(RLog('pipeWithChain-Ex4-OK: ')))
 
 // // Example with throw error
 // RE.pipeWithChain(
@@ -586,21 +586,21 @@ RE.pipeWithChain = pipeWithChain
 //   x => {throw new Error('aaaa')},
 //   x => x.filter(elem => elem > 15)
 // )(5, 6)
-// .pipe(fork(Rlog('pipeWithChain-Ex5-Err: '))(Rlog('pipeWithChain-Ex5-OK: ')))
+// .pipe(fork(RLog('pipeWithChain-Ex5-Err: '))(RLog('pipeWithChain-Ex5-OK: ')))
 
 // // Example with throw error
 // RE.pipeWithChain(
 //   (x,y) => x,
 //   x => x +2,
 // )(5, reject(10))
-// .pipe(fork(Rlog('pipeWithChain-Ex6-Err: '))(Rlog('pipeWithChain-Ex6-OK: ')))
+// .pipe(fork(RLog('pipeWithChain-Ex6-Err: '))(RLog('pipeWithChain-Ex6-OK: ')))
 
 // // Passing a Future as a parameter. Remember this must be the last one.
 // RE.pipeWithChain(
 //   (x,y) => x + y,
 //   x => x + ' --- The End!!! ---',
 // )('the value after 5ms is: ', after(5)('5'))
-// .pipe(fork(Rlog('pipeWithChain-Ex7-Err: '))(Rlog('pipeWithChain-Ex7-OK: ')))
+// .pipe(fork(RLog('pipeWithChain-Ex7-Err: '))(RLog('pipeWithChain-Ex7-OK: ')))
 
 // // Example with throw error
 // RE.pipeWithChain(
@@ -632,7 +632,7 @@ RE.runFunctionsInParallel = runFunctionsInParallel
 //       (data) => after(15)(data + 3), //8
 //       (data) => after(15)(data + 4), //9
 //     ]
-//   )(5).pipe(fork(Rlog('1: Err runFunctionsInParallel'))(Rlog('1: OK runFunctionsInParallel')))
+//   )(5).pipe(fork(RLog('1: Err runFunctionsInParallel'))(RLog('1: OK runFunctionsInParallel')))
 
 // example of race to update variable
 // RE.pipeWithChain(
@@ -645,7 +645,7 @@ RE.runFunctionsInParallel = runFunctionsInParallel
 //         (data) => map(() => data.varToRaceChanges = data.varToRaceChanges * 3)(after(10)())
 //       ]
 //     ),
-// )(resolve({ varToRaceChanges: 5 })).pipe(fork(Rlog('2: Err runFunctionsInParallel'))(Rlog('2: OK runFunctionsInParallel')))
+// )(resolve({ varToRaceChanges: 5 })).pipe(fork(RLog('2: Err runFunctionsInParallel'))(RLog('2: OK runFunctionsInParallel')))
 
 
 /**
@@ -728,8 +728,8 @@ function planBivariate(piper, callValues) {
 //     { sum:(a,b)=> a+b },
 //     { by2: a=>after(100)(a*2) },
 //     { minus3: a=>a-3 }
-//   ).fork(Rlog('plan Err'), Rlog('plan OK'), {by2:8}) // plan OK 5
-//   //.fork(Rlog('plan Err'), Rlog('plan OK')) // plan OK 7
+//   ).fork(RLog('plan Err'), RLog('plan OK'), {by2:8}) // plan OK 5
+//   //.fork(RLog('plan Err'), RLog('plan OK')) // plan OK 7
 
 
 function pickPathsUnc(pickTransformations, obj) {
@@ -804,14 +804,14 @@ RE.mergeArrayOfObjectsRenamingProps = mergeArrayOfObjectsRenamingProps
 // )//?
 
 
-function Rlog(prefix) {
+function RLog(prefix) {
   return (...obj) => {
     console.log(prefix, ...obj)
     return R.last(obj)
   }
 }
 
-RE.Rlog = Rlog
+RE.RLog = RLog
 RE.findSolution = findSolution
 RE.something = something
 RE.uncurry = uncurry
@@ -831,7 +831,7 @@ export {
   mapWithPrevious,
   pipeWithChain,
   runFunctionsInParallel,
-  Rlog,
+  RLog,
   findSolution,
   something,
   pickPaths,
