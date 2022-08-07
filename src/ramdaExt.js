@@ -1,9 +1,11 @@
 // ts-check
 import * as R from 'ramda';
-import { sorterByPaths, repeat } from './jsUtils.js'
-import { fork, reject, resolve, after, both, pap, chain, map, parallel, isFuture } from 'fluture';
-import { isBooleanObject } from 'util/types';
+import { sorterByPaths } from './jsUtils.js'
+import { fork, reject, resolve, parallel, isFuture } from 'fluture';
 
+// Only needed for testing
+import {  after, both, chain, map } from 'fluture';
+import { repeat, CustomError } from './jsUtils.js' 
 
 const RE = {}
 

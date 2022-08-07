@@ -28,6 +28,16 @@ class CustomError extends Error {
 
     this.data = data
   }
+
+  map(func) {
+    return this
+  }
+
+  chain(func) {
+    return this
+  }
+
+  static of=CustomError
 }
 // try {
 //   throw new CustomError('aa','bb',{a:1,b:2})
@@ -35,6 +45,18 @@ class CustomError extends Error {
 // {
 //   console.log(`name: ${e.name}, message: ${e.message}, data: ${JSON.stringify(e.data)}, stack: ${e.stack}`)
 // }
+//
+// mapping a function to CustomError should return the CustomError without exeecuting the function
+// import { pipeWithChain, R } from './ramdaExt.js'
+// let divide = (dividend, divisor) => 
+//   divisor !== 0 
+//     ? dividend/divisor
+//     : new CustomError('ZERO_DIVISION_EXC','Division by zero',{dividend,divisor}) 
+
+// R.map(a => {
+//   console.log(`It shouldn't print this`)
+//   return a +2
+// })(divide(8,0)) //?
 
 class Enum {
 
