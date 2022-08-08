@@ -724,6 +724,12 @@ RE.pipe = pipe
 //     )([['a','b'], ['c','d']])
 //   )
 
+
+// RE.pipe(
+//   R.identity,
+//   RLog('RLog print the whole array in one go. RLog is not iterated as it would in pipeWithChain ')
+// )([['a','b'], ['c','d']])
+
 const runFunctionsInParallel =
   (numberOfThreads = Infinity) =>
     functionsToRunInParallel =>

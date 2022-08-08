@@ -118,6 +118,7 @@ export const filterMap: any;
 export const mapWithNext: any;
 export const mapWithPrevious: any;
 export function pipeWithChain(...func: any[]): (...params: any[]) => any;
+export function pipe(...func: any[]): (...params: any[]) => any;
 export function runFunctionsInParallel(numberOfThreads?: number): (functionsToRunInParallel: any) => (data: any) => import("fluture").FutureInstance<any, any[]>;
 export function RLog(prefix: any): (...obj: any[]) => any;
 export function findSolution(solutionToFind: any, solutions: any): any;
