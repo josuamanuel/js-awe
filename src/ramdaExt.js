@@ -619,6 +619,111 @@ RE.pipeWithChain = pipeWithChain
 //   x => x +2,
 // )(5, new Error('return error')).message //?
 
+// // Note!: Arrays passing through each function of the pipeWithChain will be flatmap
+// RLog
+//   ('pipe doesnt apply flatmap to arrays: ')
+//   (
+//     RE.pipe(
+//       R.identity
+//     )([['a','b'], ['c','d']])
+//   )
+
+// Same as pipe with chain but arrays are not chainable:
+const pipe = function (...func) {
+  return function (...params) {
+    return func.reduce(
+      // iterate over functions to call in a specific way with the acum value. 
+      (acum, currentPipeFunc, index) => {
+
+        let chainFun
+        let pipeFunc = currentPipeFunc
+
+        // First function accepts multiVariant function... but there must meet certain condition.
+        if (index === 0 && acum.length > 1) {
+          const numberOfFutures = acum.filter(param => param?.constructor?.name === 'Future').length
+          if (numberOfFutures > 1)
+            acum[acum.length - 1] = reject(new Error('Only one Future allowed...'))
+          else
+            if (numberOfFutures === 1 && R.last(acum)?.constructor?.name !== 'Future')
+              acum[acum.length - 1] = reject(new Error('Future param must be the last param of the function'))
+            else
+              //Apply all the parameters to convert it to a unary function.
+              pipeFunc = currentPipeFunc.bind(undefined, ...acum.slice(0, acum.length - 1))
+        }
+
+        // Then extract last parameter
+        if (index === 0) {
+          acum = acum[acum.length - 1]
+        }
+
+        if (acum instanceof Error) {
+          return acum
+        }
+
+        // Try to find a chain kind of method for the accumlated drag value
+        if (typeof acum?.chain === 'function')
+          chainFun = acum.chain
+        else if (typeof acum?.['fantasy-land/chain'] === 'function')
+          chainFun = acum['fantasy-land/chain'].bind(acum)
+        //else if (typeof acum?.flatMap === 'function')
+        //  chainFun = acum.flatMap.bind(acum)
+
+        // if acum is a chain type the pipeFunc will be executed inside the chain.
+        if (chainFun) {
+          return chainFun(
+            (elem) => {
+              if (isAcumAFutureAndElemAnError(acum, elem)) {
+                return createReject(acum, elem)
+              }
+
+              let result
+
+              // For flutures we try catch so there will be transformed in a reject,
+              if (acum?.constructor?.name === 'Future') {
+                try {
+                  result = pipeFunc(elem)
+                } catch (e) {
+                  result = e
+                }
+              } else result = pipeFunc(elem)
+
+              if (isAcumAFutureAndElemAnError(acum, result)) {
+                return createReject(acum, result)
+              }
+
+              // inside chainFun the return needs to be of the same type as the original acum drag value.
+              // else we wrap the result using the constructor.
+              if (result?.constructor?.name === acum?.constructor?.name)
+                return result
+              else {
+                if (typeof acum?.constructor?.of === 'function') return acum.constructor.of(result)
+                if (typeof acum?.constructor?.['fantasy-land/of'] === 'function') return acum.constructor['fantasy-land/of'](result)
+
+                return result
+              }
+            }
+          )
+        }
+
+        // If acum drag value is not chainable we execute pipeFunc in a normal way.
+        return pipeFunc(acum)
+      }
+      , params
+    )
+
+  }
+}
+
+RE.pipe = pipe
+
+// RLog
+//   ('pipe doesnt apply flatmap to arrays: ')
+//   (
+//     RE.pipe(
+//       R.identity
+//     )([['a','b'], ['c','d']])
+//   )
+
 const runFunctionsInParallel =
   (numberOfThreads = Infinity) =>
     functionsToRunInParallel =>
@@ -860,6 +965,7 @@ export {
   mapWithNext,
   mapWithPrevious,
   pipeWithChain,
+  pipe,
   runFunctionsInParallel,
   RLog,
   findSolution,
