@@ -730,28 +730,55 @@ RE.pipe = pipe
 //   RLog('RLog print the whole array in one go. RLog is not iterated as it would in pipeWithChain ')
 // )([['a','b'], ['c','d']])
 
-const runFunctionsInParallel =
-  (numberOfThreads = Infinity) =>
-    functionsToRunInParallel =>
-      data => {
 
-        return parallel
-          (numberOfThreads)
-          (
-            R.map
-              (
-                funToRunInParallel => {
-                  let toReturn = funToRunInParallel(data)
+const pipeWhile = (funCond, ini) => (...funcs) => (...inputs) => {
+  if(
+    typeof funCond !== 'function' || 
+    funcs.some(func => typeof func !== 'function') ||
+    ( ini !== undefined && typeof ini !== 'function')
+  ) 
+  {
+    const dataErrorString = 
+      `funCond: ${typeof funCond} ${ini===undefined?'':'ini: '+ typeof ini} funcs: ${funcs.map(el=>typeof el)}`
+    throw new Error(`pipeWhile was called without funcfion/s in funCond or pipe functions ${dataErrorString}`)
+  }
 
-                  return isFuture(toReturn)
-                    ? toReturn
-                    : resolve(toReturn)
-                }
-              )
-              (functionsToRunInParallel)
-          )
-      }
+  if(typeof ini === 'function') ini(...inputs)
 
+  let finalReturn = inputs 
+  while(funCond(...finalReturn)) {
+    finalReturn = funcs.reduce(
+      (acum, func)  => [func(...acum)],
+      finalReturn
+    )
+  }
+
+  return R.last(finalReturn)
+} 
+RE.pipeWhile = pipeWhile
+
+// pipeWhile(x => x < 20)
+// (
+//  x => x + 2
+// )(2) //?
+
+const REparallel = 
+  (numberOfthreads=Infinity) => 
+    (futuresOrValues) => 
+      parallel
+        (numberOfthreads)
+        (futuresOrValues.map(elem => isFuture(elem)? elem: resolve(elem)) )
+RE.parallel = REparallel
+
+
+const runFunctionsInParallel = 
+  (numberOfThreads=Infinity) => 
+    (functionsToRunInParallel) => 
+      data =>
+        RE.parallel(numberOfThreads)
+        (
+          functionsToRunInParallel.map(fun => fun(data))
+        )
 RE.runFunctionsInParallel = runFunctionsInParallel
 
 // runFunctionsInParallel
@@ -788,89 +815,22 @@ RE.runFunctionsInParallel = runFunctionsInParallel
 //     ]
 //   )(5).pipe(fork(RLog('1: Err runFunctionsInParallel'))(RLog('1: OK runFunctionsInParallel')))
 
+const runFunctionsSyncOrParallel = 
+(numberOfThreads=Infinity) => 
+  (functionsToRun) => 
+    data => 
+    {
+      let futureOrValues = functionsToRun.map(fun => fun(data))
 
-/**
- * Create a plan of execution.
- * @param {(function | undefined)} piper function used to pipe. If undefined it uses pipeWithChain
- */
-function plan(piper = pipeWithChain) {
-  return function (...callValues) {
-    return planBivariate(piper, callValues)
-  }
-}
-
-function planBivariate(piper, callValues) {
-  const listOfFuncToExecute = []
-
-  const toReturn = {
-    pipe,
-    fork: go
-  }
-
-  return toReturn
-
-  /**
-   * pipe functions and it returns a future that can be executed with fork
-   * @param { ...(function | Object.<string, any>)} funcs functions to be chained 
-   */
-  function pipe(...funcs) {
-    funcs.forEach(
-      funcDef => {
-        if (typeof funcDef === 'function' && funcDef.name !== undefined) {
-          listOfFuncToExecute.push({ [funcDef.name]: funcDef })
-          return
-        }
-
-        if (typeof funcDef === 'function') {
-          listOfFuncToExecute.push({ [listOfFuncToExecute.length]: funcDef })
-          return
-        }
-
-        listOfFuncToExecute.push(funcDef)
-
+      if(futureOrValues.some(isFuture)) {
+        return parallel
+          (numberOfThreads)
+          ( futureOrValues.map(elem => isFuture(elem)? elem: resolve(elem)) )
       }
-    )
 
-    return toReturn
-  }
-
-  /**
-  * @typedef { import("fluture").RejectFunction } RejectFunction
-  * @typedef { import("fluture").ResolveFunction } ResolveFunction
-  */
-
-  /**
-   * fork execution of chained functions, substituting when corresponds with mock values.
-   * @param { RejectFunction } ko KO function 
-   * @param { ResolveFunction} ok OK function 
-   * @param {(Object.<string, any> | undefined)} mocks Replace function with value... 
-   */
-  function go(ko, ok, mocks) {
-
-    listOfFuncToExecute
-    const planList = listOfFuncToExecute.map(
-      (funcDef, index) => {
-        const funcKey = Object.keys(funcDef)[0]
-        if (mocks?.[funcKey] !== undefined) return () => mocks[funcKey]
-
-        return funcDef[funcKey]
-      }
-    )
-
-    return fork
-      (ko)
-      (ok)
-      (piper(...planList)(...callValues))
-  }
-
-}
-// plan()(3, after(100)(2))
-//   .pipe(
-//     { sum:(a,b)=> a+b },
-//     { by2: a=>after(100)(a*2) },
-//     { minus3: a=>a-3 }
-//   ).fork(RLog('plan Err'), RLog('plan OK'), {by2:8}) // plan OK 5
-//   //.fork(RLog('plan Err'), RLog('plan OK')) // plan OK 7
+      return futureOrValues
+    }
+RE.runFunctionsSyncOrParallel = runFunctionsSyncOrParallel
 
 
 function pickPathsUnc(pickTransformations, obj) {
@@ -972,7 +932,10 @@ export {
   mapWithPrevious,
   pipeWithChain,
   pipe,
+  pipeWhile,
+  parallel,
   runFunctionsInParallel,
+  runFunctionsSyncOrParallel,
   RLog,
   findSolution,
   something,

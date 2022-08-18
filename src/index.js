@@ -6,5 +6,6 @@ export * from './flutureExt.js'
 export * from './jsUtils.js';
 export * from './logLevelExtension.js';
 export * from './ramdaExt.js';
+export * from './plan.js'
 export * from './sanitizer.js';
 export * from './streamUtils.js';
