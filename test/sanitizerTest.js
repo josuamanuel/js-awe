@@ -1,5 +1,5 @@
 import { strict as assert } from 'assert'
-import { sanitize } from '../src/sanitizer.js'
+import { sanitize, lengthSanitizer } from '../src/sanitizer.js'
 
 describe('Sanitize an Object', () => {
 
@@ -147,6 +147,40 @@ describe('Sanitize an Object', () => {
     }
 
     const result = sanitize(input, ['ibmApis', 'pushNotification'])
+    assert.deepStrictEqual(result, expected)
+  })
+
+  it('Sanitize calling with my own sanitizer definition and a pre-created sanitizer group', () => {
+    const input = {
+      body:
+      {
+        name: 'Jose Marin',
+        address: '25 Melrose place',
+        addressId: 2,
+        customer: 'F54615234',
+        date: '2022-08-19'
+      }
+    }
+
+    const mySanitizer = [
+      {field: 'address', replacer: lengthSanitizer},
+      {field: 'name', replacer: lengthSanitizer}
+    ]
+
+    const inputListOfSanitizers = [mySanitizer, 'pushNotification']
+
+    const expected = {
+      body:
+      {
+        name: '*length=10*',
+        address: '*length=16*',
+        addressId: 2,
+        customer: 'F*length=8*',
+        date: '2022-08-19'
+      }
+    }
+
+    const result = sanitize(input, inputListOfSanitizers)
     assert.deepStrictEqual(result, expected)
   })
 
