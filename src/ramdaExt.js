@@ -1,11 +1,11 @@
 // ts-check
 import * as R from 'ramda';
 import { sorterByPaths } from './jsUtils.js'
-import { fork, reject, resolve, parallel, isFuture } from 'fluture';
+import { reject, resolve, parallel as RParallel, isFuture } from 'fluture';
 
 // Only needed for testing
-import {  after, both, chain, map } from 'fluture';
-import { repeat, CustomError } from './jsUtils.js' 
+// import {  after, both, chain, map, fork } from 'fluture';
+// import { repeat, CustomError } from './jsUtils.js' 
 
 const RE = {}
 
@@ -762,13 +762,13 @@ RE.pipeWhile = pipeWhile
 //  x => x + 2
 // )(2) //?
 
-const REparallel = 
+const parallel = 
   (numberOfthreads=Infinity) => 
     (futuresOrValues) => 
-      parallel
+      RParallel
         (numberOfthreads)
         (futuresOrValues.map(elem => isFuture(elem)? elem: resolve(elem)) )
-RE.parallel = REparallel
+RE.parallel = parallel
 
 
 const runFunctionsInParallel = 
@@ -823,9 +823,9 @@ const runFunctionsSyncOrParallel =
       let futureOrValues = functionsToRun.map(fun => fun(data))
 
       if(futureOrValues.some(isFuture)) {
-        return parallel
+        return RE.parallel
           (numberOfThreads)
-          ( futureOrValues.map(elem => isFuture(elem)? elem: resolve(elem)) )
+          ( futureOrValues )
       }
 
       return futureOrValues

@@ -1,30 +1,9 @@
 import { strict as assert } from 'assert'
-import { EnumMap, Enum, formatDate, CustomError, findDeepKey, traverse } from '../src/jsUtils.js'
-import pkg from 'lodash';
-const { cloneDeep, isObjectLike } = pkg;
 
-// describe('jsUtils', () => {
-
-//   it('CustomError name property', () => {
-//     const result = new CustomError('MY_ERROR', 'this is my error')
-
-//     assert.strictEqual(result.name, 'MY_ERROR')
-
-
-//   })
-// })
-
-// TEST: Unblock until end to test
 
 import { plan } from '../src/plan.js'
-import {  R, RLog, innerRightJoinWith } from '../src/ramdaExt.js'
-import {  fork, resolve } from 'fluture'
-
-const logFork = message => fork(
-  error =>RLog(message + ' - Error: ')(JSON.stringify(error))
-)(
-  response =>RLog(message + ' - OK: ')(response)
-)
+import {  R, innerRightJoinWith } from '../src/ramdaExt.js'
+import {  fork, promise, resolve } from 'fluture'
 
 const bankDB = {
   holdings: {
@@ -133,46 +112,60 @@ function composeNameAndHolders2([holdings, name])
 }
 
 
-const plan4 = 
+const complexPlan = 
 [                                               // [ 0 ]
-  getCustomerData,                               // [ 0, 0 ]
-  //RLog('-2--> '),                              
+  getCustomerData,                              // [ 0, 0 ]                           
   [                                             // [ 0, 1 ]
     R.prop('holdings'),                         // [ 0, 1, 0 ]   
     filterActiveAccounts,                       // [ 0, 1, 1 ]
-    RLog('-1--> '),                             // [ 0, 1, 2 ]
-    buildPlaceholderStructure,                  // [ 0, 1, 3 ]
-    RLog('0--> '),                               // [ 0, 1, 4 ]
-    [                                           // [ 0, 1, 5 ]
-      [                                        // [ 0, 1, 5, 0 ]
-        getBankingBalances,                     // [ 0, 1, 5, 0, 0 ]
+
+    buildPlaceholderStructure,                  // [ 0, 1, 2 ]
+    [                                           // [ 0, 1, 3 ]
+      [                                         // [ 0, 1, 3, 0 ]
+        getBankingBalances,                     // [ 0, 1, 3, 0, 0 ]
       ],       
-      [                                         // [ 0, 1, 5, 1 ]
-        getCreditCardBalances,                 // [ 0, 1, 5, 1, 0 ]
+      [                                         // [ 0, 1, 3, 1 ]
+        getCreditCardBalances,                  // [ 0, 1, 3, 1, 0 ]
       ],    // [ 0, 1, 3, 1, 0 ]
-      RLog('3--> '),                            // [ 0, 1, 5, 2 ]                         // [ 0, 1, 3, 3 ]
-      mergeCardsAndAccountsInArray              // [ 0, 1, 5, 3 ]
+      mergeCardsAndAccountsInArray              // [ 0, 1, 3, 2 ]
     ],                                          
-    [                                          // [ 0, 1, 6 ]
-      RLog('3.5-> '),                          // [ 0, 1, 6, 0 ]
-      R.prop('resultPlaceholder')               // [ 0, 1, 6, 1 ]
+    [                                          // [ 0, 1, 4 ]
+      R.prop('resultPlaceholder')              // [ 0, 1, 4, 0 ]
     ],
-    RLog('4--> '),                             // [ 0, 1, 7 ]
-    rightJoinFetchVsResultPlaceholder2,       // [ 0, 1, 6, 8 ]
-    RLog('5--> ')
+    rightJoinFetchVsResultPlaceholder2,        // [ 0, 1, 5 ]
   ],
   [
     R.prop('name')
   ],
-  RLog('6--> '),
   composeNameAndHolders2,
 ]
 
-console.time('plan4-1')
-const plan4Fun = plan(
-  plan4
-)
-plan4Fun
-  ('f1') //?
- .pipe(logFork('Final result plan4: '))
-console.timeEnd('plan4-1')
+
+
+
+describe('plan', () => {
+
+  it('plan expected output', () => {
+    const returnTestFramework = plan(complexPlan)('f1')
+    returnTestFramework.pipe(
+        fork
+          (error => assert.fail('Future was not expected to be rejected'))
+          (data =>  
+            assert.deepStrictEqual(
+              data,
+              {
+                name: 'Jose Marin',
+                holdings: [
+                  { account: '2', current: 12, available: 35, uuid: 'u2' },
+                  { account: '3', current: 8, available: 1975, uuid: 'u3' }
+                ]
+              } 
+            )
+          )
+      )
+
+    return promise(returnTestFramework)
+    
+  })
+
+})
