@@ -11,4 +11,3 @@ This will output types in genTypes... then we will need to copy the new definiti
 ## publishing lib to npm
 
 npm publish
-
