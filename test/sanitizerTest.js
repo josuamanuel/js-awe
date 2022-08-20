@@ -1,20 +1,71 @@
 import { strict as assert } from 'assert'
 import { sanitize, lengthSanitizer } from '../src/sanitizer.js'
 
+describe('lenghtSanitizer', () => {
+  it('Long string sanitizer with more padding on the left. size string > 8', () => {
+    assert.deepStrictEqual(
+      lengthSanitizer(undefined,
+        'more padding on left'),
+      '******length=20*****'
+    )
+  })
+
+  it('Long string sanitizer with equal padding on both sides. size string > 8', () => {
+    assert.deepStrictEqual(
+      lengthSanitizer(undefined,
+        'same size padding'),
+      '****length=17****'
+    )
+  })
+
+  it('long sanitizer without padding. size string 8', () => {
+    assert.deepStrictEqual(
+      lengthSanitizer(undefined,
+        'this car'),
+      'length=8'
+    )
+  })
+
+  it('short string sanitizer. size string 7', () => {
+    assert.deepStrictEqual(
+      lengthSanitizer(undefined,
+        'address'),
+      '*******'
+    )
+  })
+
+  it('zero size string', () => {
+    assert.deepStrictEqual(
+      lengthSanitizer(undefined,
+        ''),
+      ''
+    )
+  })
+
+  it('input is not a string', () => {
+    assert.deepStrictEqual(
+      lengthSanitizer(undefined,
+        ['member1', 'member2']),
+      ['member1', 'member2']
+    )
+  })
+
+})
+
 describe('Sanitize an Object', () => {
 
   it('Happy path Value sanitizer starting with Bearer. Applying the rules for the default sanitization group', () => {
     const input = {
       body:
       {
-        truken: 'bearer 123456'
+        truken: 'bearer 123456789012'
       }
     }
 
     const expected = {
       body:
       {
-        truken: 'bearer *length=6*'
+        truken: 'bearer **length=12*'
       }
     }
 
@@ -33,7 +84,7 @@ describe('Sanitize an Object', () => {
     const expected = {
       body:
       {
-        truken: 'bearer *length=6*'
+        truken: 'bearer ******'
       }
     }
 
@@ -52,7 +103,7 @@ describe('Sanitize an Object', () => {
     const expected = {
       body:
       {
-        authorization: 'bearer *length=6*'
+        authorization: 'bearer ******'
       }
     }
 
@@ -71,7 +122,7 @@ describe('Sanitize an Object', () => {
     const expected = {
       body:
       {
-        authorization: '*length=6*'
+        authorization: '******'
       }
     }
 
@@ -83,14 +134,14 @@ describe('Sanitize an Object', () => {
     const input = {
       body:
       {
-        authorization: '1234567'
+        authorization: '123456789'
       }
     }
 
     const expected = {
       body:
       {
-        authorization: '*length=7*'
+        authorization: '*length=9'
       }
     }
 
@@ -109,7 +160,7 @@ describe('Sanitize an Object', () => {
     const expected = {
       body:
       {
-        body: '*length=6*'
+        body: '******'
       }
     }
 
@@ -136,13 +187,13 @@ describe('Sanitize an Object', () => {
       body:
       {
         other: {
-          token: '*length=19*',
+          token: '*****length=19*****',
           other: {
             fin: 'Bearer *length=11*',
             d: { e: 8 }
           }
         },
-        body: '*length=6*'
+        body: '******'
       }
     }
 
@@ -163,8 +214,8 @@ describe('Sanitize an Object', () => {
     }
 
     const mySanitizer = [
-      {field: 'address', replacer: lengthSanitizer},
-      {field: 'name', replacer: lengthSanitizer}
+      { field: 'address', replacer: lengthSanitizer },
+      { field: 'name', replacer: lengthSanitizer }
     ]
 
     const inputListOfSanitizers = [mySanitizer, 'pushNotification']
@@ -172,10 +223,10 @@ describe('Sanitize an Object', () => {
     const expected = {
       body:
       {
-        name: '*length=10*',
-        address: '*length=16*',
+        name: '*length=10',
+        address: '****length=16***',
         addressId: 2,
-        customer: 'F*length=8*',
+        customer: 'Flength=8',
         date: '2022-08-19'
       }
     }

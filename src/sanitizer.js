@@ -4,7 +4,26 @@ import { anonymize } from './anonymize.js'
 import { CustomError } from './jsUtils.js'
 import { log } from './logLevelExtension.js'
 
-const lengthSanitizer = (_, value) => '*length=' + value.length + '*'
+const lengthSanitizer = (_, value) => {
+  if(typeof value !== 'string' || value.length < 1) return value
+
+  const lengthString = 'length=' + value.length
+
+  if(value.length >= lengthString.length) {
+    
+    const numberOfRightAsteriscs = Math.floor((value.length - lengthString.length) / 2)
+    
+    return lengthString
+      .padEnd(
+        lengthString.length + numberOfRightAsteriscs, '*'
+      )
+      .padStart(value.length, '*')
+  }
+
+  return ''.padEnd(value.length,'*')
+
+}
+
 const bearerSanitizer = (_, bearerToken) => bearerToken.substring(0, 7) + lengthSanitizer(undefined, bearerToken.substring(7))
 
 
