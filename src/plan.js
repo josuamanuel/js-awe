@@ -101,7 +101,7 @@ function acumSiblings(stack)
   )
 }
 
-const stackParallelReducer = function(){
+const stackParallelReducer = function(numberOfThreads){
   let accruingParallel = false
   let funsToParallelize = []
 
@@ -125,7 +125,7 @@ const stackParallelReducer = function(){
       funsToParallelize.push(el.value)
       acum.push(
         {
-          value: runFunctionsSyncOrParallel()(funsToParallelize),
+          value: runFunctionsSyncOrParallel(numberOfThreads)(funsToParallelize),
           path: el.path.slice(0,-1)
         }
       )
@@ -144,12 +144,12 @@ const stackParallelReducer = function(){
 
     return acum
   }
-}()
+}
 
-const acumParallel = (stack) =>
+const acumParallel = numberOfThreads => stack =>
 {
   return stack.reduce( 
-    stackParallelReducer,
+    stackParallelReducer(numberOfThreads),
     []
   )
 }
@@ -206,18 +206,47 @@ const lengthStackPrevLessThanCurr = function ()
       prevStack = undefined
     }
   ]
-}()
+}
 
-function plan(plan)
+function changeFunWithMockupsObj(mockupsObj)
+{
+  return stack => {
+    if (!mockupsObj) return stack
+
+    return stack.map(
+      ({path, value}) => {
+        if(mockupsObj?.[value.name] !== undefined)
+        {
+          if(typeof mockupsObj[value.name] === 'function') {
+            return {
+              value:mockupsObj[value.name],
+              path
+            }
+          }
+
+          return {
+            value: () =>  mockupsObj[value.name],
+            path
+          }      
+        }
+
+        return {value:value, path}
+      }
+    )
+  }
+}
+
+function plan(plan, {numberOfThreads, mockupsObj} = {numberOfThreads: Infinity, mockupsObj: {}})
 {
 
   return pipe(
     generateStack,
+    changeFunWithMockupsObj(mockupsObj),
     pipeWhile(stack => stack.length > 1)(
-      pipeWhile(...lengthStackPrevLessThanCurr)
+      pipeWhile(...lengthStackPrevLessThanCurr())
       (
         acumSiblings,
-        acumParallel,
+        acumParallel(numberOfThreads),
       ),
       reduceNesting,
     ),
