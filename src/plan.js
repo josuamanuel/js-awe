@@ -108,12 +108,16 @@ const stackParallelReducer = function(numberOfThreads){
   return (acum, el, index, stack) => {
     const elParent = el.path.slice(0,-1)
     const nextElParent = stack[index+1]?.path?.slice(0,-1)
+    const previousEl = stack[index-1]?.path
 
     let isElToAccrue = 
       _.isEqual(elParent?.slice(0,-1), nextElParent?.slice(0, -1)) && 
       R.last(elParent) + 1 === R.last(nextElParent) &&
-      // el is the only child of parent
-      _.isEqual(getDescendants(stack)(elParent), [el])
+      // the previous needs to be of less or equal length than current one... or previous not to exist
+      ( previousEl === undefined  || previousEl.length <= el.path.length )
+      
+      // el is the only child of parent. Below condition not needed.
+      //&& _.isEqual(getDescendants(stack)(elParent), [el]) &&
 
     if(isElToAccrue)
     {
