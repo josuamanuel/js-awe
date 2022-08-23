@@ -77,6 +77,15 @@ function getDescendants(stack)
         )
     )
 }
+
+function areRelativeFrom(ascentorInCommon)
+{
+  if(ascentorInCommon === undefined || ascentorInCommon.length === 0) return false
+
+  return familyMember1 => familyMember2 => 
+    _.isEqual(ascentorInCommon, familyMember1?.slice(0, ascentorInCommon.length)) &&
+    _.isEqual(ascentorInCommon, familyMember2?.slice(0, ascentorInCommon.length))
+}
       
 const stackSiblingsReducer = 
   (acum, el, index) => {
@@ -103,33 +112,47 @@ function acumSiblings(stack)
 
 const stackParallelReducer = function(numberOfThreads){
   let accruingParallel = false
-  let funsToParallelize = []
+  let stackItemsToParallelize = []
 
   return (acum, el, index, stack) => {
     const elParent = el.path.slice(0,-1)
-    const nextElParent = stack[index+1]?.path?.slice(0,-1)
-    const previousEl = stack[index-1]?.path
+    const elGrandparent = elParent?.slice(0,-1)
+    const nextToElParent = stack[index+1]?.path?.slice(0,-1)
+    const nextToElGrandparent = nextToElParent?.slice(0,-1)
+    const previousToEl = stack[index-1]?.path
+    const previousToElGrandparent = previousToEl?.slice(0,-2)
 
     let isElToAccrue = 
-      _.isEqual(elParent?.slice(0,-1), nextElParent?.slice(0, -1)) && 
-      R.last(elParent) + 1 === R.last(nextElParent) &&
-      // the previous needs to be of less or equal length than current one... or previous not to exist
-      ( previousEl === undefined  || previousEl.length <= el.path.length )
-      
-      // el is the only child of parent. Below condition not needed.
-      //&& _.isEqual(getDescendants(stack)(elParent), [el]) &&
+      el.path.length >= 3 &&
+      _.isEqual(elGrandparent, nextToElGrandparent) && 
+      // el is the only child of parent
+      _.isEqual(getDescendants(stack)(elParent), [el]) &&
+      // If previous was not accrued we dont want this to be desdendent of the current grandParent unless previous
+      // is a brother of the parent (function header of subsequent parellel functions).
+      (
+       accruingParallel || 
+       areRelativeFrom(elGrandparent)(el.path)(previousToEl) === false || 
+       (areRelativeFrom(elGrandparent)(el.path)(previousToEl) === true  && previousToEl.length < el.path.length )
+      )
 
     if(isElToAccrue)
     {
       accruingParallel = true
-      funsToParallelize.push(el.value)
+      stackItemsToParallelize.push(el)
     }
     
     if(isElToAccrue === false && accruingParallel === true) {
-      funsToParallelize.push(el.value)
+      // // 
+      //   isNext and el relative in relation of elGrandparent and next.length > current.path.lenth
+      //     then I need to cancel and return all stacksItemsToParallelize to the stack
+      //     put  stacksItemsToParallelize = []
+      //     put accruingParallel = false
+      // // end-logic
+
+      stackItemsToParallelize.push(el)
       acum.push(
         {
-          value: runFunctionsSyncOrParallel(numberOfThreads)(funsToParallelize),
+          value: runFunctionsSyncOrParallel(numberOfThreads)(R.pluck('value',stackItemsToParallelize)),
           path: el.path.slice(0,-1)
         }
       )
@@ -143,7 +166,7 @@ const stackParallelReducer = function(numberOfThreads){
     if(isElToAccrue === false)
     {
       accruingParallel = false
-      funsToParallelize = []
+      stackItemsToParallelize = []
     }
 
     return acum

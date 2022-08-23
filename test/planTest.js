@@ -219,4 +219,121 @@ describe('plan', () => {
     
   })
 
+  it('Plan without promise and complex nesting', () => {
+    const result= plan(
+      [
+        [
+          [
+            x => x + 1
+          ],
+          x => x + 1
+        ],
+        [
+          x => x + 1 
+        ],
+        [
+          x => x + 1
+        ]
+      ]
+    )(1)
+
+    assert.deepStrictEqual(
+      result,
+      [3,2,2]
+    )
+  })
+
+  it('Plan without promise and complex nesting', () => {
+    const result= plan(
+      [
+        [
+          [ 
+            [
+              [
+                x => x + 1
+              ]
+            ] 
+          ],
+          [
+            x => x + 1
+          ]
+        ],
+        ([x1,x2]) => x1 + x2,
+        [
+          x => x + 1 
+        ],
+        [
+          x => x + 1
+        ]
+      ]
+    )(1)
+
+    assert.deepStrictEqual(
+      result,
+      [5,5]
+    )
+  })
+
+  it('Plan without promise and complex nesting', () => {
+    const result= plan(
+      [
+        [
+          [ 
+            [
+              [
+                x => x + 1
+              ]
+            ] 
+          ],
+          [
+            x => x + 1
+          ]
+        ],
+        [
+          x => x + 1 
+        ],
+        [
+          x => x + 1
+        ],
+        [
+          x => x + 1
+        ]
+      ]
+    )(1)
+
+    assert.deepStrictEqual(
+      result,
+      [[2,2],2,2,2]
+    )
+  })
+
+
+  it('Plan without promise and complex nesting', () => {
+    const result= plan(
+      [
+        [
+          x => x + 1 
+        ],
+        [
+          x => x + 1 
+        ],
+        [
+          x => x + 1 
+        ],
+        [
+          [x => x + 1]
+        ],
+        [
+          x => x + 1
+        ]
+      ]
+    )(1)
+
+    assert.deepStrictEqual(
+      result,
+      [2,2,2,2,2]
+    )
+  })
+
+
 })
