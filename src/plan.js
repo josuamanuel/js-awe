@@ -138,21 +138,26 @@ const stackParallelReducer = function(numberOfThreads){
        ( isAncestorOf(previousToEl)(elGrandparent) === true  && previousToEl.length < el.path.length )
       )
 
-    if(isElToAccrue)
+    if(isElToAccrue === true)
     {
       accruingParallel = true
       stackItemsToParallelize.push(el)
     }
     
     if(isElToAccrue === false && accruingParallel === true) {
-      // // 
-      //   isNext descendant of elGrandParent and  next.length > current.path.lenth
-      //   isNext and el relative in relation of elGrandparent and next.length > current.path.lenth
-      //     then I need to cancel and return all stacksItemsToParallelize to the stack
-      //     put  stacksItemsToParallelize = []
-      //     put accruingParallel = false
-      // // end-logic
+      // In cases we stopped because next element even though have the grandParent as ancestor but is more 
+      // nested than our current parallelization, then we need to cancel accruing and restore all elements to acum.
+      if( isAncestorOf(nextToEl)(elGrandparent) && nextToEl?.length > el.path.length )
+      {
+        acum.push(...stackItemsToParallelize)
+        acum.push(el)
+        accruingParallel = false
+        stackItemsToParallelize = []
 
+        return acum
+      }
+
+      // Rest of cases we need to follow with parallelization including current element.
       stackItemsToParallelize.push(el)
       acum.push(
         {
