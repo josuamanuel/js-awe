@@ -78,15 +78,17 @@ function getDescendants(stack)
     )
 }
 
-function areRelativeFrom(ascentorInCommon)
+function areRelativeFrom(ancestorInCommon)
 {
-  if(ascentorInCommon === undefined || ascentorInCommon.length === 0) return false
+  if(ancestorInCommon === undefined || ancestorInCommon.length === 0) return false
 
   return familyMember1 => familyMember2 => 
-    _.isEqual(ascentorInCommon, familyMember1?.slice(0, ascentorInCommon.length)) &&
-    _.isEqual(ascentorInCommon, familyMember2?.slice(0, ascentorInCommon.length))
+    _.isEqual(ancestorInCommon, familyMember1?.slice(0, ancestorInCommon.length)) &&
+    _.isEqual(ancestorInCommon, familyMember2?.slice(0, ancestorInCommon.length))
 }
-      
+
+areRelativeFrom([0,0])([0,0,0,0])([0,0]) //?
+
 const stackSiblingsReducer = 
   (acum, el, index) => {
     if(
@@ -117,7 +119,8 @@ const stackParallelReducer = function(numberOfThreads){
   return (acum, el, index, stack) => {
     const elParent = el.path.slice(0,-1)
     const elGrandparent = elParent?.slice(0,-1)
-    const nextToElParent = stack[index+1]?.path?.slice(0,-1)
+    const nextToEl = stack[index+1]?.path
+    const nextToElParent = nextToEl?.slice(0,-1)
     const nextToElGrandparent = nextToElParent?.slice(0,-1)
     const previousToEl = stack[index-1]?.path
     const previousToElGrandparent = previousToEl?.slice(0,-2)
