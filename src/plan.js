@@ -134,8 +134,8 @@ const stackParallelReducer = function(numberOfThreads){
       // is a brother of the parent (function header of subsequent parellel functions).
       (
        accruingParallel || 
-       areRelativeFrom(elGrandparent)(el.path)(previousToEl) === false || 
-       (areRelativeFrom(elGrandparent)(el.path)(previousToEl) === true  && previousToEl.length < el.path.length )
+       isAncestorOf(previousToEl)(elGrandparent) === false ||
+       ( isAncestorOf(previousToEl)(elGrandparent) === true  && previousToEl.length < el.path.length )
       )
 
     if(isElToAccrue)
@@ -146,6 +146,7 @@ const stackParallelReducer = function(numberOfThreads){
     
     if(isElToAccrue === false && accruingParallel === true) {
       // // 
+      //   isNext descendant of elGrandParent and  next.length > current.path.lenth
       //   isNext and el relative in relation of elGrandparent and next.length > current.path.lenth
       //     then I need to cancel and return all stacksItemsToParallelize to the stack
       //     put  stacksItemsToParallelize = []
