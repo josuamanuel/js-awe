@@ -1,57 +1,6 @@
 import { strict as assert } from 'assert'
 import { sanitize, lengthSanitizer } from '../src/sanitizer.js'
 
-describe('lenghtSanitizer', () => {
-  it('Long string sanitizer with more padding on the left. size string > 8', () => {
-    assert.deepStrictEqual(
-      lengthSanitizer(undefined,
-        'more padding on left'),
-      '******length=20*****'
-    )
-  })
-
-  it('Long string sanitizer with equal padding on both sides. size string > 8', () => {
-    assert.deepStrictEqual(
-      lengthSanitizer(undefined,
-        'same size padding'),
-      '****length=17****'
-    )
-  })
-
-  it('long sanitizer without padding. size string 8', () => {
-    assert.deepStrictEqual(
-      lengthSanitizer(undefined,
-        'this car'),
-      'length=8'
-    )
-  })
-
-  it('short string sanitizer. size string 7', () => {
-    assert.deepStrictEqual(
-      lengthSanitizer(undefined,
-        'address'),
-      '*******'
-    )
-  })
-
-  it('zero size string', () => {
-    assert.deepStrictEqual(
-      lengthSanitizer(undefined,
-        ''),
-      ''
-    )
-  })
-
-  it('input is not a string', () => {
-    assert.deepStrictEqual(
-      lengthSanitizer(undefined,
-        ['member1', 'member2']),
-      ['member1', 'member2']
-    )
-  })
-
-})
-
 describe('Sanitize an Object', () => {
 
   it('Happy path Value sanitizer starting with Bearer. Applying the rules for the default sanitization group', () => {
@@ -233,6 +182,57 @@ describe('Sanitize an Object', () => {
 
     const result = sanitize(input, inputListOfSanitizers)
     assert.deepStrictEqual(result, expected)
+  })
+
+})
+
+describe('lenghtSanitizer', () => {
+  it('Long string sanitizer with more padding on the left. size string > 8', () => {
+    assert.deepStrictEqual(
+      lengthSanitizer(undefined,
+        'more padding on left'),
+      '******length=20*****'
+    )
+  })
+
+  it('Long string sanitizer with equal padding on both sides. size string > 8', () => {
+    assert.deepStrictEqual(
+      lengthSanitizer(undefined,
+        'same size padding'),
+      '****length=17****'
+    )
+  })
+
+  it('long sanitizer without padding. size string 8', () => {
+    assert.deepStrictEqual(
+      lengthSanitizer(undefined,
+        'this car'),
+      'length=8'
+    )
+  })
+
+  it('short string sanitizer. size string 7', () => {
+    assert.deepStrictEqual(
+      lengthSanitizer(undefined,
+        'address'),
+      '*******'
+    )
+  })
+
+  it('zero size string', () => {
+    assert.deepStrictEqual(
+      lengthSanitizer(undefined,
+        ''),
+      ''
+    )
+  })
+
+  it('input is not a string', () => {
+    assert.deepStrictEqual(
+      lengthSanitizer(undefined,
+        ['member1', 'member2']),
+      ['member1', 'member2']
+    )
   })
 
 })
