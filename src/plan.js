@@ -145,9 +145,10 @@ const stackParallelReducer = function(numberOfThreads){
     }
     
     if(isElToAccrue === false && accruingParallel === true) {
-      // In cases we stopped because next element even though have the grandParent as ancestor but is more 
-      // nested than our current parallelization, then we need to cancel accruing and restore all elements to acum.
-      if( isAncestorOf(nextToEl)(elGrandparent) && nextToEl?.length > el.path.length )
+      // In cases we stopped because next element is more nested than our current parallelization
+      // even though it has the grandParent as ancestor, then we need to cancel accruing and 
+      // restore all elements to acum.
+      if( nextToEl?.length > el.path.length && isAncestorOf(nextToEl)(elGrandparent) )
       {
         acum.push(...stackItemsToParallelize)
         acum.push(el)
