@@ -3,7 +3,8 @@ import { strict as assert } from 'assert'
 
 import { plan } from '../src/plan.js'
 import { R, innerRightJoinWith } from '../src/ramdaExt.js'
-import { promise, resolve } from 'fluture'
+import { promise, reject, resolve } from 'fluture'
+import { CustomError } from '../src/jsUtils.js'
 
 const bankDB = {
   holdings: {
@@ -219,6 +220,74 @@ describe('plan', () => {
     
   })
 
+  it('if a piped function reject, the final result will be a reject with the error object', () => {
+    const returnTestFramework = 
+      plan(
+        complexPlan, 
+        {
+          numberOfThreads: Infinity,
+          mockupsObj: {
+            getBankingBalances: reject(
+              {
+                "code": "400",
+                "message": "bankingToFetch is empty"
+              }
+            )
+          }
+        }
+      )('f1')
+
+    return promise(returnTestFramework)
+      .then(
+          ()=>{},
+          (error =>  
+            assert.deepStrictEqual(
+              error,
+              {
+                "code": "400",
+                "message": "bankingToFetch is empty"
+              }
+            )
+          )
+      )
+    
+  })
+
+  it('if a piped function return an instance of Error or subclass of Error, the final result will be a resolve with the error object', () => {
+    const returnTestFramework = 
+      plan(
+        complexPlan, 
+        {
+          numberOfThreads: Infinity,
+          mockupsObj: {
+            getBankingBalances: new CustomError(
+              'GET_BANKING_BALANCE_EXCEPTION',
+              'Error getting Banking Balances',
+              {
+                "code": "400",
+                "message": "bankingToFetch is empty"
+              }
+            )
+          }
+        }
+      )('f1')
+
+    return promise(returnTestFramework)
+      .then(
+          (dataError =>  
+            assert.deepStrictEqual(
+              Object.entries(dataError.data),
+              {
+                "code": "400",
+                "message": "bankingToFetch is empty"
+              }
+            )
+          ),
+          ()=>{}
+      )
+    
+  })
+    
   it('Plan without promise and complex nesting', () => {
     const result= plan(
       [
