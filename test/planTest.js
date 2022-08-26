@@ -288,7 +288,7 @@ describe('plan', () => {
     
   })
     
-  it('Plan without promise and complex nesting', () => {
+  it('Plan without Future and complex nesting', () => {
     const result= plan(
       [
         [
@@ -312,7 +312,7 @@ describe('plan', () => {
     )
   })
 
-  it('Plan without promise and complex nesting', () => {
+  it('Plan without Future and complex nesting', () => {
     const result= plan(
       [
         [
@@ -343,7 +343,7 @@ describe('plan', () => {
     )
   })
 
-  it('Plan without promise and complex nesting', () => {
+  it('Plan without Future and complex nesting', () => {
     const result= plan(
       [
         [
@@ -377,7 +377,7 @@ describe('plan', () => {
   })
 
 
-  it('Plan without promise and complex nesting', () => {
+  it('Plan without Future and complex nesting', () => {
     const result= plan(
       [
         [
@@ -402,6 +402,76 @@ describe('plan', () => {
       result,
       [2,2,2,2,2]
     )
+  })
+
+
+  // Services
+  function getCustomerDataProm(customer){
+    return Promise.resolve(bankDB.holdings[customer])
+  }
+
+  function getCreditCardBalancesProm(data) {
+    return Promise.resolve(
+      data.creditCardsToFetch.map(
+        card => ({account:card, ...bankDB.balancesCreditCards[card]})
+      )
+    )
+  }
+
+  function getBankingBalancesProm(data)
+  { 
+    return Promise.resolve(
+      data.bankingToFetch.map(
+        account => ({account, ...bankDB.balancesBanking[account]})
+      )
+    )
+  }
+
+  const complexPlanWithPromises = 
+  [                                               // [ 0 ]
+    getCustomerDataProm,                              // [ 0, 0 ]                           
+    [                                             // [ 0, 1 ]
+      R.prop('holdings'),                         // [ 0, 1, 0 ]   
+      filterActiveAccounts,                       // [ 0, 1, 1 ]
+      buildPlaceholderStructure,                  // [ 0, 1, 2 ]            
+      [                                           // [ 0, 1, 3 ]
+        [                                         // [ 0, 1, 3, 0 ]
+          getBankingBalancesProm,                     // [ 0, 1, 3, 0, 0 ]
+        ],       
+        [                                         // [ 0, 1, 3, 1 ]
+          getCreditCardBalancesProm,                  // [ 0, 1, 3, 1, 0 ]
+        ],    
+        mergeCardsAndAccountsInArray              // [ 0, 1, 3, 2 ]
+      ],                                          
+      [                                          // [ 0, 1, 4 ]
+        R.prop('resultPlaceholder')              // [ 0, 1, 4, 0 ]
+      ],
+      rightJoinFetchVsResultPlaceholder2,        // [ 0, 1, 5 ]
+    ],
+    [
+      R.prop('name')
+    ],
+    composeNameAndHolders2,
+  ]
+
+  
+  it('Complex plan with Promises', () => {
+    return plan(complexPlanWithPromises)('f1')
+      .then(
+          (data =>  
+            assert.deepStrictEqual(
+              data,
+              {
+                name: 'Jose Marin',
+                holdings: [
+                  { account: '2', current: 12, available: 35, uuid: 'u2' },
+                  { account: '3', current: 8, available: 1975, uuid: 'u3' }
+                ]
+              } 
+            )
+          ),
+          (error => assert.fail('Future was not expected to be rejected with: ' + JSON.stringify(error)))
+      )
   })
 
 
