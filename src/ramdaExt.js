@@ -835,7 +835,7 @@ function promiseAll(numberOfThreads=Infinity)
   return promisesOrValues => 
     {
       let finalPromisesOrValues = promisesOrValues
-      if(numberOfThreads !== Infinity) {
+      if(numberOfThreads < promisesOrValues.length) {
         const limit = pLimit(numberOfThreads)
         finalPromisesOrValues = promisesOrValues.map(prom => limit( ()=> prom))
       }
