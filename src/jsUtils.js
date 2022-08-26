@@ -246,6 +246,128 @@ class EnumMap {
 //   value === 0 //? true
 // }
 
+
+function transition(states, events, transitions)
+{
+  states.forEach(validateStateFormat)
+  events.forEach(validateEventFormat)
+
+  let state = states[0]
+  let finalTransitions = Object.entries(transitions).reduce(
+    (acum, [stateKey, stateValue]) => {
+      // validations
+      validateState(stateKey)
+
+      let newStateValue = stateValue
+      if(typeof stateValue === 'string') 
+      {
+        validateState(stateValue)
+
+        newStateValue = events.reduce(
+          (acum, current) => {
+            acum[current] = stateValue
+            return acum
+          },
+          {}
+        )
+      }else
+      {
+        Object.entries(newStateValue).forEach(([key, value])=> {
+          validateEvent(key)
+          validateState(value)
+        })
+      }
+
+      
+
+      acum[stateKey] = {...acum[stateKey], ...newStateValue}
+      return acum
+    },
+    states.reduce(
+      (acum, current) => {
+        acum[current] = 
+          events.reduce(
+            (acum2, el2) => {
+              acum2[el2] = el2.toUpperCase()
+              return acum2
+            },
+            {}
+          )
+        return acum
+      },
+      {}
+    )
+  )
+
+  function sendEvent(event) {
+    validateEvent(event)
+    return state = finalTransitions[state][event]
+  }
+
+  sendEvent.valueOf = () => state
+
+  return sendEvent
+
+  function validateStateFormat(state)
+  {
+    if(state !== state.toUpperCase())
+      throw new CustomError('STATE_MUST_BE_UPPERCASE', `The state: ${state} does not have all characters in uppercase`)
+  }
+
+  function validateState(state)
+  {
+    if(states.some(el => el === state) === false)
+      throw new CustomError('STATE_NOT_FOUND', `The state: ${state} was not found in the list of states supplied: ${states}`)
+  }
+
+
+  function validateEventFormat(event)
+  {
+    if(event !== event.toLowerCase())
+      throw new CustomError('EVENT_MUST_BE_LOWERCASE', `The event: ${event} does not have all characters in lowercase`)
+  }
+
+
+  function validateEvent(event)
+  {
+    if(events.some(el => el === event) === false)
+      throw new CustomError('EVENT_NOT_FOUND', `The event: ${event} was not found in the list of events supplied: ${events}`)
+  }
+}
+
+// const tranDef = [
+//   ['SYNC', 'PROMISE', 'FUTURE', 'PROMISE_AND_FUTURE'],
+//   ['sync','promise','future'],
+//   // STATE:{event:NEW_STATE}
+//   // if a event is not defined within a STATE then the default value is selected STATE:{missing_event: NEW_STATE(missing_event.toUpperCase())}
+//   {
+//     PROMISE:{
+//       sync:'PROMISE',
+//       future: 'PROMISE_AND_FUTURE'
+//       //by default: promise: 'PROMISE'
+//     },
+//     FUTURE:{
+//       sync:'FUTURE',
+//       promise: 'PROMISE_AND_FUTURE',
+//     },
+//     PROMISE_AND_FUTURE: 'PROMISE_AND_FUTURE' // same as {sync: 'PROMISE_AND_FUTURE', promise: 'PROMISE_AND_FUTURE', future: 'PROMISE_AND_FUTURE'}
+//   }
+// ]
+
+// const typeOfList = transition(...tranDef)
+
+// typeOfList('future') //?
+// typeOfList('future') //?
+// typeOfList('promise') //?
+// typeOfList('sync') //?
+// try{
+//   typeOfList('sync2')  //?
+// }catch(e) {console.log(e)}
+
+// typeOfList('sync') //?
+
+// typeOfList.valueOf() //?
+
 function arrayToObject(arr, defaultValueFunction) {
   return arr.reduce((acum, current, index) => {
     acum[current] = defaultValueFunction(current, index)
@@ -1453,6 +1575,7 @@ const jsUtils = {
   copyPropsWithValueUsingRules,
   EnumMap,
   Enum,
+  transition,
   pushUniqueKey,
   pushUniqueKeyOrChange,
   memoize,
@@ -1511,6 +1634,7 @@ export {
   copyPropsWithValueUsingRules,
   EnumMap,
   Enum,
+  transition,
   pushUniqueKey,
   pushUniqueKeyOrChange,
   memoize,

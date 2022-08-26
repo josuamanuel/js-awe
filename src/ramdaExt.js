@@ -1,7 +1,9 @@
 // ts-check
 import * as R from 'ramda';
-import { sorterByPaths } from './jsUtils.js'
-import { reject, resolve, parallel as RParallel, isFuture } from 'fluture';
+import { transition, sorterByPaths, CustomError } from './jsUtils.js'
+import { reject, resolve, parallel as FParallel, isFuture } from 'fluture';
+import { isPromise } from 'util/types';
+import pLimit from 'p-limit';
 
 // Only needed for testing
 // import {  after, both, chain, map, fork } from 'fluture';
@@ -444,6 +446,10 @@ function isAcumAFutureAndElemAnError(acum, elem) {
   return elem instanceof Error && acum?.constructor?.name === 'Future'
 }
 
+function isAcumAPromiseAndElemAnError(acum, elem) {
+  return elem instanceof Error && isPromise(acum)
+}
+
 const pipeWithChain = function (...func) {
   return function (...params) {
     return func.reduce(
@@ -665,6 +671,8 @@ const pipe = function (...func) {
           chainFun = acum.chain
         else if (typeof acum?.['fantasy-land/chain'] === 'function')
           chainFun = acum['fantasy-land/chain'].bind(acum)
+        else if (isPromise(acum))
+          chainFun = acum.then.bind(acum)
         //else if (typeof acum?.flatMap === 'function')
         //  chainFun = acum.flatMap.bind(acum)
 
@@ -679,7 +687,7 @@ const pipe = function (...func) {
               let result
 
               // For flutures we try catch so there will be transformed in a reject,
-              if (acum?.constructor?.name === 'Future') {
+              if (acum?.constructor?.name === 'Future' || isPromise(acum)) {
                 try {
                   result = pipeFunc(elem)
                 } catch (e) {
@@ -689,6 +697,10 @@ const pipe = function (...func) {
 
               if (isAcumAFutureAndElemAnError(acum, result)) {
                 return createReject(acum, result)
+              }
+
+              if (isAcumAPromiseAndElemAnError(acum, result)) {
+                return acum.then(()=>Promise.reject(result))
               }
 
               // inside chainFun the return needs to be of the same type as the original acum drag value.
@@ -730,6 +742,53 @@ RE.pipe = pipe
 //   RLog('RLog print the whole array in one go. RLog is not iterated as it would in pipeWithChain ')
 // )([['a','b'], ['c','d']])
 
+// // Example with error
+// RE.pipe(
+//   (x,y) => x+y,
+//   x => resolve([x+8, x+3]),
+//   x => new Error('My controlled error...'),
+//   x => x.filter(elem => elem > 15)
+// )(5, 6)
+// .pipe(fork(RLog('pipeWithChain-Ex3-Err: '))(RLog('pipeWithChain-Ex3-OK: ')))
+
+
+// // Example with Future reject(error)
+// RE.pipe(
+//   (x,y) => x+y,
+//   x => reject('my error...'),
+//   x=>x+3
+// )(5, 6)
+// .pipe(fork(RLog('pipe-Ex4-Err: '))(RLog('pipe-Ex4-OK: ')))
+
+// // Example with Promise.reject(error)
+// RE.pipe(
+//   (x,y) => x+y,
+//   x => Promise.reject('my error...'),
+//   x=>x+3
+// )(5, 6)
+// .then(RLog('pipe-Ex5-OK: '),RLog('pipe-Ex5-Err: ') )
+
+
+// // Example with throw error Future
+// RE.pipe(
+//   (x,y) => x+y,
+//   x => resolve([x+8, x+3]),
+//   // throw new error for flutures are transform to reject.
+//   x => {throw new Error('aaaa')},
+//   x => x.filter(elem => elem > 15)
+// )(5, 6)
+// .pipe(fork(RLog('pipeWithChain-Ex6-Err: '))(RLog('pipeWithChain-Ex6-OK: ')))
+
+// // Example with throw error Promise
+// RE.pipe(
+//   (x,y) => x+y,
+//   x => Promise.resolve([x+8, x+3]),
+//   // throw new error for flutures are transform to reject.
+//   x => {throw new Error('aaaa')},
+//   x => x.filter(elem => elem > 15)
+// )(5, 6)
+// .then(RLog('pipe-Ex7-OK: '),RLog('pipe-Ex7-Err: ') )
+
 
 const pipeWhile = (funCond, ini) => (...funcs) => (...inputs) => {
   if(
@@ -762,13 +821,29 @@ RE.pipeWhile = pipeWhile
 //  x => x + 2
 // )(2) //?
 
-const parallel = 
-  (numberOfthreads=Infinity) => 
-    (futuresOrValues) => 
-      RParallel
-        (numberOfthreads)
-        (futuresOrValues.map(elem => isFuture(elem)? elem: resolve(elem)) )
+function parallel(numberOfthreads=Infinity) 
+{ 
+  return futuresOrValues => 
+    FParallel
+      (numberOfthreads)
+      (futuresOrValues.map(elem => isFuture(elem)? elem: resolve(elem)) )
+}
 RE.parallel = parallel
+
+function promiseAll(numberOfThreads=Infinity)
+{
+  return promisesOrValues => 
+    {
+      let finalPromisesOrValues = promisesOrValues
+      if(numberOfThreads !== Infinity) {
+        const limit = pLimit(numberOfThreads)
+        finalPromisesOrValues = promisesOrValues.map(prom => limit( ()=> prom))
+      }
+      
+      return Promise.all(finalPromisesOrValues)
+    }
+}
+RE.promiseAll = promiseAll
 
 
 const runFunctionsInParallel = 
@@ -815,6 +890,39 @@ RE.runFunctionsInParallel = runFunctionsInParallel
 //     ]
 //   )(5).pipe(fork(RLog('1: Err runFunctionsInParallel'))(RLog('1: OK runFunctionsInParallel')))
 
+const getTypeSyncFuturePromiseBoth = (list) =>
+{
+  const typeofAsyncList = transition(
+    ['SYNC','PROMISE', 'FUTURE', 'MIX_PROMISE_AND_FUTURE'],
+    ['sync', 'promise','future'],
+    {
+      PROMISE:{
+        sync:'PROMISE',
+        future: 'MIX_PROMISE_AND_FUTURE'
+        //by default: promise: 'PROMISE'
+      },
+      FUTURE:{
+        sync:'FUTURE',
+        promise: 'MIX_PROMISE_AND_FUTURE',
+      },
+      MIX_PROMISE_AND_FUTURE: 'MIX_PROMISE_AND_FUTURE' // same as {sync: 'MIX_PROMISE_AND_FUTURE', promise: 'MIX_PROMISE_AND_FUTURE', future: 'MIX_PROMISE_AND_FUTURE'}
+    }
+  )
+
+  list.forEach(
+    el => 
+      typeofAsyncList(
+        isPromise(el)
+          ? 'promise' 
+          : isFuture(el)
+            ? 'future'
+            : 'sync'
+      )
+  )
+
+  return typeofAsyncList.valueOf()
+}
+
 const runFunctionsSyncOrParallel = 
 (numberOfThreads=Infinity) => 
   (functionsToRun) => 
@@ -822,16 +930,26 @@ const runFunctionsSyncOrParallel =
     {
       let futureOrValues = functionsToRun.map(fun => fun(data))
 
-      if(futureOrValues.some(isFuture)) {
+      const typeSync = getTypeSyncFuturePromiseBoth(futureOrValues)
+
+      if(typeSync === 'MIX_PROMISE_AND_FUTURE')
+        throw new CustomError('MIX_PROMISE_AND_FUTURE', 'Promises and future cannot be mixed')
+
+      if(typeSync === 'FUTURE') {
         return RE.parallel
           (numberOfThreads)
           ( futureOrValues )
+      }
+
+      if(typeSync === 'PROMISE') {
+        return promiseAll(numberOfThreads)(futureOrValues)
       }
 
       return futureOrValues
     }
 RE.runFunctionsSyncOrParallel = runFunctionsSyncOrParallel
 
+//runFunctionsSyncOrParallel(2)([()=>Promise.resolve(3), ()=>4])() //?
 
 function pickPathsUnc(pickTransformations, obj) {
 
@@ -934,6 +1052,7 @@ export {
   pipe,
   pipeWhile,
   parallel,
+  promiseAll,
   runFunctionsInParallel,
   runFunctionsSyncOrParallel,
   RLog,

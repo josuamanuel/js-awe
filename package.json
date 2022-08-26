@@ -20,6 +20,7 @@
     "lodash": "^4.17.21",
     "loglevel": "^1.8.0",
     "node-fetch": "^3.2.10",
+    "p-limit": "^4.0.0",
     "ramda": "^0.28.0",
     "stream": "^0.0.2",
     "stream-transform": "^3.2.0"

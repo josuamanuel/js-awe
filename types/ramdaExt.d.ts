@@ -14,6 +14,7 @@ export namespace RE {
   export { pipe };
   export { pipeWhile };
   export { parallel };
+  export { promiseAll };
   export { runFunctionsInParallel };
   export { runFunctionsSyncOrParallel };
   export { pickPaths };
@@ -125,6 +126,7 @@ export function pipeWithChain(...func: any[]): (...params: any[]) => any;
 export function pipe(...func: any[]): (...params: any[]) => any;
 export function pipeWhile(funCond: any, ini: any): (...funcs: any[]) => (...inputs: any[]) => any;
 export function parallel(numberOfthreads?: number): (futuresOrValues: any) => import("fluture").FutureInstance<any, any[]>;
+export function promiseAll(numberOfThreads?: number): (promisesOrValues: any) => Promise<any[]>;
 export function runFunctionsInParallel(numberOfThreads?: number): (functionsToRunInParallel: any) => (data: any) => import("fluture").FutureInstance<any, any[]>;
 export function runFunctionsSyncOrParallel(numberOfThreads?: number): (functionsToRun: any) => (data: any) => any;
 export function RLog(prefix: any): (...obj: any[]) => any;
