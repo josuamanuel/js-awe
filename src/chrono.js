@@ -76,7 +76,7 @@ function Chrono() {
         reportListOfNameRanges,
         //RE.RLog('1-->: '),
         groupByWithCalc(
-          (row) => JSON.stringify(row.names.sort(arraySorter())),
+          (row) => JSON.stringify(row.runningEvents.sort(arraySorter())),
           { percentage: (l, r) => l??0 + r, elapseMs: (l, r) => l??0 + r }
         ),
         //RE.RLog('2-->: '),
@@ -85,13 +85,14 @@ function Chrono() {
   }
 
   function historyToListOfNameRanges(historyTimeIntervals) {
+    historyTimeIntervals
     return Object.entries(historyTimeIntervals)
       .reduce(
         (acum, [key, value]) => {
           acum.push(
-            ...value.ranges.map(
+            ...(value.ranges?.map(
               range => ({ name: key, range })
-            )
+            ))??[]
           )
 
           return acum
@@ -116,11 +117,11 @@ function Chrono() {
             let i = index
             do {
               pushUniqueKeyOrChange(
-                { names: [name], range: Range(table[i].edge, table[i + 1].edge) }
+                { runningEvents: [name], range: Range(table[i].edge, table[i + 1].edge) }
                 , acum
                 , ['range']
                 , (newRow, existingRow) => {
-                  pushUniqueKey(name, existingRow.names)
+                  pushUniqueKey(name, existingRow.runningEvents)
                   return existingRow
                 }
               )
@@ -139,11 +140,11 @@ function Chrono() {
   function reportListOfNameRanges(listOfNameRanges) {
     let totalElapse = 0
     return listOfNameRanges.map(
-      ({ names, range }) => {
+      ({ runningEvents, range }) => {
         let elapseMs = Number((range.end - range.start) / BigInt(1000000))
         totalElapse = totalElapse + elapseMs
         return {
-          names,
+          runningEvents,
           elapseMs
         }
       }

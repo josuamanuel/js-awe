@@ -700,7 +700,7 @@ const pipe = function (...func) {
               }
 
               if (isAcumAPromiseAndElemAnError(acum, result)) {
-                return acum.then(()=>Promise.reject(result))
+                return acum.then(() => Promise.reject(result))
               }
 
               // inside chainFun the return needs to be of the same type as the original acum drag value.
@@ -791,29 +791,28 @@ RE.pipe = pipe
 
 
 const pipeWhile = (funCond, ini) => (...funcs) => (...inputs) => {
-  if(
-    typeof funCond !== 'function' || 
+  if (
+    typeof funCond !== 'function' ||
     funcs.some(func => typeof func !== 'function') ||
-    ( ini !== undefined && typeof ini !== 'function')
-  ) 
-  {
-    const dataErrorString = 
-      `funCond: ${typeof funCond} ${ini===undefined?'':'ini: '+ typeof ini} funcs: ${funcs.map(el=>typeof el)}`
+    (ini !== undefined && typeof ini !== 'function')
+  ) {
+    const dataErrorString =
+      `funCond: ${typeof funCond} ${ini === undefined ? '' : 'ini: ' + typeof ini} funcs: ${funcs.map(el => typeof el)}`
     throw new Error(`pipeWhile was called without funcfion/s in funCond or pipe functions ${dataErrorString}`)
   }
 
-  if(typeof ini === 'function') ini(...inputs)
+  if (typeof ini === 'function') ini(...inputs)
 
-  let finalReturn = inputs 
-  while(funCond(...finalReturn)) {
+  let finalReturn = inputs
+  while (funCond(...finalReturn)) {
     finalReturn = funcs.reduce(
-      (acum, func)  => [func(...acum)],
+      (acum, func) => [func(...acum)],
       finalReturn
     )
   }
 
   return R.last(finalReturn)
-} 
+}
 RE.pipeWhile = pipeWhile
 
 // pipeWhile(x => x < 20)
@@ -821,42 +820,25 @@ RE.pipeWhile = pipeWhile
 //  x => x + 2
 // )(2) //?
 
-function parallel(numberOfthreads=Infinity) 
-{ 
-  return futuresOrValues => 
+function parallel(numberOfthreads = Infinity) {
+  return futuresOrValues =>
     FParallel
       (numberOfthreads)
-      (futuresOrValues.map(elem => isFuture(elem)? elem: resolve(elem)) )
+      (futuresOrValues.map(elem => isFuture(elem) ? elem : resolve(elem)))
 }
 RE.parallel = parallel
 
-function promiseAll(numberOfThreads=Infinity)
-{
-  return promisesOrValues => 
-    {
-      let finalPromisesOrValues = promisesOrValues
-      if(numberOfThreads < promisesOrValues.length) {
-        const limit = pLimit(numberOfThreads)
-        finalPromisesOrValues = promisesOrValues.map(prom => limit( ()=> prom))
-      }
-      
-      return Promise.all(finalPromisesOrValues)
-    }
-}
-RE.promiseAll = promiseAll
-
-
-const runFunctionsInParallel = 
-  (numberOfThreads=Infinity) => 
-    (functionsToRunInParallel) => 
+const runFutureFunctionsInParallel =
+  (numberOfThreads = Infinity) =>
+    (functionsToRunInParallel) =>
       data =>
         RE.parallel(numberOfThreads)
-        (
-          functionsToRunInParallel.map(fun => fun(data))
-        )
-RE.runFunctionsInParallel = runFunctionsInParallel
+          (
+            functionsToRunInParallel.map(fun => fun(data))
+          )
+RE.runFutureFunctionsInParallel = runFutureFunctionsInParallel
 
-// runFunctionsInParallel
+// runFutureFunctionsInParallel
 //   ()
 //   (
 //     [
@@ -864,11 +846,11 @@ RE.runFunctionsInParallel = runFunctionsInParallel
 //       (data) => after(15)(data + 3), //8
 //       (data) => after(15)(data + 4), //9
 //     ]
-//   )(5).pipe(fork(RLog('1: Err runFunctionsInParallel'))(RLog('1: OK runFunctionsInParallel')))
+//   )(5).pipe(fork(RLog('1: Err runFutureFunctionsInParallel'))(RLog('1: OK runFutureFunctionsInParallel')))
 
 // example of race to update variable
 // RE.pipeWithChain(
-//   runFunctionsInParallel
+//   runFutureFunctionsInParallel
 //     ()
 //     (
 //       [
@@ -877,10 +859,10 @@ RE.runFunctionsInParallel = runFunctionsInParallel
 //         (data) => map(() => data.varToRaceChanges = data.varToRaceChanges * 3)(after(10)())
 //       ]
 //     ),
-// )(resolve({ varToRaceChanges: 5 })).pipe(fork(RLog('2: Err runFunctionsInParallel'))(RLog('2: OK runFunctionsInParallel')))
+// )(resolve({ varToRaceChanges: 5 })).pipe(fork(RLog('2: Err runFutureFunctionsInParallel'))(RLog('2: OK runFutureFunctionsInParallel')))
 //
 // Mixing Futures with non Futures.
-// runFunctionsInParallel
+// runFutureFunctionsInParallel
 //   ()
 //   (
 //     [
@@ -888,21 +870,20 @@ RE.runFunctionsInParallel = runFunctionsInParallel
 //       data => data + 3, //8
 //       (data) => after(15)(data + 4), //9
 //     ]
-//   )(5).pipe(fork(RLog('1: Err runFunctionsInParallel'))(RLog('1: OK runFunctionsInParallel')))
+//   )(5).pipe(fork(RLog('1: Err runFutureFunctionsInParallel'))(RLog('1: OK runFutureFunctionsInParallel')))
 
-const getTypeSyncFuturePromiseBoth = (list) =>
-{
+const getTypeSyncFuturePromiseBoth = (list) => {
   const typeofAsyncList = transition(
-    ['SYNC','PROMISE', 'FUTURE', 'MIX_PROMISE_AND_FUTURE'],
-    ['sync', 'promise','future'],
+    ['SYNC', 'PROMISE', 'FUTURE', 'MIX_PROMISE_AND_FUTURE'],
+    ['sync', 'promise', 'future'],
     {
-      PROMISE:{
-        sync:'PROMISE',
+      PROMISE: {
+        sync: 'PROMISE',
         future: 'MIX_PROMISE_AND_FUTURE'
         //by default: promise: 'PROMISE'
       },
-      FUTURE:{
-        sync:'FUTURE',
+      FUTURE: {
+        sync: 'FUTURE',
         promise: 'MIX_PROMISE_AND_FUTURE',
       },
       MIX_PROMISE_AND_FUTURE: 'MIX_PROMISE_AND_FUTURE' // same as {sync: 'MIX_PROMISE_AND_FUTURE', promise: 'MIX_PROMISE_AND_FUTURE', future: 'MIX_PROMISE_AND_FUTURE'}
@@ -910,10 +891,10 @@ const getTypeSyncFuturePromiseBoth = (list) =>
   )
 
   list.forEach(
-    el => 
+    el =>
       typeofAsyncList(
         isPromise(el)
-          ? 'promise' 
+          ? 'promise'
           : isFuture(el)
             ? 'future'
             : 'sync'
@@ -923,30 +904,70 @@ const getTypeSyncFuturePromiseBoth = (list) =>
   return typeofAsyncList.valueOf()
 }
 
-const runFunctionsSyncOrParallel = 
-(numberOfThreads=Infinity) => 
-  (functionsToRun) => 
-    data => 
-    {
-      let futureOrValues = functionsToRun.map(fun => fun(data))
 
-      const typeSync = getTypeSyncFuturePromiseBoth(futureOrValues)
+const runFunctionsSyncOrParallel =
+  (numberOfFunctionsToRunInParallel = Infinity) =>
+    (functionsToRun) =>
+      data => {
+        if (!(numberOfFunctionsToRunInParallel > 0))
+          throw new CustomError('NUMBEROFFUNCTIONSTORUNINPARALLEL_MUST_BE_BETWEEN_0_TO_INFINITY')
 
-      if(typeSync === 'MIX_PROMISE_AND_FUTURE')
-        throw new CustomError('MIX_PROMISE_AND_FUTURE', 'Promises and future cannot be mixed')
+        let activeFunctions = 0
+        let nextIndex = 0
+        let globalTypeSync = 'sync'
+        let currentTypeSync = 'sync'
+        let resultWithValuesPromisesOrFuture = []
 
-      if(typeSync === 'FUTURE') {
-        return RE.parallel
-          (numberOfThreads)
-          ( futureOrValues )
+
+        return run()
+        function run() {
+
+          if (nextIndex >= functionsToRun.length) return finalResult()
+
+          if (currentTypeSync === 'promise' && activeFunctions >= numberOfFunctionsToRunInParallel) {
+            activeFunctions--
+            return R.last(resultWithValuesPromisesOrFuture).then(run)
+          } else {
+            resultWithValuesPromisesOrFuture[nextIndex] = functionsToRun[nextIndex](data)
+            setGlobalTypeSync(resultWithValuesPromisesOrFuture[nextIndex])
+            if (currentTypeSync === 'promise') activeFunctions++
+            nextIndex++
+            return run()
+          }
+        }
+
+        function finalResult() {
+          if (globalTypeSync === 'future') {
+            return RE.parallel
+              (numberOfFunctionsToRunInParallel)
+              (resultWithValuesPromisesOrFuture)
+          }
+
+          if (globalTypeSync === 'promise') {
+            return Promise.all(resultWithValuesPromisesOrFuture)
+          }
+
+          return resultWithValuesPromisesOrFuture
+        }
+
+        function setGlobalTypeSync(task) {
+          currentTypeSync =
+            isFuture(task)
+              ? 'future'
+              : isPromise(task)
+                ? 'promise'
+                : 'sync'
+
+          if (globalTypeSync === 'sync')
+            globalTypeSync = currentTypeSync
+
+          if (currentTypeSync !== 'sync' && globalTypeSync !== currentTypeSync)
+            throw new CustomError('MIX_PROMISE_AND_FUTURE', `Promises and future cannot be mixed ${globalTypeSync} ${currentTypeSync}`)
+
+        }
+
       }
 
-      if(typeSync === 'PROMISE') {
-        return promiseAll(numberOfThreads)(futureOrValues)
-      }
-
-      return futureOrValues
-    }
 RE.runFunctionsSyncOrParallel = runFunctionsSyncOrParallel
 
 //runFunctionsSyncOrParallel(2)([()=>Promise.resolve(3), ()=>4])() //?
@@ -1052,8 +1073,7 @@ export {
   pipe,
   pipeWhile,
   parallel,
-  promiseAll,
-  runFunctionsInParallel,
+  runFutureFunctionsInParallel,
   runFunctionsSyncOrParallel,
   RLog,
   findSolution,

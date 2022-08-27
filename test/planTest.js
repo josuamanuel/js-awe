@@ -470,7 +470,7 @@ describe('plan', () => {
               } 
             )
           ),
-          (error => assert.fail('Future was not expected to be rejected with: ' + JSON.stringify(error)))
+          (error => assert.fail('Promise was not expected to be rejected with: ' + JSON.stringify(error)))
       )
   })
 
