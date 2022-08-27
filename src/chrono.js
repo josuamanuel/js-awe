@@ -74,10 +74,12 @@ function Chrono() {
         compactListOfNameRanges,
         R.sort(sorterByPaths('range')),
         reportListOfNameRanges,
+        //RE.RLog('1-->: '),
         groupByWithCalc(
           (row) => JSON.stringify(row.names.sort(arraySorter())),
-          { percentage: (l, r) => l + r, elapseMs: (l, r) => l + r }
-        )
+          { percentage: (l, r) => l??0 + r, elapseMs: (l, r) => l??0 + r }
+        ),
+        //RE.RLog('2-->: '),
       )(historyTimeIntervals) //?
     )
   }
