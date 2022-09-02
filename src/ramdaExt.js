@@ -3,7 +3,8 @@ import * as R from 'ramda';
 import { transition, sorterByPaths, CustomError } from './jsUtils.js'
 import { reject, resolve, parallel as FParallel, isFuture } from 'fluture';
 import { isPromise } from 'util/types';
-import pLimit from 'p-limit';
+import pkg from 'lodash'; 
+const { cloneDeep } = pkg; 
 
 // Only needed for testing
 // import {  after, both, chain, map, fork } from 'fluture';
@@ -1044,12 +1045,25 @@ RE.mergeArrayOfObjectsRenamingProps = mergeArrayOfObjectsRenamingProps
 // )//?
 
 
-function RLog(prefix) {
+function RLog(prefixOrFormatter) {
   return (...obj) => {
-    console.log(prefix, ...obj)
+    if(typeof prefixOrFormatter === 'function') {
+      const cloneObj = cloneDeep(obj)
+      console.log(prefixOrFormatter(...cloneObj))
+    }else console.log(prefixOrFormatter, ...obj)
+
     return R.last(obj)
   }
 }
+
+// RLog('test')('a','b',[1,2,'test']) //?
+// RLog(
+//   (x,y,z)=> {
+//     // changing values in object doesn't change the return value.
+//     z[2].a=z[2].a.toUpperCase()
+//     return `param1: ${x} param2: ${y} param3[0]: ${z[0]} param3[1]: ${z[1]} param3[2].a: ${z[2].a}`
+//   })
+//   ('a','b',[1,2,{a:'test'}]) //?
 
 RE.RLog = RLog
 RE.findSolution = findSolution

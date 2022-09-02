@@ -1,18 +1,21 @@
+import { platform } from 'os';
 import { arraySorter, pushUniqueKeyOrChange, sorterByPaths, pushUniqueKey } from './jsUtils.js';
 import { sleepWithFunction } from './jsUtils.js';
 import { groupByWithCalc, R, RE } from './ramdaExt.js';
+import { Table } from './table/table.js'
+import { Text } from './table/components/text.js'
+import { Timeline } from './table/components/timeline.js'
 
 function Chrono() {
-
 
   let historyTimeIntervals = {}
 
   let chronoEvents = {}
   createTimeEvent('chronoCreation')
 
-  function createTimeEvent(eventName) {
-    let currentDate = new Date()
+  let rangeType = Range({type:'hrtimeBigInt', displayFormat:'ms', referenceHrtime: chronoEvents['chronoCreation'].hrtime})
 
+  function createTimeEvent(eventName) {
     chronoEvents[eventName] = {
       date: new Date(),
       hrtime: process.hrtime.bigint()
@@ -54,7 +57,7 @@ function Chrono() {
 
       historyTimeIntervals[eventName].ranges = historyTimeIntervals[eventName].ranges ?? []
       historyTimeIntervals[eventName].ranges.push(
-        Range(
+        rangeType(
           start,
           currentHrtime
         )
@@ -63,29 +66,124 @@ function Chrono() {
     })
   }
 
+  function eventsReport(events)
+  {
+    const entriesEvents = Object.entries(events)
+    const [minHrtime, maxHrtime] = entriesEvents.reduce(
+      (acum, [eventName, eventObject]) => {
+        eventObject.ranges.forEach(
+          range => {
+            if(acum[0] > range.start) acum[0] = range.start
+            if(acum[1] <range.end) acum[1] = range.end
+          })
+       return acum
+      },
+      [Infinity,0]
+    ) //?
+    
+     
+  //   console.log(`
+  //  -------------------------------------------------------------------------------------------
+  // | events              | ms  0     80        200   500        900     1100                   |
+  // |---------------------|---------------------------------------------------------------------|          
+  // | loadConfig          |     |----------------------|          |--------|                    |
+  // | getCards            |     |-----------|          |---------------|                        |
+  // | getAccounts         |     |------|                                                        |
+  // | compeseFinalOutput  |                       |--------------|         |---------------|    |
+  //  -------------------------------------------------------------------------------------------
+  //   `)
+    //plot(entriesEvents, minHrtime, maxHrtime)
+    return events
+  }
 
+  function totalEventsElapseTimeReport(events)
+  {
+    let totalElapse = 0
+    const toLog = events.reduce(
+      (acum, current) => {
+        let found = acum.find(el => el.name === current.name)
 
+        const currentElapseMs = hrtimeBigIntToMs(current.range.end - current.range.start)
+        totalElapse = totalElapse + currentElapseMs
+        if(found) found.elapse = found.elapse + currentElapseMs
+        else acum.push({name: current.name, elapse: currentElapseMs})
+
+        return acum
+      },
+      []
+    ).map(nameRange => {
+      nameRange.percentage = Number(Number(100 * nameRange.elapse / totalElapse).toFixed(2))
+      return nameRange
+    })
+
+    console.log('Total elapse Time of each event: ')
+    console.table(toLog)
+    return events
+  }
+
+  function coincidingEventsReport(elapseTable)
+  {
+
+    R.pipe(
+      groupByWithCalc(
+        (row) => JSON.stringify(row.runningEvents.sort(arraySorter())),
+        { percentage: (l, r) => (l??0) + r, elapseMs: (l, r) => (l??0) + r }
+      ),
+      R.map( row => ({...row, percentage: Number(row.percentage.toFixed(2))}) ),
+      RE.RLog(()=>'Elapse times by coinciding events'),
+      (coincidingEvents) => console.table(coincidingEvents)
+    )(elapseTable)
+
+    return elapseTable
+  }
+
+  function timelineReport(data)
+  {
+    const timeline = Table()
+
+    timeline.addColumn({ type: Text(), id: 'event', title: 'Events' })
+    timeline.addColumn({ type: Timeline(), id: 'ranges' })
+
+    console.log(timeline.draw(data))
+
+    return data
+  }
+
+  function formatReportAndForget(data)
+  {
+    let toReport = Object.entries(data).map(
+      ([eventName, event]) => (
+        {
+          event: eventName, 
+          ranges: event.ranges.map(
+            ({start, end} ) => ({start: hrtimeBigIntToMs(start), end: hrtimeBigIntToMs(end)})
+          )
+        }))
+    console.log(toReport)
+    console.log(timelineReport(toReport))
+    return data
+  }
+  
   function report() {
     createTimeEvent('report')
     console.log(chronoEvents)
-    console.table(
       R.pipe(
+        RE.RLog('-1-->: '),
+        formatReportAndForget,
+        eventsReport,
         historyToListOfNameRanges,
+        RE.RLog('0-->: '),
+        totalEventsElapseTimeReport,
         compactListOfNameRanges,
+        RE.RLog('1-->: '),
         R.sort(sorterByPaths('range')),
         reportListOfNameRanges,
-        //RE.RLog('1-->: '),
-        groupByWithCalc(
-          (row) => JSON.stringify(row.runningEvents.sort(arraySorter())),
-          { percentage: (l, r) => l??0 + r, elapseMs: (l, r) => l??0 + r }
-        ),
-        //RE.RLog('2-->: '),
-      )(historyTimeIntervals) //?
-    )
+        RE.RLog('3-->: '),
+        coincidingEventsReport
+      )(historyTimeIntervals)
   }
 
   function historyToListOfNameRanges(historyTimeIntervals) {
-    historyTimeIntervals
     return Object.entries(historyTimeIntervals)
       .reduce(
         (acum, [key, value]) => {
@@ -117,7 +215,7 @@ function Chrono() {
             let i = index
             do {
               pushUniqueKeyOrChange(
-                { runningEvents: [name], range: Range(table[i].edge, table[i + 1].edge) }
+                { runningEvents: [name], range: rangeType(table[i].edge, table[i + 1].edge) }
                 , acum
                 , ['range']
                 , (newRow, existingRow) => {
@@ -134,14 +232,14 @@ function Chrono() {
         []
       ).filter(
         elem => elem.range.start !== elem.range.end
-      ) //?
+      )
   }
 
   function reportListOfNameRanges(listOfNameRanges) {
     let totalElapse = 0
     return listOfNameRanges.map(
       ({ runningEvents, range }) => {
-        let elapseMs = Number((range.end - range.start) / BigInt(1000000))
+        let elapseMs = hrtimeBigIntRangeToElapseMs(range)
         totalElapse = totalElapse + elapseMs
         return {
           runningEvents,
@@ -151,7 +249,7 @@ function Chrono() {
     ).map(nameRange => {
       nameRange.percentage = 100 * nameRange.elapseMs / totalElapse
       return nameRange
-    }) //?
+    })
   }
 
   function hrtimeToDate(currentHrtime) {
@@ -167,72 +265,157 @@ function Chrono() {
 }
 
 
-function Range(start, end) {
+function hrtimeBigIntRangeToElapseMs({start, end}) {
+  return Number((end - start) / BigInt(1000000))
+}
+//hrtimeBigIntRangeToElapseMs(Range(BigInt(1953997827221605), BigInt(1953997981407671) )) //?
+//hrtimeBigIntRangeToElapseMs({ start:BigInt(1953997827221605), end:BigInt(1953997981407671) }) //?
 
-  if (start > end) throw new Error('Range(start, end) start cannot be > than end')
+function hrtimeBigIntToMs(hrtime) {
+  return Number(hrtime / BigInt(1000000))
+}
 
-  function toString() {
-    return `{ start:${start}, end:${end} }`
+function Range(...params) {
+  let type
+  let displayFormat
+  let referenceHrtime
+
+  if(params.length === 2 ) {
+    return range(params[0], params[1])
+  }
+  else {
+    ({ type, displayFormat, referenceHrtime} = params[0])
+    return range
   }
 
-  function intersect(rangeB) {
-    let newStart = start > rangeB.start ? start : rangeB.start
-    let newEnd = end < rangeB.end ? end : rangeB.end
+  function range(start, end)
+  {
+    if (start > end) throw new Error('range(start, end) start cannot be > than end')
 
-    if (newStart === undefined || newEnd === undefined) return Range(undefined, undefined)
-    if (newStart > newEnd) return Range(undefined, undefined)
+    function toString() 
+    {
+      if(type === 'hrtimeBigInt' && displayFormat === 'ms' && referenceHrtime !== undefined) {
+        const startMs = hrtimeBigIntRangeToElapseMs({start:referenceHrtime, end:start})
+        const endMs = hrtimeBigIntRangeToElapseMs({start:referenceHrtime, end})
+        return `{ start:${startMs} <-${endMs - startMs}-> end:${endMs} }`
+      }
 
-    return Range(newStart, newEnd)
-  }
+      return `{ start:${start}, end:${end} }`
+    }
 
-  return {
-    [Symbol.for('nodejs.util.inspect.custom')]: toString,
-    toString,
-    intersect,
-    start,
-    end
+    function intersect(rangeB) {
+      let newStart = start > rangeB.start ? start : rangeB.start
+      let newEnd = end < rangeB.end ? end : rangeB.end
+
+      if (newStart === undefined || newEnd === undefined) return range(undefined, undefined)
+      if (newStart > newEnd) return range(undefined, undefined)
+
+      return range(newStart, newEnd)
+    }
+
+    return {
+      [Symbol.for('nodejs.util.inspect.custom')]: toString,
+      toString,
+      intersect,
+      start,
+      end
+    }
   }
 }
 
 export { Chrono }
 
 
-// let chrono = Chrono()
+let chrono = Chrono()
 
-// chrono.time('step1')
-// tasks().then(()=>{
-//   chrono.timeEnd('step1')
-//   chrono.report()
+chrono.time('step1')
+tasks().then(()=>{
+  chrono.timeEnd('step1')
+  chrono.report()
+})
+
+async function tasks()
+{
+
+  await sleepWithFunction(
+    650,
+    () => {
+      chrono.time('step2')
+    }
+  )
+
+  await sleepWithFunction(
+    300,
+    () => {
+      chrono.time('step3')
+    }
+  )
+
+  await sleepWithFunction(
+    400,
+    () => {
+      chrono.timeEnd('step2')
+    }
+  )
+
+  await sleepWithFunction(
+    500,
+    () => {
+      chrono.timeEnd('step3')
+    }
+  ),
+  await sleepWithFunction(
+    100,
+    () => {
+      chrono.time('step2')
+    }
+  ),
+  await sleepWithFunction(
+    150,
+    () => {
+      chrono.timeEnd('step2')
+    }
+  )
+}
+
+
+
+// let chrono2 = Chrono()
+
+// chrono2.time('step1')
+// tasks2().then(()=>{
+//   chrono2.timeEnd('step1')
+//   chrono2.report()
 // })
 
-// async function tasks()
-// {
+async function tasks2()
+{
 
-//   await sleepWithFunction(
-//     650,
-//     () => {
-//       chrono.time('step2')
-//     }
-//   )
+  await sleepWithFunction(
+    650,
+    () => {
+      chrono2.timeEnd('step1')
+    }
+  )
 
-//   await sleepWithFunction(
-//     300,
-//     () => {
-//       chrono.time('step3')
-//     }
-//   )
+  await sleepWithFunction(
+    300,
+    () => {
+      chrono2.time('step1')
+    }
+  )
 
-//   await sleepWithFunction(
-//     400,
-//     () => {
-//       chrono.timeEnd('step2')
-//     }
-//   )
+  await sleepWithFunction(
+    400,
+    () => {
+      chrono2.timeEnd('step1')
+    }
+  )
 
-//   await sleepWithFunction(
-//     500,
-//     () => {
-//       chrono.timeEnd('step3')
-//     }
-//   )
-// }
+  await sleepWithFunction(
+    500,
+    () => {
+      chrono2.time('step1')
+    }
+  )
+}
