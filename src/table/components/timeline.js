@@ -67,42 +67,7 @@ function Timeline()
 
       return {
         id,
-        heading: {
-          nextValue: function*() {
-            yield scalePoints.reduce(
-              (line, scalePoint) => {
-                return putCenteredValueAtPosIfFit(
-                  line, 
-                  timelineScale.valueInUnits(scalePoints[0])(scalePoint),
-                  convertToResolution(scalePoint) + 3,
-                  1
-                )
-              },
-              timelineScale.label + ' ' + ''.padEnd(LENGTH_IN_CHARS_OF_INI_END_TIMELINE + LAST_SCALE_VALUE_MARGIN)
-            )
-          }
-        },
-        row: {
-          nextValue: function*() {
-            for (let intervals of data)
-            {
-              yield intervals.reduce(
-                (line, interval) => 
-                drawInterval(
-                  line, 
-                  convertToResolution(interval.start) + timelineScale.label.length + 1, 
-                  convertToResolution(interval.end) + timelineScale.label.length + 1, 
-                ),
-                ''.padEnd(size)
-              )
-            }
-
-          }
-        },
         load: columnData => {
-
-          //columnData
-          console.log(columnData)
           data = columnData.map(
             intervals =>
               intervals.map( 
@@ -134,7 +99,41 @@ function Timeline()
           size = timelineScale.label.length + 1 + LENGTH_IN_CHARS_OF_INI_END_TIMELINE + LAST_SCALE_VALUE_MARGIN
         },
         getUndefinedRepresentation: ()=>''.padEnd(size),
-        getSize: () => size
+        getSize: () => size,
+
+        heading: {
+          nextValue: function*() {
+            yield scalePoints.reduce(
+              (line, scalePoint) => {
+                return putCenteredValueAtPosIfFit(
+                  line, 
+                  timelineScale.valueInUnits(scalePoints[0])(scalePoint),
+                  convertToResolution(scalePoint) + 3,
+                  1
+                )
+              },
+              timelineScale.label + ' ' + ''.padEnd(LENGTH_IN_CHARS_OF_INI_END_TIMELINE + LAST_SCALE_VALUE_MARGIN)
+            )
+          }
+        },
+
+        row: {
+          nextValue: function*() {
+            for (let intervals of data)
+            {
+              yield intervals.reduce(
+                (line, interval) => 
+                drawInterval(
+                  line, 
+                  convertToResolution(interval.start) + timelineScale.label.length + 1, 
+                  convertToResolution(interval.end) + timelineScale.label.length + 1, 
+                ),
+                ''.padEnd(size)
+              )
+            }
+
+          }
+        }
       }
     }
   }

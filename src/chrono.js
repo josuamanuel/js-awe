@@ -1,4 +1,3 @@
-import { platform } from 'os';
 import { arraySorter, pushUniqueKeyOrChange, sorterByPaths, pushUniqueKey } from './jsUtils.js';
 import { sleepWithFunction } from './jsUtils.js';
 import { groupByWithCalc, R, RE } from './ramdaExt.js';
@@ -116,8 +115,10 @@ function Chrono() {
       return nameRange
     })
 
+    console.log('')
     console.log('Total elapse Time of each event: ')
     console.table(toLog)
+
     return events
   }
 
@@ -130,8 +131,11 @@ function Chrono() {
         { percentage: (l, r) => (l??0) + r, elapseMs: (l, r) => (l??0) + r }
       ),
       R.map( row => ({...row, percentage: Number(row.percentage.toFixed(2))}) ),
-      RE.RLog(()=>'Elapse times by coinciding events'),
-      (coincidingEvents) => console.table(coincidingEvents)
+      (coincidingEvents) => {
+        console.log('')
+        console.log('Coinciding Events timeline: ')
+        console.table(coincidingEvents)
+      }
     )(elapseTable)
 
     return elapseTable
@@ -144,12 +148,14 @@ function Chrono() {
     timeline.addColumn({ type: Text(), id: 'event', title: 'Events' })
     timeline.addColumn({ type: Timeline(), id: 'ranges' })
 
+    console.log('')
+    console.log('Timeline of events:')
     console.log(timeline.draw(data))
 
     return data
   }
 
-  function formatReportAndForget(data)
+  function formatReportAndReturnInputParam(data)
   {
     let toReport = Object.entries(data).map(
       ([eventName, event]) => (
@@ -159,26 +165,34 @@ function Chrono() {
             ({start, end} ) => ({start: hrtimeBigIntToMs(start), end: hrtimeBigIntToMs(end)})
           )
         }))
-    console.log(toReport)
-    console.log(timelineReport(toReport))
+    timelineReport(toReport)
+
     return data
   }
   
+  function chronoReport()
+  {
+    console.log('')
+    Object.entries(chronoEvents).forEach(
+      ([key, value]) => console.log(key, ': ', value.date)
+    )
+  }
+
   function report() {
     createTimeEvent('report')
-    console.log(chronoEvents)
+    chronoReport()
       R.pipe(
-        RE.RLog('-1-->: '),
-        formatReportAndForget,
+        //RE.RLog('-1-->: '),
+        formatReportAndReturnInputParam,
         eventsReport,
         historyToListOfNameRanges,
-        RE.RLog('0-->: '),
+        //RE.RLog('0-->: '),
         totalEventsElapseTimeReport,
         compactListOfNameRanges,
-        RE.RLog('1-->: '),
+        //RE.RLog('1-->: '),
         R.sort(sorterByPaths('range')),
         reportListOfNameRanges,
-        RE.RLog('3-->: '),
+        //RE.RLog('3-->: '),
         coincidingEventsReport
       )(historyTimeIntervals)
   }
@@ -340,21 +354,21 @@ async function tasks()
   await sleepWithFunction(
     650,
     () => {
+      chrono.timeEnd('step1')
+    }
+  )
+
+  await sleepWithFunction(
+    20,
+    () => {
       chrono.time('step2')
     }
   )
 
   await sleepWithFunction(
-    300,
+    12,
     () => {
       chrono.time('step3')
-    }
-  )
-
-  await sleepWithFunction(
-    400,
-    () => {
-      chrono.timeEnd('step2')
     }
   )
 
@@ -367,13 +381,13 @@ async function tasks()
   await sleepWithFunction(
     100,
     () => {
-      chrono.time('step2')
+      chrono.timeEnd('step2')
     }
   ),
   await sleepWithFunction(
-    150,
+    15,
     () => {
-      chrono.timeEnd('step2')
+      chrono.time('step1')
     }
   )
 }

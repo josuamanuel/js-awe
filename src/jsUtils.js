@@ -1,6 +1,7 @@
 'use strict'
-import pkg from 'lodash';
-const { cloneDeep } = pkg;
+//import pkg from 'lodash';
+//const { cloneDeep } = pkg;
+import { cloneDeep }  from './lodashCloneDeep.js'
 
 const logWithPrefix = (title, displayFunc) => (message) => {
 
