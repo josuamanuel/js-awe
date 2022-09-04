@@ -35892,7 +35892,7 @@
     {}
 
     try { 
-      if(now === undefined) now = ()=> BigInt(performance.now()*1000);
+      if(now === undefined && performance.now) now = ()=> BigInt(performance.now()*1000);
     }catch(e)
     {
       now = ()=> BigInt(Date.now()*1000);
