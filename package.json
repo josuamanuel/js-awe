@@ -8,11 +8,13 @@
   "scripts": {
     "test": "npm run testUT",
     "testUT": "export CONFIG_ENV=Testing && export LOG_LEVEL=SILENT && mocha ./test/**/*.js",
-    "build": "rollup src/index.js -o dist/awe.js -f iife -n awe"
+    "build": "rollup -c"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@rollup/plugin-commonjs": "^22.0.2",
+    "@rollup/plugin-node-resolve": "^13.3.0",
     "mocha": "^10.0.0",
     "rollup": "^2.79.0"
   },
