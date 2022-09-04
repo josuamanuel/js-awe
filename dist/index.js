@@ -1,10 +1,11 @@
+try {
+  globalThis
+}catch(e)
+{
+  var globalThis
+}
+
 (function (global, factory) {
-  try {
-    globalThis
-  }catch(e)
-  {
-    var globalThis
-  }
   console.log('it got here...')
   console.log('I can see globalThis', globalThis)
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('util/types'), require('node:http'), require('node:https'), require('node:zlib'), require('node:stream'), require('node:buffer'), require('node:util'), require('node:url'), require('node:net'), require('node:fs'), require('node:path'), require('stream'), require('util'), require('fs')) :
