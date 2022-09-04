@@ -40559,7 +40559,7 @@ try {
   // 64 KiB (same size chrome slice theirs blob into Uint8array's)
   const POOL_SIZE$1 = 65536;
 
-  if (!globalThis.ReadableStream) {
+  if (!globalThis?.ReadableStream) {
     // `node:stream/web` got introduced in v16.5.0 as experimental
     // and it's preferred over the polyfilled version. So we also
     // suppress the warning that gets emitted by NodeJS for using it.
