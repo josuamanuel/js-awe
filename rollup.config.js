@@ -8,7 +8,7 @@ export default {
     file: 'dist/anonymize.js',
     format: 'umd',
     name: 'awe',
-    inlineDynamicImports: true
+    //inlineDynamicImports: true
   },
   plugins: [
     resolve(),
