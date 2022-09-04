@@ -1,5 +1,8 @@
-var anonymize = (function (exports) {
-  'use strict';
+(function (global, factory) {
+  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
+  typeof define === 'function' && define.amd ? define(['exports'], factory) :
+  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.awe = {}));
+})(this, (function (exports) { 'use strict';
 
   const dict = {
     upperLetters: ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'],
@@ -49,7 +52,4 @@ var anonymize = (function (exports) {
 
   Object.defineProperty(exports, '__esModule', { value: true });
 
-  return exports;
-
-})({});
-this.anonymize = anonymize;
+}));
