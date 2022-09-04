@@ -2,7 +2,7 @@ try {
   globalThis
 }catch(e)
 {
-  var globalThis = global ?? {}
+  var globalThis = this ?? global ?? {}
 }
 
 (function (global, factory) {
