@@ -52,3 +52,4 @@ var anonymize = (function (exports) {
   return exports;
 
 })({});
+this.anonymize = anonymize;
