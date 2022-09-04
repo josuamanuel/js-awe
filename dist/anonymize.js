@@ -1,4 +1,4 @@
-(function (exports) {
+var anonymize = (function (exports) {
   'use strict';
 
   const dict = {
