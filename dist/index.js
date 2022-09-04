@@ -35889,13 +35889,13 @@
     try {
       now = process.hrtime.bigint; 
     }catch(e)
+    {}
+
+    try { 
+      if(now === undefined) now = ()=> BigInt(performance.now()*1000);
+    }catch(e)
     {
-      try { 
-        now = ()=> BigInt(performance.now()*1000);
-      }catch(e)
-      {
-        now = ()=> BigInt(Date.now()*1000);
-      }
+      now = ()=> BigInt(Date.now()*1000);
     }
 
     let historyTimeIntervals = {};

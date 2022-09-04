@@ -6,17 +6,17 @@ import { Text } from './table/components/text.js'
 import { Timeline } from './table/components/timeline.js'
 
 function Chrono() {
-  let now
+  let now;
   try {
-    now = process.hrtime.bigint 
+    now = process.hrtime.bigint; 
+  }catch(e)
+  {}
+
+  try { 
+    if(now === undefined) now = ()=> BigInt(performance.now()*1000);
   }catch(e)
   {
-    try { 
-      now = ()=> BigInt(performance.now()*1000)
-    }catch(e)
-    {
-      now = ()=> BigInt(Date.now()*1000)
-    }
+    now = ()=> BigInt(Date.now()*1000);
   }
 
   let historyTimeIntervals = {}
