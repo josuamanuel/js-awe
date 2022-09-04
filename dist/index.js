@@ -2,16 +2,14 @@ try {
   globalThis
 }catch(e)
 {
-  var globalThis = this ?? global ?? {}
+  var globalThis = this
 }
 
 (function (global, factory) {
-  console.log('it got here...')
-  console.log('I can see globalThis', globalThis)
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('util/types'), require('node:http'), require('node:https'), require('node:zlib'), require('node:stream'), require('node:buffer'), require('node:util'), require('node:url'), require('node:net'), require('node:fs'), require('node:path'), require('stream'), require('util'), require('fs')) :
   typeof define === 'function' && define.amd ? define(['exports', 'util/types', 'node:http', 'node:https', 'node:zlib', 'node:stream', 'node:buffer', 'node:util', 'node:url', 'node:net', 'node:fs', 'node:path', 'stream', 'util', 'fs'], factory) :
   (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.awe = {}, global.types, global.http, global.https, global.zlib, global.Stream, global.node_buffer, global.node_util, global.node_url, global.node_net, null, null, global.stream, global.util, global.fs));
-})(this, (function (exports, types, http, https, zlib, Stream, node_buffer, node_util, node_url, node_net, node_fs, node_path, stream, util, fs) { 'use strict';
+})(this, (function (exports, types, http, https, zlib, Stream, node_buffer, node_util, node_url, node_net, node_fs, node_path, stream, util, fs) {
 
   function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
 
@@ -40561,7 +40559,7 @@ try {
   // 64 KiB (same size chrome slice theirs blob into Uint8array's)
   const POOL_SIZE$1 = 65536;
 
-  if (!globalThis?.ReadableStream) {
+  if (!globalThis.ReadableStream) {
     // `node:stream/web` got introduced in v16.5.0 as experimental
     // and it's preferred over the polyfilled version. So we also
     // suppress the warning that gets emitted by NodeJS for using it.
