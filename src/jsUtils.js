@@ -1540,7 +1540,12 @@ function* loopIndexGenerator(initValue, iterations) {
 
 function processExit(error) {
   console.log(`Shutting down with error: ${error}`);
-  process.exit(1)
+  try {
+    process.exit(1)
+  }catch(e)
+  {
+    console.log(e)
+  }
 }
 
 const jsUtils = {

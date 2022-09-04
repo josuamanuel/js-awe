@@ -6,6 +6,18 @@ import { Text } from './table/components/text.js'
 import { Timeline } from './table/components/timeline.js'
 
 function Chrono() {
+  let now
+  try {
+    now = process.hrtime.bigint 
+  }catch(e)
+  {
+    try { 
+      now = ()=> BigInt(performance.now()*1000)
+    }catch(e)
+    {
+      now = ()=> BigInt(Date.now()*1000)
+    }
+  }
 
   let historyTimeIntervals = {}
 
@@ -17,13 +29,13 @@ function Chrono() {
   function createTimeEvent(eventName) {
     chronoEvents[eventName] = {
       date: new Date(),
-      hrtime: process.hrtime.bigint()
+      hrtime: now()
     }
   }
 
   function time(eventNames) {
 
-    let currentHrtime = process.hrtime.bigint()
+    let currentHrtime = now()
 
     let listOfEvents = typeof eventNames === 'string' ? [eventNames] : eventNames
 
@@ -37,20 +49,20 @@ function Chrono() {
 
 
   function timeEnd(eventNames) {
-    let currentHrtime = process.hrtime.bigint()
+    let currentHrtime = now()
 
     let listOfEvents = typeof eventNames === 'string' ? [eventNames] : eventNames
 
     listOfEvents.forEach(eventName => {
       if (historyTimeIntervals[eventName] === undefined) {
-        process.emitWarning(`No such Label '${eventName}' for .timeEnd(...)`, 'CustomWarning', 'WARN002');
+        console.log(`No such Label '${eventName}' for .timeEnd(...)`, 'CustomWarning', 'WARN002');
         return
       }
 
       let start = historyTimeIntervals[eventName].start.pop()
 
       if (start === undefined) {
-        process.emitWarning(`Label '${eventName}' was already consumed by a previous call to .timeEnd(...)`, 'CustomWarning', 'WARN003');
+        console.log(`Label '${eventName}' was already consumed by a previous call to .timeEnd(...)`, 'CustomWarning', 'WARN003');
         return
       }
 
