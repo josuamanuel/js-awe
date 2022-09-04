@@ -5,6 +5,8 @@
   {
     var globalThis
   }
+  console.log('it got here...')
+  console.log('I can see globalThis', globalThis)
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('util/types'), require('node:http'), require('node:https'), require('node:zlib'), require('node:stream'), require('node:buffer'), require('node:util'), require('node:url'), require('node:net'), require('node:fs'), require('node:path'), require('stream'), require('util'), require('fs')) :
   typeof define === 'function' && define.amd ? define(['exports', 'util/types', 'node:http', 'node:https', 'node:zlib', 'node:stream', 'node:buffer', 'node:util', 'node:url', 'node:net', 'node:fs', 'node:path', 'stream', 'util', 'fs'], factory) :
   (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.awe = {}, global.types, global.http, global.https, global.zlib, global.Stream, global.node_buffer, global.node_util, global.node_url, global.node_net, null, null, global.stream, global.util, global.fs));
