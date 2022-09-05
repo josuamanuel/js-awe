@@ -4,6 +4,9 @@ import { Table } from './table/table.js'
 import { Text } from './table/components/text.js'
 import { Timeline } from './table/components/timeline.js'
 
+// needed only for debuging
+//import { RE } from './ramdaExt.js';
+
 function Chrono() {
   let now;
   try {
@@ -91,18 +94,6 @@ function Chrono() {
       [Infinity,0]
     ) //?
     
-     
-  //   console.log(`
-  //  -------------------------------------------------------------------------------------------
-  // | events              | ms  0     80        200   500        900     1100                   |
-  // |---------------------|---------------------------------------------------------------------|          
-  // | loadConfig          |     |----------------------|          |--------|                    |
-  // | getCards            |     |-----------|          |---------------|                        |
-  // | getAccounts         |     |------|                                                        |
-  // | compeseFinalOutput  |                       |--------------|         |---------------|    |
-  //  -------------------------------------------------------------------------------------------
-  //   `)
-    //plot(entriesEvents, minHrtime, maxHrtime)
     return events
   }
 
@@ -201,7 +192,7 @@ function Chrono() {
         totalEventsElapseTimeReport,
         compactListOfNameRanges,
         //RE.RLog('1-->: '),
-        R.sort(sorterByPaths('range')),
+        R.sort(sorterByPaths('range.start')),
         reportListOfNameRanges,
         //RE.RLog('3-->: '),
         coincidingEventsReport
