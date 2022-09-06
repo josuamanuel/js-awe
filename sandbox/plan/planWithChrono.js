@@ -6,7 +6,7 @@ import { RLog, R, innerRightJoinWith } from '../../src/ramdaExt.js'
 import { fork, after } from 'fluture'
 
 const logFork = message => fork(
-  error =>RLog(message + ' - Error: ')(JSON.stringify(error))
+  error =>RLog(message + ' - Error: ')(error)
 )(
   response =>RLog(message + ' - OK: ')(response)
 )
