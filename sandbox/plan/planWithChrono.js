@@ -188,5 +188,5 @@ const executeIfyouWantToCancel = planFun
 // enough time to execute the whole plan
  timeoutId = setTimeout(executeIfyouWantToCancel, 30000)
 
- // We stop in the middle of execution
+ // Setting up a low value of timeout 250ms will stop in the middle of the plan execution
 //setTimeout(executeIfyouWantToCancel, 250)
