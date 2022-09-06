@@ -8,7 +8,7 @@ const { cloneDeep } = pkg; 
 
 // Only needed for testing
 // import {  after, both, chain, map, fork } from 'fluture';
-// import { repeat, CustomError } from './jsUtils.js' 
+// import { repeat } from './jsUtils.js' 
 
 const RE = {}
 
@@ -470,7 +470,7 @@ const pipeWithChain = function (...func) {
               acum[acum.length - 1] = reject(new Error('Future param must be the last param of the function'))
             else
               //Apply all the parameters to convert it to a unary function.
-              pipeFunc = currentPipeFunc.bind(undefined, ...acum.slice(0, acum.length - 1))
+              pipeFunc = currentPipeFunc?.bind(undefined, ...acum.slice(0, acum.length - 1))
         }
 
         // Then extract last parameter
@@ -655,7 +655,7 @@ const pipe = function (...func) {
               acum[acum.length - 1] = reject(new Error('Future param must be the last param of the function'))
             else
               //Apply all the parameters to convert it to a unary function.
-              pipeFunc = currentPipeFunc.bind(undefined, ...acum.slice(0, acum.length - 1))
+              pipeFunc = currentPipeFunc?.bind(undefined, ...acum.slice(0, acum.length - 1))
         }
 
         // Then extract last parameter
