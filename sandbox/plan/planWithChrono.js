@@ -3,7 +3,7 @@ import { plan  } from '../../src/plan.js'
 import { Chrono } from '../../src/chrono.js'
 import { RLog, R, innerRightJoinWith } from '../../src/ramdaExt.js'
 
-import { fork, after } from 'fluture'
+import { fork, after, map, mapRej } from 'fluture'
 
 const logFork = message => fork(
   error =>RLog(message + ' - Error: ')(error)
@@ -173,8 +173,10 @@ const executeIfyouWantToCancel = planFun
   ('f1')
  .pipe(R.map(chronoTimeEnd('dataProcessing')))
  .pipe(R.map(chronoReport))
- // We clear the timeout, otherwise node will hang and idle execution until timeout completes.
- .pipe(R.map((data)=>{clearTimeout(timeoutId);return data}))
+ // We clear the timeout if it fails, otherwise node will hang and idle execution until timeout completes.
+ .pipe(mapRej((error)=>{clearTimeout(timeoutId);return error}))
+ // We clear the timeout if it works, otherwise node will hang and idle execution until timeout completes.
+ .pipe(map((data)=>{clearTimeout(timeoutId);return data}))
  .pipe(logFork('Final result plan: '))
 
 
