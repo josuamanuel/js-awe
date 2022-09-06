@@ -6,7 +6,7 @@ import { isPromise } from 'util/types';
 import pkg from 'lodash'; 
 const { cloneDeep } = pkg; 
 
-// Only needed for testing
+// //Only needed for testing
 // import {  after, both, chain, map, fork } from 'fluture';
 // import { repeat } from './jsUtils.js' 
 
@@ -507,7 +507,11 @@ const pipeWithChain = function (...func) {
                 } catch (e) {
                   result = e
                 }
-              } else result = pipeFunc(elem)
+              } else
+              {
+                // Exceptions in pipeFunc will need to be handle by the caller in sync calls.
+                result = pipeFunc(elem)
+              }
 
               if (isAcumAFutureAndElemAnError(acum, result)) {
                 return createReject(acum, result)
@@ -694,7 +698,11 @@ const pipe = function (...func) {
                 } catch (e) {
                   result = e
                 }
-              } else result = pipeFunc(elem)
+              } else 
+              {
+                // Exceptions in pipeFunc will need to be handle by the caller in sync calls.
+                result = pipeFunc(elem)
+              }
 
               if (isAcumAFutureAndElemAnError(acum, result)) {
                 return createReject(acum, result)
@@ -790,6 +798,19 @@ RE.pipe = pipe
 // )(5, 6)
 // .then(RLog('pipe-Ex7-OK: '),RLog('pipe-Ex7-Err: ') )
 
+// // Example with throw error sync
+// // Exeption is raised up in sync mode vs async
+// // where exception is transjform in rejec(exception)
+// try {
+//   RE.pipe(
+//     (x,y) => x+y,
+//     x => {throw new Error('aaaa')},
+//     x => x.filter(elem => elem > 15)
+//   )(5, 6)
+// } catch(e)
+// {
+//   console.log('Sync failed with: ', e)
+// }
 
 const pipeWhile = (funCond, ini) => (...funcs) => (...inputs) => {
   if (
