@@ -122,36 +122,32 @@ function composeNameAndHolders([holdings, name])
 
 let chrono = Chrono()
 
-const chronoTime = event => data => { chrono.time(event); return data}
-const chronoTimeEnd = event => data => { chrono.timeEnd(event); return data}
-const chronoReport = data => {chrono.report(); return data}
-
 
 const productInformationPlan = 
 [                
-  chronoTimeEnd('plan'),                          
-  chronoTime('getCustomerData'),
+  chrono.setTimeEnd('plan'),                          
+  chrono.setTime('getCustomerData'),
   getCustomerData,                                  
-  chronoTimeEnd('getCustomerData'),                     
+  chrono.setTimeEnd('getCustomerData'),                     
   [                                          
-    chronoTime('preparingPlaceholder'),
+    chrono.setTime('preparingPlaceholder'),
     R.prop('holdings'),                      
     filterActiveAccounts,                      
     buildPlaceholderStructure,                  
-    chronoTimeEnd('preparingPlaceholder'),
+    chrono.setTimeEnd('preparingPlaceholder'),
     [                                           
       [         
-        chronoTime('getBankingBalances'),                                
+        chrono.setTime('getBankingBalances'),                                
 
         getBankingBalances,                     
-        chronoTimeEnd('getBankingBalances'),
+        chrono.setTimeEnd('getBankingBalances'),
       ],       
       [                                         
-        chronoTime('getCreditCardBalances'),                                
+        chrono.setTime('getCreditCardBalances'),                                
         getCreditCardBalances,                 
-        chronoTimeEnd('getCreditCardBalances'),                               
+        chrono.setTimeEnd('getCreditCardBalances'),                               
       ],                                        
-      chronoTime('dataProcessing'),                                          
+      chrono.setTime('dataProcessing'),                                          
       mergeCardsAndAccountsInArray             
     ],                                          
     [                                           
@@ -172,8 +168,8 @@ const planFun = plan(
 
 planFun
   ('f1')
-.then(chronoTimeEnd('dataProcessing'))
-.then(chronoReport)
+.then(chrono.setTimeEnd('dataProcessing'))
+.then(chrono.logReport)
 .then((OK)=>console.log('OK: ', OK), (error)=>console.log('Error: ', error))
 
 

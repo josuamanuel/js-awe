@@ -277,7 +277,22 @@ function Chrono() {
     return new Date(milisecondsDate)
   }
 
-  return { time, timeEnd, report }
+  const setTime = event => data => { 
+    time(event)
+    return data
+  }
+
+  const setTimeEnd = event => data => { 
+    timeEnd(event)
+    return data
+  }
+
+  const logReport = data => {
+    report()
+    return data
+  }
+
+  return { time, timeEnd, report, setTime, setTimeEnd, logReport }
 }
 
 

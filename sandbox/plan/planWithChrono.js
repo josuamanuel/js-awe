@@ -117,38 +117,34 @@ function composeNameAndHolders([holdings, name])
   }
 }
 
-let chrono = Chrono()
-
-const chronoTime = event => data => { chrono.time(event); return data}
-const chronoTimeEnd = event => data => { chrono.timeEnd(event); return data}
-const chronoReport = data => {chrono.report(); return data}
+let {time, setTime, setTimeEnd, logReport} = Chrono()
 
 
 const productInformationPlan = 
 [                
-  chronoTimeEnd('plan'),                          
-  chronoTime('getCustomerData'),
+  setTimeEnd('plan'),                          
+  setTime('getCustomerData'),
   getCustomerData,                                  
-  chronoTimeEnd('getCustomerData'),                     
+  setTimeEnd('getCustomerData'),                     
   [                                          
-    chronoTime('preparingPlaceholder'),
+    setTime('preparingPlaceholder'),
     R.prop('holdings'),                      
     filterActiveAccounts,                      
     buildPlaceholderStructure,                  
-    chronoTimeEnd('preparingPlaceholder'),
+    setTimeEnd('preparingPlaceholder'),
     [                                           
       [         
-        chronoTime('getBankingBalances'),                                
+        setTime('getBankingBalances'),                                
 
         getBankingBalances,                     
-        chronoTimeEnd('getBankingBalances'),
+        setTimeEnd('getBankingBalances'),
       ],       
       [                                         
-        chronoTime('getCreditCardBalances'),                                
+        setTime('getCreditCardBalances'),                                
         getCreditCardBalances,                 
-        chronoTimeEnd('getCreditCardBalances'),                               
+        setTimeEnd('getCreditCardBalances'),                               
       ],                                        
-      chronoTime('dataProcessing'),                                          
+      setTime('dataProcessing'),                                          
       mergeCardsAndAccountsInArray             
     ],                                          
     [                                           
@@ -164,15 +160,15 @@ const productInformationPlan =
 
 let timeoutId
 
-chrono.time('plan')
+time('plan')
 const planFun = plan(
   productInformationPlan
 )
 
 const executeIfyouWantToCancel = planFun
   ('f1')
- .pipe(R.map(chronoTimeEnd('dataProcessing')))
- .pipe(R.map(chronoReport))
+ .pipe(R.map(setTimeEnd('dataProcessing')))
+ .pipe(R.map(logReport))
  // We clear the timeout if it fails, otherwise node will hang and idle execution until timeout completes.
  .pipe(mapRej((error)=>{clearTimeout(timeoutId);return error}))
  // We clear the timeout if it works, otherwise node will hang and idle execution until timeout completes.
