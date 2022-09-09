@@ -8,36 +8,27 @@ import { Timeline } from './table/components/timeline.js'
 //import { RE } from './ramdaExt.js';
 
 function Chrono() {
-  let now;
-  try {
-    now = process.hrtime.bigint; 
-  }catch(e)
-  {}
-
-  try { 
-    if(now === undefined && performance.now) now = ()=> BigInt(Math.floor(performance.now()*1000));
-  }catch(e)
-  {
-    now = ()=> BigInt(Date.now()*1000);
-  }
+  let microSecondsNow
+  if(performance.now) microSecondsNow = () => Math.floor(performance.now()*1000)
+  if(microSecondsNow === undefined) microSecondsNow = ()=> Date.now()*1000
 
   let historyTimeIntervals = {}
 
   let chronoEvents = {}
   createTimeEvent('chronoCreation')
 
-  let rangeType = Range({type:'hrtimeBigInt', displayFormat:'ms', referenceHrtime: chronoEvents['chronoCreation'].hrtime})
+  let rangeType = Range({type:'microSeconds', displayFormat:'ms', referenceMicroSeconds: chronoEvents['chronoCreation'].microSeconds})
 
   function createTimeEvent(eventName) {
     chronoEvents[eventName] = {
       date: new Date(),
-      hrtime: now()
+      microSeconds: microSecondsNow()
     }
   }
 
   function time(eventNames) {
 
-    let currentHrtime = now()
+    let currentMicroSeconds = microSecondsNow()
 
     let listOfEvents = typeof eventNames === 'string' ? [eventNames] : eventNames
 
@@ -45,13 +36,13 @@ function Chrono() {
       historyTimeIntervals[eventName] = historyTimeIntervals[eventName] ?? {}
 
       historyTimeIntervals[eventName].start = historyTimeIntervals[eventName].start ?? []
-      historyTimeIntervals[eventName].start.push(currentHrtime)
+      historyTimeIntervals[eventName].start.push(currentMicroSeconds)
     })
   }
 
 
   function timeEnd(eventNames) {
-    let currentHrtime = now()
+    let currentMicroSeconds = microSecondsNow()
 
     let listOfEvents = typeof eventNames === 'string' ? [eventNames] : eventNames
 
@@ -72,7 +63,7 @@ function Chrono() {
       historyTimeIntervals[eventName].ranges.push(
         rangeType(
           start,
-          currentHrtime
+          currentMicroSeconds
         )
       )
 
@@ -82,7 +73,7 @@ function Chrono() {
   function eventsReport(events)
   {
     const entriesEvents = Object.entries(events)
-    const [minHrtime, maxHrtime] = entriesEvents.reduce(
+    const [minMicroSeconds, maxMicroSeconds] = entriesEvents.reduce(
       (acum, [eventName, eventObject]) => {
         eventObject.ranges.forEach(
           range => {
@@ -104,7 +95,7 @@ function Chrono() {
       (acum, current) => {
         let found = acum.find(el => el.name === current.name)
 
-        const currentElapseMs = hrtimeBigIntToMs(current.range.end - current.range.start)
+        const currentElapseMs = microSecondsToMs(current.range.end - current.range.start)
         totalElapse = totalElapse + currentElapseMs
         if(found) found.elapse = found.elapse + currentElapseMs
         else acum.push({name: current.name, elapse: currentElapseMs})
@@ -130,7 +121,7 @@ function Chrono() {
     R.pipe(
       groupByWithCalc(
         (row) => JSON.stringify(row.runningEvents.sort(arraySorter())),
-        { percentage: (l, r) => (l??0) + r, elapseMs: (l, r) => (l??0) + r }
+        { percentage: (l, r) => (l??0) + r, elapseMs: (l, r) => Math.floor((l??0) + r) }
       ),
       R.map( row => ({...row, percentage: Number(row.percentage.toFixed(2))}) ),
       (coincidingEvents) => {
@@ -164,7 +155,7 @@ function Chrono() {
         {
           event: eventName, 
           ranges: event.ranges.map(
-            ({start, end} ) => ({start: hrtimeBigIntToMs(start), end: hrtimeBigIntToMs(end)})
+            ({start, end} ) => ({start: microSecondsToMs(start), end: microSecondsToMs(end)})
           )
         }))
     timelineReport(toReport)
@@ -255,7 +246,7 @@ function Chrono() {
     let totalElapse = 0
     return listOfNameRanges.map(
       ({ runningEvents, range }) => {
-        let elapseMs = hrtimeBigIntRangeToElapseMs(range)
+        let elapseMs = microSecondsRangeToElapseMs(range)
         totalElapse = totalElapse + elapseMs
         return {
           runningEvents,
@@ -268,11 +259,10 @@ function Chrono() {
     })
   }
 
-  function hrtimeToDate(currentHrtime) {
+  function microSecondsToDate(currentMicroSeconds) {
     let chronoCreation = chronoEvents['chronoCreation']
     let milisecondsDate =
-      chronoCreation.date - 0 +
-      Number((currentHrtime - chronoCreation.hrtime) / BigInt(1000000))
+      chronoCreation.date + (currentMicroSeconds - chronoCreation.microSeconds) / 1000
 
     return new Date(milisecondsDate)
   }
@@ -292,30 +282,31 @@ function Chrono() {
     return data
   }
 
-  return { time, timeEnd, report, setTime, setTimeEnd, logReport }
+  const getChronoState = () => historyTimeIntervals
+
+  return { time, timeEnd, report, setTime, setTimeEnd, logReport, getChronoState }
 }
 
 
-function hrtimeBigIntRangeToElapseMs({start, end}) {
-  return Number((end - start) / BigInt(1000000))
+function microSecondsRangeToElapseMs({start, end}) {
+  return (end - start) / 1000
 }
-//hrtimeBigIntRangeToElapseMs(Range(BigInt(1953997827221605), BigInt(1953997981407671) )) //?
-//hrtimeBigIntRangeToElapseMs({ start:BigInt(1953997827221605), end:BigInt(1953997981407671) }) //?
 
-function hrtimeBigIntToMs(hrtime) {
-  return Number(hrtime / BigInt(1000000))
+
+function microSecondsToMs(microSeconds) {
+  return Math.floor(microSeconds / 1000)
 }
 
 function Range(...params) {
   let type
   let displayFormat
-  let referenceHrtime
+  let referenceMicroSeconds
 
   if(params.length === 2 ) {
     return range(params[0], params[1])
   }
   else {
-    ({ type, displayFormat, referenceHrtime} = params[0])
+    ({ type, displayFormat, referenceMicroSeconds} = params[0])
     return range
   }
 
@@ -325,9 +316,9 @@ function Range(...params) {
 
     function toString() 
     {
-      if(type === 'hrtimeBigInt' && displayFormat === 'ms' && referenceHrtime !== undefined) {
-        const startMs = hrtimeBigIntRangeToElapseMs({start:referenceHrtime, end:start})
-        const endMs = hrtimeBigIntRangeToElapseMs({start:referenceHrtime, end})
+      if(type === 'microSeconds' && displayFormat === 'ms' && referenceMicroSeconds !== undefined) {
+        const startMs = microSecondsRangeToElapseMs({start:referenceMicroSeconds, end:start})
+        const endMs = microSecondsRangeToElapseMs({start:referenceMicroSeconds, end})
         return `{ start:${startMs} <-${endMs - startMs}-> end:${endMs} }`
       }
 
