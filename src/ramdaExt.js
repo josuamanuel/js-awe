@@ -1,8 +1,7 @@
 // ts-check
 import * as R from 'ramda';
-import { transition, sorterByPaths, CustomError } from './jsUtils.js'
+import { transition, sorterByPaths, CustomError, isPromise } from './jsUtils.js'
 import { reject, resolve, parallel as FParallel, isFuture } from 'fluture';
-import { isPromise } from 'util/types';
 import pkg from 'lodash'; 
 const { cloneDeep } = pkg; 
 

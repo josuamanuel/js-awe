@@ -15,7 +15,7 @@ function Chrono() {
   {
 
   }
-  
+
   if(microSecondsNow === undefined) microSecondsNow = ()=> Date.now()*1000
 
   let historyTimeIntervals = {}
@@ -116,7 +116,9 @@ function Chrono() {
 
     console.log('')
     console.log('Total elapse Time of each event: ')
-    console.table(toLog)
+
+    if(console.table) console.table(toLog)
+    else console.log(toLog)
 
     return events
   }
@@ -133,7 +135,8 @@ function Chrono() {
       (coincidingEvents) => {
         console.log('')
         console.log('Coinciding Events timeline: ')
-        console.table(coincidingEvents)
+        if(console.table) console.table(coincidingEvents)
+        else console.log(coincidingEvents)
       }
     )(elapseTable)
 
