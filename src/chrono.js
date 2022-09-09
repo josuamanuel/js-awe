@@ -9,7 +9,13 @@ import { Timeline } from './table/components/timeline.js'
 
 function Chrono() {
   let microSecondsNow
-  if(performance.now) microSecondsNow = () => Math.floor(performance.now()*1000)
+  try {
+    if(performance.now) microSecondsNow = () => Math.floor(performance.now()*1000)
+  }catch(e)
+  {
+
+  }
+  
   if(microSecondsNow === undefined) microSecondsNow = ()=> Date.now()*1000
 
   let historyTimeIntervals = {}
