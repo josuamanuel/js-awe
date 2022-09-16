@@ -1,22 +1,20 @@
-import { arraySorter, pushUniqueKeyOrChange, sorterByPaths, pushUniqueKey } from './jsUtils.js';
-import { groupByWithCalc, R } from './ramdaExt.js';
+import { arraySorter, pushUniqueKeyOrChange, sorterByPaths, pushUniqueKey, sleepWithValue, CustomError, pushAt } from './jsUtils.js';
+import { groupByWithCalc, R, RE } from './ramdaExt.js';
 import { Table } from './table/table.js'
 import { Text } from './table/components/text.js'
 import { Timeline } from './table/components/timeline.js'
 import { performance } from 'node:perf_hooks'
+import { plan } from './plan.js';
 
 // needed only for debuging
 //import { RE } from './ramdaExt.js';
 
+//TDL avarage
+//TDL serialize and deserilize using performance.getEntriesByType("measure")
+
 function Chrono() {
   let milisecondsNow
-  try {
-    if(performance.now) milisecondsNow = () => performance.now()
-  }catch(e)
-  {
-
-  }
-
+  if(performance.now) milisecondsNow = () => performance.now()
   if(milisecondsNow === undefined) milisecondsNow = ()=> Date.now()
 
   let historyTimeIntervals = {}
@@ -35,51 +33,228 @@ function Chrono() {
 
   function time(eventNames) {
 
-    let currentMilisecondss = milisecondsNow()
+    let currentMiliseconds = milisecondsNow()
 
     let listOfEvents = typeof eventNames === 'string' ? [eventNames] : eventNames
 
     listOfEvents.forEach(eventName => {
+
+      if(typeof eventName !== 'string' ||  isNaN(Number(eventName)) === false ) 
+        throw new CustomError(
+          'EVENT_NAME_MUST_HAVE_ALPHABETICS_CHARS',
+          `Event name '${eventName}' must be of type string and contain some non numeric character`,
+          eventName
+        )
+
       historyTimeIntervals[eventName] = historyTimeIntervals[eventName] ?? {}
 
       historyTimeIntervals[eventName].start = historyTimeIntervals[eventName].start ?? []
-      historyTimeIntervals[eventName].start.push(currentMilisecondss)
+      historyTimeIntervals[eventName].start.push(currentMiliseconds)
     })
   }
 
 
   function timeEnd(eventNames) {
-    let currentMilisecondss = milisecondsNow()
+    let currentMiliseconds = milisecondsNow()
 
-    let listOfEvents = typeof eventNames === 'string' ? [eventNames] : eventNames
+    let listOfEvents =
+      typeof eventNames === 'string'
+        ? [eventNames] 
+        : eventNames
 
     listOfEvents.forEach(eventName => {
       if (historyTimeIntervals[eventName] === undefined) {
-        console.log(`No such Label '${eventName}' for .timeEnd(...)`, 'CustomWarning', 'WARN002');
-        return
+        throw new CustomError('EVENT_NAME_NOT_FOUND', `No such Label '${eventName}' for .timeEnd(...)`, eventName);
       }
 
       let start = historyTimeIntervals[eventName].start.pop()
 
       if (start === undefined) {
-        console.log(`Label '${eventName}' was already consumed by a previous call to .timeEnd(...)`, 'CustomWarning', 'WARN003');
-        return
+        throw new CustomError('EVENT_NAME_ALREADY_CONSUMED',`eventName: '${eventName}' was already consumed by a previous call to .timeEnd(...)`, eventName);
       }
 
       historyTimeIntervals[eventName].ranges = historyTimeIntervals[eventName].ranges ?? []
       historyTimeIntervals[eventName].ranges.push(
         rangeType(
           start,
-          currentMilisecondss
+          currentMiliseconds
         )
       )
 
     })
   }
 
-  function avarage()
+  function validateEvents()
   {
+    const greatestNumberOfRanges = Object.entries(historyTimeIntervals).find(
+      ([eventName, eventValues], indexEvent, intervalEntries) => 
+        eventValues.ranges.length > intervalEntries[0][1].ranges.length
+    )
 
+    if(greatestNumberOfRanges !== undefined) 
+      throw new CustomError(
+        'FIRST_EVENT_SHOULD_HAVE_THE_GREATEST_NUMBER_OF_RANGES',
+        `Found an event with more ranges than the first recorded`,
+        greatestNumberOfRanges
+      )
+  }
+
+
+  function fillWithUndefinedRanges()
+  {
+    //historyTimeIntervals['firstPap150'].ranges.pop()
+    historyTimeIntervals //?
+
+    Object.entries(historyTimeIntervals).forEach(
+      ([eventName, eventValues], indexEvent, intervalEntries) => {
+        let indexRangeForEvent = 0
+        intervalEntries[0][1].ranges.forEach(
+          ({start: startRef, end: endRef}, indexRangeRef) => {
+            if(indexEvent === 0 ) {
+              eventValues.ranges[indexRangeRef] = rangeType(startRef, endRef, indexRangeRef)
+              return
+            }
+
+            let foundMatchingInterval = false
+            while( 
+              eventValues.ranges[indexRangeForEvent]?.start >= startRef &&
+              ( 
+                indexRangeRef + 1 === intervalEntries[0][1].ranges.length ||
+                eventValues.ranges[indexRangeForEvent].start < intervalEntries[0][1].ranges[indexRangeRef + 1]?.start 
+              )
+            )
+            {
+              foundMatchingInterval = true
+              
+              // Accrued ranges for same interval, deleting the previous one
+              if(eventValues.ranges[indexRangeForEvent -1]?.interval === indexRangeRef)
+              {
+                eventName
+                eventValues.ranges[indexRangeForEvent] = 
+                  rangeType(
+                    eventValues.ranges[indexRangeForEvent].start - (eventValues.ranges[indexRangeForEvent-1].end - eventValues.ranges[indexRangeForEvent-1].start),
+                    eventValues.ranges[indexRangeForEvent].end,
+                    indexRangeRef
+                  )
+                eventValues.ranges.splice(indexRangeForEvent -1, 1)
+              }else
+              {
+                eventValues.ranges[indexRangeForEvent] = 
+                rangeType(
+                  eventValues.ranges[indexRangeForEvent].start, 
+                  eventValues.ranges[indexRangeForEvent].end,
+                  indexRangeRef
+                )
+                indexRangeForEvent++
+              }  
+            }
+
+            if(foundMatchingInterval === false)
+            {
+              pushAt(indexRangeForEvent, rangeType(undefined, undefined, indexRangeRef), eventValues.ranges)
+              indexRangeForEvent++
+            }
+          }
+        )
+      }
+    )
+    historyTimeIntervals //?
+  }
+
+  function findParentRanges(indexEvent, intervalEntries)
+  {
+    let isNotAParent = true
+    while(indexEvent !== 0 && isNotAParent === true) {
+      indexEvent--
+      isNotAParent = intervalEntries[indexEvent][1].ranges.some(({start, end}) => start === undefined || end === undefined)
+    }
+
+    indexEvent
+    return [intervalEntries[indexEvent][1].ranges, indexEvent]
+  }
+
+  //TDL
+  function avarageEvents()
+  {
+    validateEvents()
+    fillWithUndefinedRanges()
+
+    let newHistoryArrayTimeIntervals = Object.entries(historyTimeIntervals).reduce(
+      (newHistoryIntervals, [eventName, eventValues], indexEvent, intervalEntries) => {
+
+        const [parentRanges, parentIndexEvent] = findParentRanges( indexEvent, intervalEntries)
+
+        const [totalElapse, totalEndToStartGap, totalStartToStartGap] =
+          eventValues.ranges.reduce(
+            ([totalElapse, totalEndToStartGap, totalStartToStartGap], {start=0, end=0}, indexRange) => {
+              totalElapse = totalElapse + end - start
+              if(indexEvent !== 0 && start !== 0 && end !== 0) {
+                totalEndToStartGap = totalEndToStartGap + start - parentRanges[indexRange].end
+                totalStartToStartGap = totalStartToStartGap + start - parentRanges[indexRange].start 
+              }
+
+              return [
+                totalElapse,
+                totalEndToStartGap,
+                totalStartToStartGap
+              ]
+            },
+            [0, 0, 0]
+          )
+        
+        let avarageEventStart  
+        let avarageEventEnd
+
+        const totalRangesWithValues = 
+          eventValues.ranges.filter(
+            ({start, end}) => start !== undefined & end !== undefined
+          ).length
+
+        if(indexEvent === 0) {
+          avarageEventStart = intervalEntries[0][1].ranges[0].start
+        }
+
+        if(indexEvent !== 0 && Math.abs(totalEndToStartGap) <= Math.abs(totalStartToStartGap) )
+        {
+          avarageEventStart = 
+            newHistoryIntervals[parentIndexEvent].ranges[0].end +
+            totalEndToStartGap/totalRangesWithValues
+        }
+
+        if(indexEvent !== 0 && Math.abs(totalStartToStartGap) < Math.abs(totalEndToStartGap) )
+        {
+          avarageEventStart = 
+          newHistoryIntervals[parentIndexEvent].ranges[0].start +
+            totalStartToStartGap/eventValues.ranges.length 
+        }
+
+        avarageEventEnd = avarageEventStart + totalElapse/eventValues.ranges.length
+
+        newHistoryIntervals[indexEvent] = 
+          {
+            eventName,
+            ranges: [
+              rangeType(
+                avarageEventStart,
+                avarageEventEnd,
+                0
+              )
+            ]
+          }
+ 
+        return newHistoryIntervals
+      },
+      []
+    )
+    historyTimeIntervals = newHistoryArrayTimeIntervals.reduce(
+      (acum, el) => {
+        acum[el.eventName] = {ranges:el.ranges}
+        return acum
+      },
+      {}
+    )
+
+    //range: { start:3.5852760076522827 <-133.67405599355698-> end:137.25933200120926 }
   }
 
   function eventsReport(events)
@@ -191,17 +366,18 @@ function Chrono() {
     createTimeEvent('report')
     chronoReport()
       R.pipe(
-        //RE.RLog('-1-->: '),
+        //RE.RLog('0-->: '),
         formatReportAndReturnInputParam,
         eventsReport,
         historyToListOfNameRanges,
-        //RE.RLog('0-->: '),
-        totalEventsElapseTimeReport,
-        compactListOfNameRanges,
         //RE.RLog('1-->: '),
+        totalEventsElapseTimeReport,
+        //RE.RLog('2-->: '),
+        compactListOfNameRanges,
+        //RE.RLog('3-->: '),
         R.sort(sorterByPaths('range.start')),
         reportListOfNameRanges,
-        //RE.RLog('3-->: '),
+        //RE.RLog('4-->: '),
         coincidingEventsReport
       )(historyTimeIntervals)
   }
@@ -225,8 +401,8 @@ function Chrono() {
   function compactListOfNameRanges(ListOfRangeNames) {
     return ListOfRangeNames.reduce(
       (acum, { name, range }) => {
-        acum.push({ name, isLeft: true, edge: range.start, edgeEnd: range.end })
-        acum.push({ name, isLeft: false, edge: range.end })
+        acum.push({ name, isLeft: true, edge: range.start, edgeEnd: range.end, interval:range.interval })
+        acum.push({ name, isLeft: false, edge: range.end, interval:range.interval })
         return acum
       },
       []
@@ -238,7 +414,7 @@ function Chrono() {
             let i = index
             do {
               pushUniqueKeyOrChange(
-                { runningEvents: [name], range: rangeType(table[i].edge, table[i + 1].edge) }
+                { runningEvents: [name], range: rangeType(table[i].edge, table[i + 1].edge, table[i].interval) }
                 , acum
                 , ['range']
                 , (newRow, existingRow) => {
@@ -292,7 +468,7 @@ function Chrono() {
 
   const getChronoState = () => historyTimeIntervals
 
-  return { time, timeEnd, report, setTime, setTimeEnd, logReport, getChronoState }
+  return { time, timeEnd, report, setTime, setTimeEnd, logReport, getChronoState, avarageEvents }
 }
 
 
@@ -308,16 +484,17 @@ function Range(...params) {
   let displayFormat
   let referenceMilisecondss
 
-  if(params.length === 2 ) {
-    return range(params[0], params[1])
+  if(params.length >= 2 ) {
+    return range(...params)
   }
   else {
     ({ type, displayFormat, referenceMilisecondss} = params[0])
     return range
   }
 
-  function range(start, end)
+  function range(start, end, interval)
   {
+    //console.log(interval) 
     if (start > end) throw new Error('range(start, end) start cannot be > than end')
 
     function toString() 
@@ -325,7 +502,7 @@ function Range(...params) {
       if(type === 'miliseconds' && displayFormat === 'ms' && referenceMilisecondss !== undefined) {
         const startMs = milisecondsRangeToElapseMs({start:referenceMilisecondss, end:start})
         const endMs = milisecondsRangeToElapseMs({start:referenceMilisecondss, end})
-        return `{ start:${startMs} <-${endMs - startMs}-> end:${endMs} }`
+        return `${'interval: ' + interval} { start:${startMs} <-${endMs - startMs}-> end:${endMs} }`
       }
 
       return `{ start:${start}, end:${end} }`
@@ -346,9 +523,86 @@ function Range(...params) {
       toString,
       intersect,
       start,
-      end
+      end,
+      interval
     }
   }
 }
 
 export { Chrono }
+
+let {setTime, setTimeEnd, logReport, avarageEvents, getChronoState} = Chrono()
+
+
+plan(
+  [
+    // Ite 1
+    setTime('100ms'),
+    () => sleepWithValue(100, 5).then(setTimeEnd('100ms')),
+    [
+      setTime('parentOfFirstPap150'),
+      () => sleepWithValue(2, 5).then(setTimeEnd('parentOfFirstPap150')),
+      setTime('firstPap150'),
+      () => sleepWithValue(150, 5).then(setTimeEnd('firstPap150')),
+    ],
+    [
+      setTime('secondPap80'),
+      () => sleepWithValue(80, 5).then(setTimeEnd('secondPap80')),
+      setTime('secondPap80'),
+      () => sleepWithValue(80, 5).then(setTimeEnd('secondPap80')),
+    ],
+    // setTime('lastProcess30'),
+    // () => sleepWithValue(30, 5).then(setTimeEnd('lastProcess30')),
+
+    // Ite 2
+    setTime('100ms'),
+    () => sleepWithValue(70, 5).then(setTimeEnd('100ms')),
+    [
+      setTime('parentOfFirstPap150'),
+      () => sleepWithValue(2, 5).then(setTimeEnd('parentOfFirstPap150')),
+      setTime('firstPap150'),
+      () => sleepWithValue(60, 5).then(setTimeEnd('firstPap150')),
+    ],
+    [
+      setTime('secondPap80'),
+      () => sleepWithValue(280, 5).then(setTimeEnd('secondPap80')),
+    ],
+    // setTime('lastProcess30'),
+    // () => sleepWithValue(70, 5).then(setTimeEnd('lastProcess30')),
+
+    // Ite 3
+    setTime('100ms'),
+    () => sleepWithValue(70, 5).then(setTimeEnd('100ms')),
+    [
+      setTime('parentOfFirstPap150'),
+      () => sleepWithValue(2, 5).then(setTimeEnd('parentOfFirstPap150')),
+    ],
+    // [
+    //   setTime('firstPap150'),
+    //   () => sleepWithValue(60, 5).then(setTimeEnd('firstPap150')),
+    // ],
+    // [
+    //   setTime('secondPap80'),
+    //   () => sleepWithValue(280, 5).then(setTimeEnd('secondPap80')),
+    // ],
+    // setTime('lastProcess30'),
+    // () => sleepWithValue(70, 5).then(setTimeEnd('lastProcess30')),
+
+    // Ite 4
+    setTime('100ms'),
+    () => sleepWithValue(70, 5).then(setTimeEnd('100ms')),
+    [
+      setTime('parentOfFirstPap150'),
+      () => sleepWithValue(2, 5).then(setTimeEnd('parentOfFirstPap150')),
+      setTime('firstPap150'),
+      () => sleepWithValue(60, 5).then(setTimeEnd('firstPap150')),
+    ],
+    // [
+    //   setTime('secondPap80'),
+    //   () => sleepWithValue(280, 5).then(setTimeEnd('secondPap80')),
+    // ],
+    setTime('lastProcess30'),
+    () => sleepWithValue(70, 5).then(setTimeEnd('lastProcess30')),
+
+  ]
+)().then(avarageEvents).then(()=>console.log(getChronoState())).then(logReport)

@@ -1365,6 +1365,24 @@ function pushUniqueKeyOrChange(newRow, table, indexes = [0], mergeFun) {
 //   (newRow, existingRow) => [newRow[0] + existingRow[0], newRow[1] + existingRow[1]]
 // ) //?
 
+function pushAt(pos,value, arr){
+  if(Array.isArray(arr) === false) throw new CustomError('PUSHAT_LAST_PARAMETER_MUST_BE_ARRAY')
+
+  // if(pos >= arr.length) {
+  //   arr[pos] = value 
+  //   return arr
+  // }
+
+  const length = arr.length
+  repeat(arr.length - pos).times( index => arr[length - index] =  arr[length - index - 1] )
+  arr[pos] = value 
+  return arr
+
+}
+// pushAt(0,2,[]) //?
+// pushAt(0,2,[1,2,3]) //?
+// pushAt(5,2,[1,2,3]) //?
+
 function memoize() {
   const resultsMap = new Map()
 
@@ -1584,6 +1602,7 @@ const jsUtils = {
   transition,
   pushUniqueKey,
   pushUniqueKeyOrChange,
+  pushAt,
   memoize,
   fillWith,
   isDate,
@@ -1643,6 +1662,7 @@ export {
   transition,
   pushUniqueKey,
   pushUniqueKeyOrChange,
+  pushAt,
   memoize,
   fillWith,
   isDate,
