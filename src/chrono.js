@@ -157,14 +157,18 @@ function Chrono() {
     )
   }
 
-  function findParentRanges(indexEvent, intervalEntries)
+  function findParentRanges(eventValues, indexEvent, intervalEntries)
   {
     let isNotAParent = true
     while(indexEvent !== 0 && isNotAParent === true) {
       indexEvent--
-      isNotAParent = intervalEntries[indexEvent][1].ranges.some(({start, end}) => start === undefined || end === undefined)
+      isNotAParent = intervalEntries[indexEvent][1].ranges.some(
+        ({start, end}, index) => 
+          (start === undefined || end === undefined) && 
+          (eventValues.ranges[index].start !== undefined || eventValues.ranges[index].end !== undefined)
+      )
     }
-
+    
     return [intervalEntries[indexEvent][1].ranges, indexEvent]
   }
 
@@ -177,7 +181,7 @@ function Chrono() {
     let newHistoryArrayTimeIntervals = Object.entries(historyTimeIntervals).reduce(
       (newHistoryIntervals, [eventName, eventValues], indexEvent, intervalEntries) => {
 
-        const [parentRanges, parentIndexEvent] = findParentRanges( indexEvent, intervalEntries)
+        const [parentRanges, parentIndexEvent] = findParentRanges( eventValues, indexEvent, intervalEntries)
 
         const [totalElapse, totalEndToStartGap, totalStartToStartGap] =
           eventValues.ranges.reduce(
