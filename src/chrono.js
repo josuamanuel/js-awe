@@ -102,8 +102,6 @@ function Chrono() {
 
   function fillWithUndefinedRanges()
   {
-    //historyTimeIntervals['firstPap150'].ranges.pop()
-    historyTimeIntervals //?
 
     Object.entries(historyTimeIntervals).forEach(
       ([eventName, eventValues], indexEvent, intervalEntries) => {
@@ -129,7 +127,6 @@ function Chrono() {
               // Accrued ranges for same interval, deleting the previous one
               if(eventValues.ranges[indexRangeForEvent -1]?.interval === indexRangeRef)
               {
-                eventName
                 eventValues.ranges[indexRangeForEvent] = 
                   rangeType(
                     eventValues.ranges[indexRangeForEvent].start - (eventValues.ranges[indexRangeForEvent-1].end - eventValues.ranges[indexRangeForEvent-1].start),
@@ -158,7 +155,6 @@ function Chrono() {
         )
       }
     )
-    historyTimeIntervals //?
   }
 
   function findParentRanges(indexEvent, intervalEntries)
@@ -169,7 +165,6 @@ function Chrono() {
       isNotAParent = intervalEntries[indexEvent][1].ranges.some(({start, end}) => start === undefined || end === undefined)
     }
 
-    indexEvent
     return [intervalEntries[indexEvent][1].ranges, indexEvent]
   }
 
@@ -270,7 +265,7 @@ function Chrono() {
        return acum
       },
       [Infinity,0]
-    ) //?
+    )
     
     return events
   }
@@ -365,21 +360,21 @@ function Chrono() {
   function report() {
     createTimeEvent('report')
     chronoReport()
-      R.pipe(
-        //RE.RLog('0-->: '),
-        formatReportAndReturnInputParam,
-        eventsReport,
-        historyToListOfNameRanges,
-        //RE.RLog('1-->: '),
-        totalEventsElapseTimeReport,
-        //RE.RLog('2-->: '),
-        compactListOfNameRanges,
-        //RE.RLog('3-->: '),
-        R.sort(sorterByPaths('range.start')),
-        reportListOfNameRanges,
-        //RE.RLog('4-->: '),
-        coincidingEventsReport
-      )(historyTimeIntervals)
+    R.pipe(
+      //RE.RLog('0-->: '),
+      formatReportAndReturnInputParam,
+      eventsReport,
+      historyToListOfNameRanges,
+      //RE.RLog('1-->: '),
+      totalEventsElapseTimeReport,
+      //RE.RLog('2-->: '),
+      compactListOfNameRanges,
+      //RE.RLog('3-->: '),
+      R.sort(sorterByPaths('range.start')),
+      reportListOfNameRanges,
+      //RE.RLog('4-->: '),
+      coincidingEventsReport
+    )(historyTimeIntervals)
   }
 
   function historyToListOfNameRanges(historyTimeIntervals) {
@@ -605,4 +600,6 @@ plan(
     () => sleepWithValue(70, 5).then(setTimeEnd('lastProcess30')),
 
   ]
-)().then(avarageEvents).then(()=>console.log(getChronoState())).then(logReport)
+)().then(avarageEvents)
+  //.then(()=>console.log(getChronoState()))
+  .then(logReport)
