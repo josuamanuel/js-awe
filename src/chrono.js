@@ -459,8 +459,29 @@ function Chrono() {
       )
   }
 
+  const getChronoStateUsingPerformanceAPIFormat = () => {
+    return Object.entries(historyTimeIntervals).reduce(
+        (performanceAPIFormatAcum, [eventName, eventValue]) => {
+          eventValue.ranges.forEach(
+            range => 
+              performanceAPIFormatAcum.push(
+                {
+                  duration: range.end - range.start,
+                  startTime: range.start,
+                  name: eventName,
+                  entryType: 'measure'
+                }
+              )
+          )
+          
+          return performanceAPIFormatAcum 
+        },
+        []
+      )
+  }
+
   return { time, timeEnd, report, setTime, setTimeEnd, logReport, 
-    getChronoState, setChronoStateUsingPerformanceAPIFormat, avarageEvents }
+    getChronoState, setChronoStateUsingPerformanceAPIFormat, getChronoStateUsingPerformanceAPIFormat, avarageEvents }
 }
 
 
