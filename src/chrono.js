@@ -1,10 +1,9 @@
-import { arraySorter, pushUniqueKeyOrChange, sorterByPaths, pushUniqueKey, sleepWithValue, CustomError, pushAt } from './jsUtils.js';
-import { groupByWithCalc, R, RE } from './ramdaExt.js';
+import { arraySorter, pushUniqueKeyOrChange, sorterByPaths, pushUniqueKey, CustomError, pushAt } from './jsUtils.js';
+import { groupByWithCalc, R } from './ramdaExt.js';
 import { Table } from './table/table.js'
 import { Text } from './table/components/text.js'
 import { Timeline } from './table/components/timeline.js'
 import { performance } from 'node:perf_hooks'
-import { plan } from './plan.js';
 
 // needed only for debuging
 //import { RE } from './ramdaExt.js';
@@ -84,22 +83,6 @@ function Chrono() {
     })
   }
 
-  function validateEvents()
-  {
-    const greatestNumberOfRanges = Object.entries(historyTimeIntervals).find(
-      ([eventName, eventValues], indexEvent, intervalEntries) => 
-        eventValues.ranges.length > intervalEntries[0][1].ranges.length
-    )
-
-    if(greatestNumberOfRanges !== undefined) 
-      throw new CustomError(
-        'FIRST_EVENT_SHOULD_HAVE_THE_GREATEST_NUMBER_OF_RANGES',
-        `Found an event with more ranges than the first recorded`,
-        greatestNumberOfRanges
-      )
-  }
-
-
   function fillWithUndefinedRanges()
   {
 
@@ -169,19 +152,18 @@ function Chrono() {
       )
     }
     
-    return [intervalEntries[indexEvent][1].ranges, indexEvent]
+    return [intervalEntries[indexEvent][1].ranges, intervalEntries[indexEvent][0]]
   }
 
   //TDL
   function avarageEvents()
   {
-    validateEvents()
     fillWithUndefinedRanges()
 
-    let newHistoryArrayTimeIntervals = Object.entries(historyTimeIntervals).reduce(
+    historyTimeIntervals = Object.entries(historyTimeIntervals).reduce(
       (newHistoryIntervals, [eventName, eventValues], indexEvent, intervalEntries) => {
 
-        const [parentRanges, parentIndexEvent] = findParentRanges( eventValues, indexEvent, intervalEntries)
+        const [parentRanges, parentEventName] = findParentRanges( eventValues, indexEvent, intervalEntries)
 
         const [totalElapse, totalEndToStartGap, totalStartToStartGap] =
           eventValues.ranges.reduce(
@@ -216,22 +198,21 @@ function Chrono() {
         if(indexEvent !== 0 && Math.abs(totalEndToStartGap) <= Math.abs(totalStartToStartGap) )
         {
           avarageEventStart = 
-            newHistoryIntervals[parentIndexEvent].ranges[0].end +
+            newHistoryIntervals[parentEventName].ranges[0].end +
             totalEndToStartGap/totalRangesWithValues
         }
 
         if(indexEvent !== 0 && Math.abs(totalStartToStartGap) < Math.abs(totalEndToStartGap) )
         {
           avarageEventStart = 
-          newHistoryIntervals[parentIndexEvent].ranges[0].start +
+          newHistoryIntervals[parentEventName].ranges[0].start +
             totalStartToStartGap/eventValues.ranges.length 
         }
 
         avarageEventEnd = avarageEventStart + totalElapse/eventValues.ranges.length
 
-        newHistoryIntervals[indexEvent] = 
+        newHistoryIntervals[eventName] = 
           {
-            eventName,
             ranges: [
               rangeType(
                 avarageEventStart,
@@ -243,16 +224,8 @@ function Chrono() {
  
         return newHistoryIntervals
       },
-      []
-    )
-    historyTimeIntervals = newHistoryArrayTimeIntervals.reduce(
-      (acum, el) => {
-        acum[el.eventName] = {ranges:el.ranges}
-        return acum
-      },
       {}
     )
-
     //range: { start:3.5852760076522827 <-133.67405599355698-> end:137.25933200120926 }
   }
 
