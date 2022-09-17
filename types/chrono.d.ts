@@ -18,6 +18,13 @@
    * console.log the status of the events at time of the call.
    */
   report():void
+  setTime: (event: any) => (data: any) => any;
+  setTimeEnd: (event: any) => (data: any) => any;
+  logReport: (data: any) => any;
+  getChronoState: () => {};
+  setChronoStateUsingPerformanceAPIFormat: (performanceGetEntriesByTypeOjb: any) => void;
+  getChronoStateUsingPerformanceAPIFormat: () => any[];
+  avarageEvents: () => void;
 }
 export declare function Chrono(): Chrono
 //# sourceMappingURL=chrono.d.ts.map

@@ -35,6 +35,7 @@ declare namespace jsUtils {
     export { transition };
     export { pushUniqueKey };
     export { pushUniqueKeyOrChange };
+    export { pushAt };
     export { memoize };
     export { fillWith };
     export { isDate };
@@ -151,6 +152,7 @@ export function transition(states: any, events: any, transitions: any): {
 };
 export function pushUniqueKey(row: any, table: any, indexes?: number[]): any;
 export function pushUniqueKeyOrChange(newRow: any, table: any, indexes: number[], mergeFun: any): any;
+export function pushAt(pos: any, value: any, arr: any): any;
 export function memoize(): {
     memoizeMap: (func: any, ...params: any[]) => any;
     memoizeWithHashFun: (func: any, hashFunc: any, ...params: any[]) => any;
