@@ -8,8 +8,6 @@ import { performance } from 'node:perf_hooks'
 // needed only for debuging
 //import { RE } from './ramdaExt.js';
 
-//TDL avarage
-//TDL serialize and deserilize using performance.getEntriesByType("measure")
 
 function Chrono() {
   let milisecondsNow
@@ -30,6 +28,16 @@ function Chrono() {
     }
   }
 
+  function validateEventName(eventName)
+  {
+    if(typeof eventName !== 'string' ||  isNaN(Number(eventName)) === false ) 
+    throw new CustomError(
+      'EVENT_NAME_MUST_HAVE_ALPHABETICS_CHARS',
+      `Event name '${eventName}' must be of type string and contain some non numeric character`,
+      eventName
+    )
+  }
+
   function time(eventNames) {
 
     let currentMiliseconds = milisecondsNow()
@@ -38,12 +46,7 @@ function Chrono() {
 
     listOfEvents.forEach(eventName => {
 
-      if(typeof eventName !== 'string' ||  isNaN(Number(eventName)) === false ) 
-        throw new CustomError(
-          'EVENT_NAME_MUST_HAVE_ALPHABETICS_CHARS',
-          `Event name '${eventName}' must be of type string and contain some non numeric character`,
-          eventName
-        )
+      validateEventName(eventName)
 
       historyTimeIntervals[eventName] = historyTimeIntervals[eventName] ?? {}
 
@@ -440,7 +443,24 @@ function Chrono() {
 
   const getChronoState = () => historyTimeIntervals
 
-  return { time, timeEnd, report, setTime, setTimeEnd, logReport, getChronoState, avarageEvents }
+  const setChronoStateUsingPerformanceAPIFormat = (performanceGetEntriesByTypeOjb) => {
+    historyTimeIntervals = 
+      performanceGetEntriesByTypeOjb.reduce(
+        (historyAcum, {name, startTime, duration}) => {
+          validateEventName(name)
+          historyAcum[name] ??= {}
+          historyAcum[name].ranges ??= []
+          historyAcum[name].ranges.push(
+            rangeType(startTime, startTime + duration)
+          )
+          return historyAcum 
+        },
+        {}
+      )
+  }
+
+  return { time, timeEnd, report, setTime, setTimeEnd, logReport, 
+    getChronoState, setChronoStateUsingPerformanceAPIFormat, avarageEvents }
 }
 
 
