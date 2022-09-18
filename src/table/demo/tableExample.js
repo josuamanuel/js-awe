@@ -1,7 +1,7 @@
 
-import { Table } from './table.js'
-import { Text } from './components/text.js'
-import { Timeline } from './components/timeline.js'
+import { Table } from '../table.js'
+import { Text } from '../components/text.js'
+import { Timeline } from '../components/timeline.js'
 
 const timelineData = [
   {
