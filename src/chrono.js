@@ -90,42 +90,49 @@ function Chrono() {
   {
 
     Object.entries(historyTimeIntervals).forEach(
-      ([eventName, eventValues], indexEvent, intervalEntries) => {
+      ([eventName, currentEventValues], indexEvent, intervalEntries) => {
         let indexRangeForEvent = 0
         intervalEntries[0][1].ranges.forEach(
           ({start: startRef, end: endRef}, indexRangeRef) => {
             if(indexEvent === 0 ) {
-              eventValues.ranges[indexRangeRef] = rangeType(startRef, endRef, indexRangeRef)
+              currentEventValues.ranges[indexRangeRef] = rangeType(startRef, endRef, indexRangeRef)
               return
             }
 
+            const isCurrentEventSameIntervalAsReference =  () => {
+              const isStartOfCurrentEventAfterStartOfReference = 
+                currentEventValues.ranges[indexRangeForEvent]?.start >= startRef 
+
+              const isStartOfCurrentEventBeforeStartOfNextReference = 
+                indexRangeRef + 1 === intervalEntries[0][1].ranges.length
+                || currentEventValues.ranges[indexRangeForEvent]?.start < intervalEntries[0][1].ranges[indexRangeRef + 1]?.start 
+
+              return isStartOfCurrentEventAfterStartOfReference 
+                  && isStartOfCurrentEventBeforeStartOfNextReference
+            }
+
             let foundMatchingInterval = false
-            while( 
-              eventValues.ranges[indexRangeForEvent]?.start >= startRef &&
-              ( 
-                indexRangeRef + 1 === intervalEntries[0][1].ranges.length ||
-                eventValues.ranges[indexRangeForEvent].start < intervalEntries[0][1].ranges[indexRangeRef + 1]?.start 
-              )
-            )
+            while( isCurrentEventSameIntervalAsReference() )
             {
               foundMatchingInterval = true
               
               // Accrued ranges for same interval, deleting the previous one
-              if(eventValues.ranges[indexRangeForEvent -1]?.interval === indexRangeRef)
+              const isSameIntervalAsPreviousOne = currentEventValues.ranges[indexRangeForEvent -1]?.interval === indexRangeRef
+              if(isSameIntervalAsPreviousOne)
               {
-                eventValues.ranges[indexRangeForEvent] = 
+                currentEventValues.ranges[indexRangeForEvent] = 
                   rangeType(
-                    eventValues.ranges[indexRangeForEvent].start - (eventValues.ranges[indexRangeForEvent-1].end - eventValues.ranges[indexRangeForEvent-1].start),
-                    eventValues.ranges[indexRangeForEvent].end,
+                    currentEventValues.ranges[indexRangeForEvent].start - (currentEventValues.ranges[indexRangeForEvent-1].end - currentEventValues.ranges[indexRangeForEvent-1].start),
+                    currentEventValues.ranges[indexRangeForEvent].end,
                     indexRangeRef
                   )
-                eventValues.ranges.splice(indexRangeForEvent -1, 1)
+                currentEventValues.ranges.splice(indexRangeForEvent -1, 1)
               }else
               {
-                eventValues.ranges[indexRangeForEvent] = 
+                currentEventValues.ranges[indexRangeForEvent] = 
                 rangeType(
-                  eventValues.ranges[indexRangeForEvent].start, 
-                  eventValues.ranges[indexRangeForEvent].end,
+                  currentEventValues.ranges[indexRangeForEvent].start, 
+                  currentEventValues.ranges[indexRangeForEvent].end,
                   indexRangeRef
                 )
                 indexRangeForEvent++
@@ -134,7 +141,7 @@ function Chrono() {
 
             if(foundMatchingInterval === false)
             {
-              pushAt(indexRangeForEvent, rangeType(undefined, undefined, indexRangeRef), eventValues.ranges)
+              pushAt(indexRangeForEvent, rangeType(undefined, undefined, indexRangeRef), currentEventValues.ranges)
               indexRangeForEvent++
             }
           }
