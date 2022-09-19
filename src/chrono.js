@@ -376,8 +376,8 @@ function Chrono() {
   function compactListOfNameRanges(ListOfRangeNames) {
     return ListOfRangeNames.reduce(
       (acum, { name, range }) => {
-        acum.push({ name, isLeft: true, edge: range.start, edgeEnd: range.end, interval:range.interval })
-        acum.push({ name, isLeft: false, edge: range.end, interval:range.interval })
+        acum.push({ name, isLeft: true, edge: range.start, edgeEnd: range.end })
+        acum.push({ name, isLeft: false, edge: range.end })
         return acum
       },
       []
@@ -389,7 +389,7 @@ function Chrono() {
             let i = index
             do {
               pushUniqueKeyOrChange(
-                { runningEvents: [name], range: rangeType(table[i].edge, table[i + 1].edge, table[i].interval) }
+                { runningEvents: [name], range: rangeType(table[i].edge, table[i + 1].edge) }
                 , acum
                 , ['range']
                 , (newRow, existingRow) => {
