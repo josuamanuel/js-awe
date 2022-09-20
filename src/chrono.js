@@ -19,7 +19,13 @@ function Chrono() {
   let chronoEvents = {}
   createTimeEvent('chronoCreation')
 
-  let rangeType = Range({type:'miliseconds', displayFormat:'ms', referenceMilisecondss: chronoEvents['chronoCreation'].miliseconds})
+  let rangeType = Range(
+    {
+      type:'miliseconds', 
+      displayFormat:'ms', 
+      referenceMiliseconds: chronoEvents['chronoCreation'].miliseconds
+    }
+  )
 
   function createTimeEvent(eventName) {
     chronoEvents[eventName] = {
@@ -42,15 +48,17 @@ function Chrono() {
 
     let currentMiliseconds = milisecondsNow()
 
-    let listOfEvents = typeof eventNames === 'string' ? [eventNames] : eventNames
+    let listOfEvents = typeof eventNames === 'string' 
+      ? [eventNames] 
+      : eventNames
 
     listOfEvents.forEach(eventName => {
 
       validateEventName(eventName)
 
-      historyTimeIntervals[eventName] = historyTimeIntervals[eventName] ?? {}
+      historyTimeIntervals[eventName] ??= {}
 
-      historyTimeIntervals[eventName].start = historyTimeIntervals[eventName].start ?? []
+      historyTimeIntervals[eventName].start ??= []
       historyTimeIntervals[eventName].start.push(currentMiliseconds)
     })
   }
@@ -66,16 +74,24 @@ function Chrono() {
 
     listOfEvents.forEach(eventName => {
       if (historyTimeIntervals[eventName] === undefined) {
-        throw new CustomError('EVENT_NAME_NOT_FOUND', `No such Label '${eventName}' for .timeEnd(...)`, eventName);
+        throw new CustomError(
+          'EVENT_NAME_NOT_FOUND', 
+          `No such Label '${eventName}' for .timeEnd(...)`, 
+          eventName
+        )
       }
 
       let start = historyTimeIntervals[eventName].start.pop()
 
       if (start === undefined) {
-        throw new CustomError('EVENT_NAME_ALREADY_CONSUMED',`eventName: '${eventName}' was already consumed by a previous call to .timeEnd(...)`, eventName);
+        throw new CustomError(
+          'EVENT_NAME_ALREADY_CONSUMED',
+          `eventName: '${eventName}' was already consumed by a previous call to .timeEnd(...)`,
+          eventName
+        )
       }
 
-      historyTimeIntervals[eventName].ranges = historyTimeIntervals[eventName].ranges ?? []
+      historyTimeIntervals[eventName].ranges ??= []
       historyTimeIntervals[eventName].ranges.push(
         rangeType(
           start,
@@ -100,12 +116,15 @@ function Chrono() {
             }
 
             const isCurrentEventSameIntervalAsReference =  () => {
+              const currentEventStart = currentEventValues.ranges[indexRangeForEvent]?.start
+              const nextEventStart = intervalEntries[0][1].ranges[indexRangeRef + 1]?.start 
+
               const isStartOfCurrentEventAfterStartOfReference = 
-                currentEventValues.ranges[indexRangeForEvent]?.start >= startRef 
+                currentEventStart >= startRef 
 
               const isStartOfCurrentEventBeforeStartOfNextReference = 
                 indexRangeRef + 1 === intervalEntries[0][1].ranges.length
-                || currentEventValues.ranges[indexRangeForEvent]?.start < intervalEntries[0][1].ranges[indexRangeRef + 1]?.start 
+                ||  currentEventStart < nextEventStart
 
               return isStartOfCurrentEventAfterStartOfReference 
                   && isStartOfCurrentEventBeforeStartOfNextReference
@@ -115,16 +134,20 @@ function Chrono() {
             while( isCurrentEventSameIntervalAsReference() )
             {
               foundMatchingInterval = true
+
+              const currentEvent = currentEventValues.ranges[indexRangeForEvent]
+              const nextEvent = currentEventValues.ranges[indexRangeForEvent + 1]
+              const previousEvent = currentEventValues.ranges[indexRangeForEvent -1]
               
               // Accrued ranges for same interval, deleting the previous one
-              const isSameIntervalAsPreviousOne = currentEventValues.ranges[indexRangeForEvent -1]?.interval === indexRangeRef
-              
+              const isSameIntervalAsPreviousOne = previousEvent?.interval === indexRangeRef
+
               if(isSameIntervalAsPreviousOne)
               {
                 currentEventValues.ranges[indexRangeForEvent] = 
                   rangeType(
-                    currentEventValues.ranges[indexRangeForEvent].start - (currentEventValues.ranges[indexRangeForEvent-1].end - currentEventValues.ranges[indexRangeForEvent-1].start),
-                    currentEventValues.ranges[indexRangeForEvent].end,
+                    currentEvent.start - (previousEvent.end - previousEvent.start),
+                    currentEvent.end,
                     indexRangeRef
                   )
                 currentEventValues.ranges.splice(indexRangeForEvent -1, 1)
@@ -132,8 +155,8 @@ function Chrono() {
               {
                 currentEventValues.ranges[indexRangeForEvent] = 
                 rangeType(
-                  currentEventValues.ranges[indexRangeForEvent].start, 
-                  currentEventValues.ranges[indexRangeForEvent].end,
+                  currentEvent.start, 
+                  currentEvent.end,
                   indexRangeRef
                 )
                 indexRangeForEvent++
@@ -142,7 +165,11 @@ function Chrono() {
 
             if(foundMatchingInterval === false)
             {
-              pushAt(indexRangeForEvent, rangeType(undefined, undefined, indexRangeRef), currentEventValues.ranges)
+              pushAt(
+                indexRangeForEvent,
+                rangeType(undefined, undefined, indexRangeRef), 
+                currentEventValues.ranges
+              )
               indexRangeForEvent++
             }
           }
@@ -503,13 +530,13 @@ function milisecondsRangeToElapseMs({start, end}) {
 function Range(...params) {
   let type
   let displayFormat
-  let referenceMilisecondss
+  let referenceMiliseconds
 
   if(params.length >= 2 ) {
     return range(...params)
   }
   else {
-    ({ type, displayFormat, referenceMilisecondss} = params[0])
+    ({ type, displayFormat, referenceMiliseconds} = params[0])
     return range
   }
 
@@ -520,9 +547,9 @@ function Range(...params) {
 
     function toString() 
     {
-      if(type === 'miliseconds' && displayFormat === 'ms' && referenceMilisecondss !== undefined) {
-        const startMs = milisecondsRangeToElapseMs({start:referenceMilisecondss, end:start})
-        const endMs = milisecondsRangeToElapseMs({start:referenceMilisecondss, end})
+      if(type === 'miliseconds' && displayFormat === 'ms' && referenceMiliseconds !== undefined) {
+        const startMs = milisecondsRangeToElapseMs({start:referenceMiliseconds, end:start})
+        const endMs = milisecondsRangeToElapseMs({start:referenceMiliseconds, end})
         return `${'interval: ' + interval} { start:${startMs} <-${endMs - startMs}-> end:${endMs} }`
       }
 
