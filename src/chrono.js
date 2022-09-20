@@ -11,7 +11,7 @@ import { performance } from 'node:perf_hooks'
 
 function Chrono() {
   let milisecondsNow
-  if(performance.now) milisecondsNow = () => performance.now()
+  if(performance?.now) milisecondsNow = () => performance.now()
   if(milisecondsNow === undefined) milisecondsNow = ()=> Date.now()
 
   let historyTimeIntervals = {}
