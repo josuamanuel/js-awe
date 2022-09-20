@@ -481,13 +481,25 @@ function Chrono() {
   const setChronoStateUsingPerformanceAPIFormat = (performanceGetEntriesByTypeOjb) => {
     historyTimeIntervals = 
       performanceGetEntriesByTypeOjb.reduce(
-        (historyAcum, {name, startTime, duration}) => {
+        (historyAcum, {name, startTime, duration, entryType}) => {
           validateEventName(name)
-          historyAcum[name] ??= {}
-          historyAcum[name].ranges ??= []
-          historyAcum[name].ranges.push(
-            rangeType(startTime, startTime + duration)
-          )
+
+          if(entryType === 'mark')
+          {
+            historyAcum[name] ??= {}
+            historyAcum[name].start ??= []
+            historyAcum[name].start.push(startTime)
+          }
+
+          if(entryType === 'measure')
+          {
+            historyAcum[name] ??= {}
+            historyAcum[name].ranges ??= []
+            historyAcum[name].ranges.push(
+              rangeType(startTime, startTime + duration)
+            )
+          }
+
           return historyAcum 
         },
         {}
@@ -497,7 +509,19 @@ function Chrono() {
   const getChronoStateUsingPerformanceAPIFormat = () => {
     return Object.entries(historyTimeIntervals).reduce(
         (performanceAPIFormatAcum, [eventName, eventValue]) => {
-          eventValue.ranges.forEach(
+
+          eventValue.start?.forEach(
+            start => performanceAPIFormatAcum.push(
+              {
+                duration: 0,
+                startTime: start,
+                name: eventName,
+                entryType: 'mark'
+              }              
+            )
+          )
+
+          eventValue.ranges?.forEach(
             range => 
               performanceAPIFormatAcum.push(
                 {
