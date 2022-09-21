@@ -3,7 +3,7 @@ import { plan } from '../../src/plan.js'
 import { Chrono } from '../../src/chrono.js'
 import { sleepWithValue } from '../../src/jsUtils.js'
 
-let { setTime, setTimeEnd, logReport, avarageEvents, getChronoState } = Chrono()
+let { setTime, setTimeEnd, logReport, average, getChronoState } = Chrono()
 
 
 plan(
@@ -77,6 +77,6 @@ plan(
     () => sleepWithValue(70, 5).then(setTimeEnd('lastProcess30')),
 
   ]
-)().then(avarageEvents)
+)().then(average)
   //.then(()=>console.log(getChronoState()))
   .then(logReport)
