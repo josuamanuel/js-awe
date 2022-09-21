@@ -138,12 +138,12 @@ function Chrono() {
               const currentRange = currentEventValues.ranges[indexRangeForEvent]
               const previousRange = currentEventValues.ranges[indexRangeForEvent -1]
               
-              // Accrued ranges for same interval, deleting the previous one
+              // Accrued ranges for same interval, deleting the current one
               const isSameIntervalAsPreviousOne = previousRange?.interval === indexRangeRef
 
               if(isSameIntervalAsPreviousOne)
               {
-                currentEventValues.ranges[indexRangeForEvent] = 
+                currentEventValues.ranges[indexRangeRef] = 
                   rangeType(
                     currentRange.start - (previousRange.end - previousRange.start),
                     currentRange.end,
