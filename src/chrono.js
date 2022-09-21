@@ -136,6 +136,7 @@ function Chrono() {
               foundMatchingInterval = true
 
               const currentRange = currentEventValues.ranges[indexRangeForEvent]
+              const nextRange = currentEventValues.ranges[indexRangeForEvent + 1]
               const previousRange = currentEventValues.ranges[indexRangeForEvent -1]
               
               // Accrued ranges for same interval, deleting the current one
@@ -149,7 +150,7 @@ function Chrono() {
                     currentRange.end,
                     indexRangeRef
                   )
-                currentEventValues.ranges.pop()
+                currentEventValues.ranges.splice(indexRangeForEvent, 1)
               }else
               {
                 currentEventValues.ranges[indexRangeForEvent] = 
