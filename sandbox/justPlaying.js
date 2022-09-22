@@ -6,11 +6,15 @@ import { Chrono } from '../src/chrono.js'
 const myChrono = Chrono()
 
 myChrono.time('start')
-sleepWithValue(100, 5).then(x => {
-  console.log(x, myChrono.timeEnd('start'))
-  myChrono.average()
-  myChrono.report()
-})
+sleepWithValue(100, 5)
+  .then(x => {
+    console.log(x, myChrono.timeEnd('start'))
+    return sleepWithValue(100,5)
+  })
+  .then(x => {
+    myChrono.average()
+    myChrono.report()
+  })
 
 
 /*
