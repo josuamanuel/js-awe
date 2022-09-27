@@ -1,8 +1,5 @@
 'use strict'
-//import pkg from 'lodash';
-//const { cloneDeep } = pkg;
-import { cloneDeep }  from './lodashCloneDeep.js'
-
+import clone from 'just-clone'
 const logWithPrefix = (title, displayFunc) => (message) => {
 
   let finalMessage = message
@@ -111,7 +108,7 @@ class Enum {
         }
       }
 
-      stateRules = cloneDeep(rules)
+      stateRules = clone(rules)
     }
 
     function get(_target, prop) {
@@ -191,7 +188,7 @@ class Enum {
 class EnumMap {
   constructor(values) {
 
-    return new Proxy(cloneDeep(values), this)
+    return new Proxy(clone(values), this)
   }
 
   get(target, prop) {
@@ -229,7 +226,7 @@ class EnumMap {
       )
     }
 
-    return new EnumMap(cloneDeep(invertedValues))
+    return new EnumMap(clone(invertedValues))
   }
 
 }
@@ -416,7 +413,7 @@ function reviverPromiseForCloneDeep(value) {
 function traverse(objIni, reviver, pureFunction = true) {
   const currentPath = ['root']
 
-  const objClone = pureFunction ? cloneDeep(objIni, reviverPromiseForCloneDeep) : objIni
+  const objClone = pureFunction ? clone(objIni, reviverPromiseForCloneDeep) : objIni
 
   let exitVar = false
   let objForReviver = {}

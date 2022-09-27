@@ -2,8 +2,7 @@
 import * as R from 'ramda';
 import { transition, sorterByPaths, CustomError, isPromise } from './jsUtils.js'
 import { reject, resolve, parallel as FParallel, isFuture } from 'fluture';
-import pkg from 'lodash'; 
-const { cloneDeep } = pkg; 
+import clone from 'just-clone'
 
 // //Only needed for testing
 // import {  after, both, chain, map, fork } from 'fluture';
@@ -1068,7 +1067,7 @@ RE.mergeArrayOfObjectsRenamingProps = mergeArrayOfObjectsRenamingProps
 function RLog(prefixOrFormatter) {
   return (...obj) => {
     if(typeof prefixOrFormatter === 'function') {
-      const cloneObj = cloneDeep(obj)
+      const cloneObj = clone(obj)
       console.log(prefixOrFormatter(...cloneObj))
     }else console.log(prefixOrFormatter, ...obj)
 

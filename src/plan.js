@@ -1,6 +1,6 @@
 import { resolve } from 'fluture'
 import {  R, pipe, pipeWhile, runFunctionsSyncOrParallel } from './ramdaExt.js'
-import _ from 'lodash'
+import compare from 'just-compare'
 import { repeat, traverse } from './jsUtils.js'
 
 
@@ -40,13 +40,13 @@ function generateStack(plan)
 const isAncestorOf = 
   son => 
     parent => 
-      son?.length > parent?.length && _.isEqual(parent, son.slice(0, parent.length))
+      son?.length > parent?.length && compare(parent, son.slice(0, parent.length))
 
 
 const isSiblingOf = 
   sibling1 => 
     sibling2 => 
-      _.isEqual(
+      compare(
         sibling1?.slice(0,-1),
         sibling2?.slice(0,-1)
       )
@@ -58,7 +58,7 @@ function hasAnyDescendant(stack)
     stack.some(
       el => 
         path.length < el.path.length &&
-        _.isEqual(
+        compare(
           el.path.slice(0, path.length),
           path
         )
@@ -71,7 +71,7 @@ function getDescendants(stack)
     stack.filter(
       el => 
         path.length < el.path.length &&
-        _.isEqual(
+        compare(
           el.path.slice(0, path.length),
           path
         )
@@ -83,8 +83,8 @@ function areRelativeFrom(ancestorInCommon)
   if(ancestorInCommon === undefined || ancestorInCommon.length === 0) return false
 
   return familyMember1 => familyMember2 => 
-    _.isEqual(ancestorInCommon, familyMember1?.slice(0, ancestorInCommon.length)) &&
-    _.isEqual(ancestorInCommon, familyMember2?.slice(0, ancestorInCommon.length))
+    compare(ancestorInCommon, familyMember1?.slice(0, ancestorInCommon.length)) &&
+    compare(ancestorInCommon, familyMember2?.slice(0, ancestorInCommon.length))
 }
 
 areRelativeFrom([0,0])([0,0,0,0])([0,0]) //?
@@ -127,9 +127,9 @@ const stackParallelReducer = function(numberOfThreads){
 
     let isElToAccrue = 
       el.path.length >= 3 &&
-      _.isEqual(elGrandparent, nextToElGrandparent) && 
+      compare(elGrandparent, nextToElGrandparent) && 
       // el is the only child of parent
-      _.isEqual(getDescendants(stack)(elParent), [el]) &&
+      compare(getDescendants(stack)(elParent), [el]) &&
       // If previous was not accrued we dont want this to be desdendent of the current grandParent unless previous
       // is a brother of the parent (function header of subsequent parellel functions).
       (

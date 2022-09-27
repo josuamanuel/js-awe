@@ -1,10 +1,7 @@
 'use strict'
-import _ from 'lodash'
+import clone from 'just-clone'
 import jsUtils from './jsUtils.js'
 
-function reviverPromiseForCloneDeep(value) {
-  if (jsUtils.isPromise(value)) return value
-}
 
 function cloneCopy(to, from, firstCleanTo, shallow) {
 
@@ -29,7 +26,7 @@ function cloneCopy(to, from, firstCleanTo, shallow) {
   } else {
     for (let prop in from) {
       if (from.hasOwnProperty(prop)) {
-        to[prop] = _.cloneDeepWith(from[prop], reviverPromiseForCloneDeep)
+        to[prop] = clone(from[prop]) //, reviverPromiseForCloneDeep)
       }
     }
   }
@@ -90,4 +87,4 @@ function promiseAll(obj) {
 
 }
 
-export { cloneCopy, wildcardToRegExp, promiseAll, _ }
+export { cloneCopy, wildcardToRegExp, promiseAll }

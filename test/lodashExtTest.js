@@ -1,7 +1,8 @@
 import { strict as assert } from 'assert'
 
-import { wildcardToRegExp, cloneCopy, promiseAll, _, } from '../src/lodashExt.js'
+import { wildcardToRegExp, cloneCopy, promiseAll, } from '../src/lodashExt.js'
 import { traverse, getValueAtPath, setValueAtPath } from '../src/jsUtils.js'
+import clone from 'just-clone'
 
 describe('lodashExt', () => {
 
@@ -94,9 +95,9 @@ describe('lodashExt', () => {
 
     //Arrange
     //subject
-    const subject = _.cloneDeep(setValueAtPathSubject)
+    const subject = clone(setValueAtPathSubject)
     //expected
-    const expected = _.cloneDeep(setValueAtPathSubject)
+    const expected = clone(setValueAtPathSubject)
     expected.house.room[0].wardrove = { test: 'mytest' }
 
     //act
@@ -112,9 +113,9 @@ describe('lodashExt', () => {
   it('setValueAtPath', () => {
     //Arrange
     //subject
-    const subject = _.cloneDeep(setValueAtPathSubject)
+    const subject = clone(setValueAtPathSubject)
     //expected
-    const expected = _.cloneDeep(setValueAtPathSubject)
+    const expected = clone(setValueAtPathSubject)
     expected.house.room[4] = {}
     expected.house.room[4].wardrove = { test: 'mytest' }
 
@@ -152,9 +153,9 @@ describe('lodashExt', () => {
 
     //Arrange
     //subject
-    const subject = _.cloneDeep(setValueAtPathSubject)
+    const subject = clone(setValueAtPathSubject)
     //expected
-    const expected = _.cloneDeep(setValueAtPathSubject)
+    const expected = clone(setValueAtPathSubject)
     expected.house.room[4] = []
     expected.house.room[4][4] = {}
     expected.house.room[4][4].wardrove = { test: 'mytest' }

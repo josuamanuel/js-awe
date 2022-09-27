@@ -1,7 +1,6 @@
 import { strict as assert } from 'assert'
 import { EnumMap, Enum, formatDate, CustomError, findDeepKey, traverse } from '../src/jsUtils.js'
-import pkg from 'lodash';
-const { cloneDeep, isObjectLike } = pkg;
+import clone from 'just-clone'
 
 describe('jsUtils', () => {
 
@@ -459,9 +458,9 @@ describe('jsUtils', () => {
 
     //Arrange
     //subject
-    const subject = cloneDeep(subjectBase)
+    const subject = clone(subjectBase)
     //expected
-    const expected = cloneDeep(subjectBase)
+    const expected = clone(subjectBase)
     expected.house.room[0].wardrove.jean = 'red'
 
     //Act
@@ -479,9 +478,9 @@ describe('jsUtils', () => {
 
     //Arrange
     //subject
-    const subject = cloneDeep(subjectBase)
+    const subject = clone(subjectBase)
     //expected
-    const expected = cloneDeep(subjectBase)
+    const expected = clone(subjectBase)
     expected.house.room[1].bed = null
     expected.house.room[0].wardrove.jean = 'red'
 
@@ -503,9 +502,9 @@ describe('jsUtils', () => {
   it('traverse with stop stopping the change to null', () => {
     //Arrange
     //subject
-    const subject = cloneDeep(subjectBase)
+    const subject = clone(subjectBase)
     //expected
-    const expected = cloneDeep(subjectBase)
+    const expected = clone(subjectBase)
     expected.house.room[0].wardrove.jean = 'red'
 
     //Act
@@ -525,9 +524,9 @@ describe('jsUtils', () => {
   it('traverse with skip stopping a change but continue with other changes', () => {
     //Arrange
     //subject
-    const subject = cloneDeep(subjectBase)
+    const subject = clone(subjectBase)
     //expected
-    const expected = cloneDeep(subjectBase)
+    const expected = clone(subjectBase)
     expected.house.room[0].wardrove.jean = 'red'
     expected.house.room[2] = 'nothing'
 

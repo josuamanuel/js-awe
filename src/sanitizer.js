@@ -1,8 +1,9 @@
 
-import _ from 'lodash'
 import { anonymize } from './anonymize.js'
 import { CustomError } from './jsUtils.js'
 import { log } from './logLevelExtension.js'
+import deepMapValues from 'just-deep-map-values'
+import compare from 'just-compare'
 
 const lengthSanitizer = (_, value) => {
   if(typeof value !== 'string' || value.length < 1) return value
@@ -141,7 +142,7 @@ function sanitize(obj, sanitizers = ['ibmApis'], noSanitzedUptoLogLevel) {
 
   const allGroupsConsolidated = consolidateGroups(sanitizers)
 
-  return _.cloneDeepWith(obj, customizer)
+  return deepMapValues(obj, customizer)
 
   function isToReplace(fieldOrValue, key, val, keyOrVal) {
     if (typeof fieldOrValue === 'function')
@@ -150,7 +151,7 @@ function sanitize(obj, sanitizers = ['ibmApis'], noSanitzedUptoLogLevel) {
     if (isRegExp(fieldOrValue) && typeof keyOrVal === 'string')
       return keyOrVal?.match(fieldOrValue)
 
-    return _.isEqual(fieldOrValue, keyOrVal)
+    return compare(fieldOrValue, keyOrVal)
   }
 
   function toReplace(replacer, key, val) {
@@ -163,14 +164,14 @@ function sanitize(obj, sanitizers = ['ibmApis'], noSanitzedUptoLogLevel) {
     else return false
   }
 
-  function customizer(obj, parentKey, parentObj) {
-    if (obj === null || obj === undefined || obj === {}) return undefined
+  function customizer(leafValue, keyOfLeaf) {
+    if (leafValue === null || leafValue === undefined || leafValue === {}) return leafValue
 
     for (let { field, value, type, sanitizer, replacer } of allGroupsConsolidated) {
-      if (typeMet(obj, type) === false) return undefined
-      if (sanitizer !== undefined) return sanitizer(parentKey, obj)
-      if (field !== undefined && isToReplace(field, parentKey, obj, parentKey)) return toReplace(replacer, parentKey, obj)
-      if (value !== undefined && isToReplace(value, parentKey, obj, obj)) return toReplace(replacer, parentKey, obj)
+      if (typeMet(leafValue, type) === false) return leafValue
+      if (sanitizer !== undefined) return sanitizer(keyOfLeaf, leafValue)
+      if (field !== undefined && isToReplace(field, keyOfLeaf, leafValue, keyOfLeaf)) return toReplace(replacer, keyOfLeaf, leafValue)
+      if (value !== undefined && isToReplace(value, keyOfLeaf, leafValue, leafValue)) return toReplace(replacer, keyOfLeaf, leafValue)
     }
 
   }
