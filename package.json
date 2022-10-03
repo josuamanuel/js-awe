@@ -3,7 +3,12 @@
   "version": "1.0.12",
   "homepage": "https://github.com/josuamanuel/js-awe",
   "author": "josuamanuel@hotmail.com",
-  "description": "",
+  "repository": "github:josuamanuel/jsTrading",
+  "bugs":{
+    "url" : "https://github.com/josuamanuel/jsTrading/issues",
+    "email" : "josuamanuel@hotmail.com"
+  },
+  "description": "Awesome js utils and constructs",
   "type": "module",
   "main": "src/index.js",
   "types": "types/index.d.ts",
