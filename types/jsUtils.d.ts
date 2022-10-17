@@ -125,7 +125,21 @@ export function notTo(funct: any): (...params: any[]) => boolean;
 export function arrayToObject(arr: any, defaultValueFunction: any): any;
 export function arrayOfObjectsToObject(iterable: any): any;
 export function removeDuplicates(arr: any): any[];
-export function traverse(objIni: any, reviver: any, pureFunction?: boolean): any;
+
+
+/**
+ * Access each node of the object calling the reviver function. Reviver can return:
+ * undefined: no change
+ * traverse.skip: stop accessing subtrees
+ * traverse.stop: stop completly the object traverse
+ * traverse.delete: delete the current node
+ * 
+ * @param objIni The object to traverse.
+ * @param reviver The function to be called for each node
+ * @pureFunction true: work with a deepClone of objIni, false: work with objIni passed as a parameter.
+ * @returns Return the object after applying reviver actions
+ */
+export function traverse(objIni: any, reviver: (value:any, path:string[], parent:any, prop:string) => any, pureFunction?: boolean): any
 export namespace traverse {
     export const skip: symbol;
     export const stop: symbol;

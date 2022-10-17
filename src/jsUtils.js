@@ -401,7 +401,9 @@ function reviverPromiseForCloneDeep(value) {
   if (jsUtils.isPromise(value)) return value
 }
 
-// reviver is called for each node as: reviver(nodeRef, currentPath, parent). For example: currentPath=['root', 'parent', 'son', '0', 'jose']
+// reviver is called for each node as: reviver(nodeRef, currentPath, parent, key). 
+// For example: being objIni={a:{b:{c:3}},d:4} the reviver to call node a.b will be
+// reviver({c:3}, ['a','b'], {b:{c:3}}, 'b') currentPath=['root', 'parent', 'son', '0', 'jose']
 // reviver return value will impact traverse: 
 //  undefined: do nothing.
 //  Any value: assign this value (parent[key])
