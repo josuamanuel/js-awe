@@ -488,6 +488,33 @@ traverse.stop = Symbol()
 traverse.delete = Symbol()
 
 
+function traverseVertically(functionToRun, verFields, toTraverse)
+{
+  if(Array.isArray(toTraverse) === false) return
+
+  let maxLength = 0
+  let firstTime = true
+  for(let i = 0; firstTime || i < maxLength; i++)
+  {
+    let toReturn = []
+    for(let j = 0; j< toTraverse.length; j++)
+    {
+      toReturn[j] = {...toTraverse[j]}
+      for(const field of verFields)
+      {
+        if( firstTime) {
+          maxLength = toTraverse[j]?.[field]?.length > maxLength
+            ? toTraverse[j][field].length 
+            : maxLength
+        }
+        toReturn[j][field] = toTraverse[j]?.[field]?.[i]
+      }
+    }
+    if(maxLength !== 0) functionToRun(toReturn)
+    firstTime = false
+  }
+}
+
 function copyPropsWithValueUsingRules(objDest, copyRules, shouldUpdateOnlyEmptyFields = false) {
 
   return function (inputObj) {
@@ -1594,6 +1621,7 @@ const jsUtils = {
   arrayOfObjectsToObject,
   removeDuplicates,
   traverse,
+  traverseVertically,
   copyPropsWithValue,
   copyPropsWithValueUsingRules,
   EnumMap,
@@ -1654,6 +1682,7 @@ export {
   arrayOfObjectsToObject,
   removeDuplicates,
   traverse,
+  traverseVertically,
   copyPropsWithValue,
   copyPropsWithValueUsingRules,
   EnumMap,

@@ -146,6 +146,29 @@ export namespace traverse {
     const _delete: symbol;
     export { _delete as delete };
 }
+/**
+ * Takes vertifical slices of a two nested array and calls functionToRun with each slice
+ * @example
+ * ```
+ * traverseVertically (
+ *  functionToRun
+ *  ['marathonResults'], // List of fields for the second level nested array
+ *  [{name:'Jose',marathonResults:[12,35]},{name:'Ana',marathonResults:[1]}]
+ * )
+ * ```
+ * This will produce folllowing calls
+ * ```
+ * functionToRun([{name:'Jose', marathonResults:12}, {name:'Ana',marathonResults:1}])
+ * functionToRun([{name:'Jose', marathonResults:35}, {name:'Ana',marathonResults:undefined}])
+ * ```
+ * 
+ * @param functionToRun This function will be called for each vertical slice.
+ * @param verFields Fields inside each item of the traverse array that contains the second nested arrays to iterate vertically.
+ * @param toTraverse: Array to be traverse
+ * @returns void
+ */
+export function traverseVertically(functionToRun: (verticalSlice: object) => any, verFields:string[], toTraverse:any[]):void
+
 export function copyPropsWithValue(objDest: any, shouldUpdateOnlyEmptyFields?: boolean): (input: any) => any;
 export function copyPropsWithValueUsingRules(objDest: any, copyRules: any, shouldUpdateOnlyEmptyFields?: boolean): (inputObj: any) => any;
 export class EnumMap {
