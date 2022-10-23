@@ -1,5 +1,5 @@
 import { strict as assert } from 'assert'
-import { EnumMap, Enum, formatDate, CustomError, findDeepKey, traverse } from '../src/jsUtils.js'
+import { EnumMap, Enum, formatDate, CustomError, findDeepKey, traverse, traverseVertically } from '../src/jsUtils.js'
 import clone from 'just-clone'
 
 describe('jsUtils', () => {
@@ -630,6 +630,173 @@ describe('jsUtils', () => {
       }
     )
 
+  })
+
+
+  //traverseVertically()
+  const subjectTV = [
+    {
+      name:'apple',
+      avge:[
+        {
+          date:"2022-01-01",
+          close: 22.1
+        },
+        {
+          date:"2022-01-02",
+        }
+      ],
+      hist:[
+        {
+          date:"2022-01-01",
+          close: 22.1
+        },
+        {
+          date:"2022-01-02",
+        }
+      ]
+    },
+    {
+      name:'microsoft',
+      avge:[
+        {
+          date:"2022-01-01",
+          close: 22.1
+        },
+        {
+          date:"2022-01-02",
+        }
+      ],
+      hist:[
+        {
+          date:"2022-01-01",
+        },
+        {
+          date:"2022-01-02",
+        },
+        {
+          date:"2022-01-03",
+          close:99
+        }
+      ]
+    }
+  ]
+
+  it('traverseVertically a complex array', () => {
+    let calledWithIndex = []
+    traverseVertically( 
+      (verticalSlice, runIndex)=> {
+        calledWithIndex[runIndex] = true
+        if(runIndex === 0) {
+          assert.deepEqual(
+            verticalSlice, 
+            [
+              {
+                name:'apple',
+                avge:{ date:"2022-01-01", close: 22.1},
+                hist:{ date:"2022-01-01", close: 22.1},
+              },
+              {
+                name:'microsoft',
+                avge: { date:"2022-01-01", close: 22.1 },
+                hist: { date:"2022-01-01"},
+              }
+            ]
+          )
+        }
+
+        if(runIndex === 1) {
+          assert.deepEqual(
+            verticalSlice, 
+            [
+              {
+                name:'apple',
+                avge: { date:"2022-01-02" },
+                hist: { date:"2022-01-02" }
+              },
+              {
+                name:'microsoft',
+                avge: { date:"2022-01-02" },
+                hist: { date:"2022-01-02" }
+              }
+            ]
+          )
+        }
+
+        if(runIndex === 2) {
+          assert.deepEqual(
+            verticalSlice, 
+            [
+              {
+                name:'apple',
+                avge:undefined,
+                hist:undefined,
+              },
+              {
+                name:'microsoft',
+                avge: undefined,
+                hist: { date:"2022-01-03", close:99},
+              }
+            ]
+
+          )
+        }      
+
+      }, 
+      ['avge','hist'], 
+      subjectTV
+    )
+
+    assert.deepEqual(calledWithIndex, [true,true,true], 'Index for false values indicates that functionToRun was omitted and over run')
+  })
+
+  it('traverseVertically an undefined object', () =>
+    traverseVertically( 
+        ()=> {assert.fail('It should not have called functionToRun')}, 
+        ['result'], 
+        undefined
+    )
+  )
+
+  it('traverseVertically an empty array', () =>
+    traverseVertically( 
+      ()=> {assert.fail('It should not have called functionToRun')}, 
+      ['result'], 
+      []
+    )
+  )
+
+  it('traverseVertically an array with all vertical fields not being arrays', () =>
+    traverseVertically( 
+      ()=> {assert.fail('It should not have called functionToRun')}, 
+      ['result'], 
+      [{result:12}]
+    )
+  )
+
+  it('traverseVertically an array with null, empty objects, and one that has a vertical field match', () => {
+    let wasCalled = false
+    traverseVertically(
+      (verticalSlice, runIndex) => {
+        if(runIndex === 0) {
+          wasCalled = true
+          assert.deepEqual(
+            verticalSlice, 
+            [
+              { hist: undefined, avge: undefined },
+              { hist: undefined, avge: undefined },
+              { avge: undefined, hist: undefined },
+              { hist: undefined, avge: undefined },
+              { name: 'apple', hist: 12, avge: undefined }
+            ]
+          )
+        }
+      },
+      ['hist', 'avge'],
+      [{},{hist:undefined},{avge:[]}, null,{name:'apple',hist:[12]}]  
+    )
+    
+    if(wasCalled === false) assert.fail('It should have called functionToRun passed as argument')
   })
 
 })

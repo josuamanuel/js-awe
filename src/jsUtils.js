@@ -492,6 +492,7 @@ function traverseVertically(functionToRun, verFields, toTraverse)
 {
   if(Array.isArray(toTraverse) === false) return
 
+  let runIndex = 0
   let maxLength = 0
   let firstTime = true
   for(let i = 0; firstTime || i < maxLength; i++)
@@ -510,7 +511,10 @@ function traverseVertically(functionToRun, verFields, toTraverse)
         toReturn[j][field] = toTraverse[j]?.[field]?.[i]
       }
     }
-    if(maxLength !== 0) functionToRun(toReturn)
+    if(maxLength !== 0) {
+      functionToRun(toReturn, runIndex)
+      runIndex++
+    }
     firstTime = false
   }
 }

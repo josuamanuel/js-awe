@@ -167,7 +167,7 @@ export namespace traverse {
  * @param toTraverse: Array to be traverse
  * @returns void
  */
-export function traverseVertically(functionToRun: (verticalSlice: object) => any, verFields:string[], toTraverse:any[]):void
+export function traverseVertically(functionToRun: (verticalSlice: object, runIndex:number) => any, verFields:string[], toTraverse:any[]):void
 
 export function copyPropsWithValue(objDest: any, shouldUpdateOnlyEmptyFields?: boolean): (input: any) => any;
 export function copyPropsWithValueUsingRules(objDest: any, copyRules: any, shouldUpdateOnlyEmptyFields?: boolean): (inputObj: any) => any;
