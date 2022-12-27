@@ -889,6 +889,20 @@ function subtractDays(daysToSubtract, date) {
 //subtractDays(40).toISOString() //?
 //subtractDays(3, new Date('2021-03-25')) //?
 
+function addDays(daysToAdd, date)
+{
+  let dateToReturn =
+    date
+      ? new Date(date)
+      : new Date()
+
+  if (isDate(dateToReturn) === false) return date
+
+  dateToReturn.setDate(dateToReturn.getDate() + daysToAdd);
+  return dateToReturn
+}
+// addDays(2, "2022-01-01") //?
+
 function previousDayOfWeek(dayOfWeek, date) {
   let dateObj = date ?? new Date()
 
@@ -902,8 +916,8 @@ function previousDayOfWeek(dayOfWeek, date) {
 
   return subtractDays(toSubtract, dateObj)
 }
-//previousDayOfWeek(6,new Date('2021-05-07')).toISOString() //?
-//previousDayOfWeek(1,new Date('2021-03-25'))
+//previousDayOfWeek(6,new Date('2021-05-07')) //?
+//previousDayOfWeek(1,new Date('2021-03-25')) //?
 
 function getSameDateOrPreviousFridayForWeekends(date) {
   let dateObj = date ?? new Date()
@@ -1645,6 +1659,7 @@ const jsUtils = {
   dateToObj,
   diffInDaysYYYY_MM_DD,
   subtractDays,
+  addDays,
   previousDayOfWeek,
   getSameDateOrPreviousFridayForWeekends,
   replaceAll,
@@ -1706,6 +1721,7 @@ export {
   dateToObj,
   diffInDaysYYYY_MM_DD,
   subtractDays,
+  addDays,
   previousDayOfWeek,
   getSameDateOrPreviousFridayForWeekends,
   replaceAll,
