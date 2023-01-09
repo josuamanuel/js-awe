@@ -1,13 +1,13 @@
 import { strict as assert } from 'assert'
 
 import { wildcardToRegExp, cloneCopy, promiseAll, } from '../src/lodashExt.js'
-import { traverse, getValueAtPath, setValueAtPath } from '../src/jsUtils.js'
+import { traverse, getAt, setAt } from '../src/jsUtils.js'
 import clone from 'just-clone'
 
 describe('lodashExt', () => {
 
-  //getValueAtPath()
-  const getValueAtPathSubject = {
+  //getAt()
+  const getAtSubject = {
     house:
     {
       room: [
@@ -35,8 +35,8 @@ describe('lodashExt', () => {
     }
   }
 
-  it('getValueAtPath', () => {
-    const actual = getValueAtPath(getValueAtPathSubject, 'house.room.0.wardrove')
+  it('getAt', () => {
+    const actual = getAt(getAtSubject, 'house.room.0.wardrove')
     assert.deepStrictEqual(
       actual,
       {
@@ -46,7 +46,7 @@ describe('lodashExt', () => {
     )
   })
 
-  it('getValueAtPath: To get root inform path empty', () => {
+  it('getAt: To get root inform path empty', () => {
 
     //Arrange
     //subject
@@ -55,15 +55,15 @@ describe('lodashExt', () => {
     const expected = 3
 
     //Act
-    const actual = getValueAtPath(3, '')
+    const actual = getAt(3, '')
     //Assert
     assert.strictEqual(actual, expected)
 
   })
 
 
-  //setValueAtPath()
-  const setValueAtPathSubject = {
+  //setAt()
+  const setAtSubject = {
     house:
     {
       room: [
@@ -91,18 +91,18 @@ describe('lodashExt', () => {
     }
   }
 
-  it('setValueAtPath', () => {
+  it('setAt', () => {
 
     //Arrange
     //subject
-    const subject = clone(setValueAtPathSubject)
+    const subject = clone(setAtSubject)
     //expected
-    const expected = clone(setValueAtPathSubject)
+    const expected = clone(setAtSubject)
     expected.house.room[0].wardrove = { test: 'mytest' }
 
     //act
     let actual = subject
-    setValueAtPath(actual, 'house.room.0.wardrove', { test: 'mytest' })
+    setAt(actual, 'house.room.0.wardrove', { test: 'mytest' })
 
     //assert
     assert.deepStrictEqual(actual, expected)
@@ -110,18 +110,18 @@ describe('lodashExt', () => {
   })
 
 
-  it('setValueAtPath', () => {
+  it('setAt', () => {
     //Arrange
     //subject
-    const subject = clone(setValueAtPathSubject)
+    const subject = clone(setAtSubject)
     //expected
-    const expected = clone(setValueAtPathSubject)
+    const expected = clone(setAtSubject)
     expected.house.room[4] = {}
     expected.house.room[4].wardrove = { test: 'mytest' }
 
     //Act
     let actual = subject
-    setValueAtPath(actual, 'house.room.4.wardrove', { test: 'mytest' })
+    setAt(actual, 'house.room.4.wardrove', { test: 'mytest' })
 
     //Assert
     assert.deepStrictEqual(subject, expected)
@@ -130,7 +130,7 @@ describe('lodashExt', () => {
 
 
 
-  it('setValueAtPath simple test with arrays', () => {
+  it('setAt simple test with arrays', () => {
     //Arrange
     //subject
     const subject = []
@@ -142,27 +142,27 @@ describe('lodashExt', () => {
 
     //Act
     let actual = subject
-    setValueAtPath(actual, '4.4.4', 'myTest')
+    setAt(actual, '4.4.4', 'myTest')
 
     //Assert
     assert.deepStrictEqual(actual, expected)
 
   })
 
-  it('setValueAtPath complex', () => {
+  it('setAt complex', () => {
 
     //Arrange
     //subject
-    const subject = clone(setValueAtPathSubject)
+    const subject = clone(setAtSubject)
     //expected
-    const expected = clone(setValueAtPathSubject)
+    const expected = clone(setAtSubject)
     expected.house.room[4] = []
     expected.house.room[4][4] = {}
     expected.house.room[4][4].wardrove = { test: 'mytest' }
 
     //Act
     let actual = subject
-    setValueAtPath(actual, 'house.room.4.4.wardrove', { test: 'mytest' })
+    setAt(actual, 'house.room.4.4.wardrove', { test: 'mytest' })
 
     //Assert
     assert.deepStrictEqual(actual, expected)

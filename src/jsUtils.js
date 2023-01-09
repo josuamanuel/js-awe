@@ -35,7 +35,7 @@ class CustomError extends Error {
     return this
   }
 
-  static of=CustomError
+  static of = CustomError
 }
 // try {
 //   throw new CustomError('aa','bb',{a:1,b:2})
@@ -245,8 +245,7 @@ class EnumMap {
 // }
 
 
-function transition(states, events, transitions)
-{
+function transition(states, events, transitions) {
   states.forEach(validateStateFormat)
   events.forEach(validateEventFormat)
 
@@ -257,8 +256,7 @@ function transition(states, events, transitions)
       validateState(stateKey)
 
       let newStateValue = stateValue
-      if(typeof stateValue === 'string') 
-      {
+      if (typeof stateValue === 'string') {
         validateState(stateValue)
 
         newStateValue = events.reduce(
@@ -268,22 +266,21 @@ function transition(states, events, transitions)
           },
           {}
         )
-      }else
-      {
-        Object.entries(newStateValue).forEach(([key, value])=> {
+      } else {
+        Object.entries(newStateValue).forEach(([key, value]) => {
           validateEvent(key)
           validateState(value)
         })
       }
 
-      
 
-      acum[stateKey] = {...acum[stateKey], ...newStateValue}
+
+      acum[stateKey] = { ...acum[stateKey], ...newStateValue }
       return acum
     },
     states.reduce(
       (acum, current) => {
-        acum[current] = 
+        acum[current] =
           events.reduce(
             (acum2, el2) => {
               acum2[el2] = el2.toUpperCase()
@@ -306,29 +303,25 @@ function transition(states, events, transitions)
 
   return sendEvent
 
-  function validateStateFormat(state)
-  {
-    if(state !== state.toUpperCase())
+  function validateStateFormat(state) {
+    if (state !== state.toUpperCase())
       throw new CustomError('STATE_MUST_BE_UPPERCASE', `The state: ${state} does not have all characters in uppercase`)
   }
 
-  function validateState(state)
-  {
-    if(states.some(el => el === state) === false)
+  function validateState(state) {
+    if (states.some(el => el === state) === false)
       throw new CustomError('STATE_NOT_FOUND', `The state: ${state} was not found in the list of states supplied: ${states}`)
   }
 
 
-  function validateEventFormat(event)
-  {
-    if(event !== event.toLowerCase())
+  function validateEventFormat(event) {
+    if (event !== event.toLowerCase())
       throw new CustomError('EVENT_MUST_BE_LOWERCASE', `The event: ${event} does not have all characters in lowercase`)
   }
 
 
-  function validateEvent(event)
-  {
-    if(events.some(el => el === event) === false)
+  function validateEvent(event) {
+    if (events.some(el => el === event) === false)
       throw new CustomError('EVENT_NOT_FOUND', `The event: ${event} was not found in the list of events supplied: ${events}`)
   }
 }
@@ -491,7 +484,7 @@ traverse.matchPath = function (pathStringQuery, reviverPath) {
 
   let pathStringArr = pathStringQuery.split('.')
 
-  if ( pathStringArr.length !== reviverPath.length ) {
+  if (pathStringArr.length !== reviverPath.length) {
     return false;
   }
 
@@ -500,30 +493,26 @@ traverse.matchPath = function (pathStringQuery, reviverPath) {
   )
 }
 
-function traverseVertically(functionToRun, verFields, toTraverse)
-{
-  if(Array.isArray(toTraverse) === false) return
+function traverseVertically(functionToRun, verFields, toTraverse) {
+  if (Array.isArray(toTraverse) === false) return
 
   let runIndex = 0
   let maxLength = 0
   let firstTime = true
-  for(let i = 0; firstTime || i < maxLength; i++)
-  {
+  for (let i = 0; firstTime || i < maxLength; i++) {
     let toReturn = []
-    for(let j = 0; j< toTraverse.length; j++)
-    {
-      toReturn[j] = {...toTraverse[j]}
-      for(const field of verFields)
-      {
-        if( firstTime) {
+    for (let j = 0; j < toTraverse.length; j++) {
+      toReturn[j] = { ...toTraverse[j] }
+      for (const field of verFields) {
+        if (firstTime) {
           maxLength = toTraverse[j]?.[field]?.length > maxLength
-            ? toTraverse[j][field].length 
+            ? toTraverse[j][field].length
             : maxLength
         }
         toReturn[j][field] = toTraverse[j]?.[field]?.[i]
       }
     }
-    if(maxLength !== 0) {
+    if (maxLength !== 0) {
       functionToRun(toReturn, runIndex)
       runIndex++
     }
@@ -545,15 +534,15 @@ function copyPropsWithValueUsingRules(objDest, copyRules, shouldUpdateOnlyEmptyF
           to = rule
         }
 
-        let valueToCopy = getValueAtPath(inputObj, from)
+        let valueToCopy = getAt(inputObj, from)
 
         if (valueToCopy === undefined || valueToCopy === null) return
 
-        if (shouldUpdateOnlyEmptyFields === true && isEmpty(getValueAtPath(objDest, to)))
-          setValueAtPath(objDest, to, valueToCopy)
+        if (shouldUpdateOnlyEmptyFields === true && isEmpty(getAt(objDest, to)))
+          setAt(objDest, to, valueToCopy)
 
         if (shouldUpdateOnlyEmptyFields === false)
-          setValueAtPath(objDest, to, valueToCopy)
+          setAt(objDest, to, valueToCopy)
 
       }
     )
@@ -592,13 +581,13 @@ function copyPropsWithValue(objDest, shouldUpdateOnlyEmptyFields = false) {
       const destPath = currentPath.slice(1 - currentPath.length)
 
       if (shouldUpdateOnlyEmptyFields === true) {
-        const valueAtDest = getValueAtPath(objDest, destPath)
-        if (isEmpty(valueAtDest)) setValueAtPath(objDest, destPath, nodeValue)
+        const valueAtDest = getAt(objDest, destPath)
+        if (isEmpty(valueAtDest)) setAt(objDest, destPath, nodeValue)
 
         return
       }
 
-      setValueAtPath(objDest, destPath, nodeValue) //?
+      setAt(objDest, destPath, nodeValue) //?
 
     })
 
@@ -901,8 +890,7 @@ function subtractDays(daysToSubtract, date) {
 //subtractDays(40).toISOString() //?
 //subtractDays(3, new Date('2021-03-25')) //?
 
-function addDays(daysToAdd, date)
-{
+function addDays(daysToAdd, date) {
   let dateToReturn =
     date
       ? new Date(date)
@@ -1066,7 +1054,7 @@ function deepFreeze(o) {
   return o
 }
 
-function getValueAtPath(obj, valuePath) {
+function getAt(obj, valuePath) {
   if (obj === undefined || obj === null || valuePath === undefined || valuePath === null) {
     return
   }
@@ -1092,14 +1080,16 @@ function getValueAtPath(obj, valuePath) {
 
   return result
 }
-// getValueAtPath(undefined, '') //?
-// getValueAtPath(5, '') //?
-// getValueAtPath({arr:[1,2,{b:3}],j:{n:3}}, 'j') //?
-// getValueAtPath({arr:[1,2,{b:3}],j:{n:3}}, 'arr.$last.b') //?
-// getValueAtPath({arr:[1,2,{b:3}],j:{n:3}}, 'j') //?
 
 
-function setValueAtPath(obj, valuePath, value) {
+// getAt(undefined, '') //?
+// getAt(5, '') //?
+// getAt({arr:[1,2,{b:3}],j:{n:3}}, 'j') //?
+// getAt({arr:[1,2,{b:3}],j:{n:3}}, 'arr.$last.b') //?
+// getAt({arr:[1,2,{b:3}],j:{n:3}}, 'j') //?
+
+
+function setAt(obj, valuePath, value) {
   // modified the value of an existing property:   {a:8} ==> 'a' with 12 => {a:12}
   const MODIFIED = 'MODIFIED'
 
@@ -1118,59 +1108,94 @@ function setValueAtPath(obj, valuePath, value) {
   let valuePathArray
 
   if (obj === undefined || obj === null || valuePath === undefined || valuePath === null) {
-    throw { name: 'setValueAtPathParamsException', msg: 'obj: ' + obj + ', valuePath: ' + valuePath + ', value: ' + value }
+    throw { name: 'setAtParamsException', msg: 'obj: ' + obj + ', valuePath: ' + valuePath + ', value: ' + value }
   }
 
   try {
     valuePathArray = typeof valuePath === 'string' ? valuePath.split('.') : valuePath
-    valuePathArray
     for (let i = 0, j = valuePathArray.length; i < j; i++) {
 
+      let field = nameToIndex(result, valuePathArray[i])
+    
       if (i === (valuePathArray.length - 1)) {
         if (result?.[valuePathArray[i]] !== undefined) {
-          result?.[valuePathArray[i]] //?
-          valueReturn
           if (valueReturn !== CREATED) valueReturn = MODIFIED
         } else {
           if (valueReturn !== CREATED) valueReturn = ADDED
         }
-        result[valuePathArray[i]] = value
+
+        result[field] = value
       } else {
-        if (typeof result[valuePathArray[i]] !== 'object') {
-          if (Number.isNaN(Number(valuePathArray[i + 1]))) result[valuePathArray[i]] = {}
-          else result[valuePathArray[i]] = []
+        if (typeof result[field] !== 'object') {
+          if (Number.isNaN(Number(valuePathArray[i + 1]))) result[field] = {}
+          else result[field] = []
 
           valueReturn = CREATED
         }
 
-        result = result[valuePathArray[i]]
+        result = result[field]
       }
     }
     if (valueReturn === FAILED) {
-      throw { name: 'setValueAtPathException', msg: 'obj: ' + obj + ', valuePath: ' + valuePath + ', value: ' + value }
+      throw { name: 'setAtException', msg: 'obj: ' + obj + ', valuePath: ' + valuePath + ', value: ' + value }
     }
   }
   catch (e) {
-    console.log(e + ' Warning: There was an exception in setValueAtPath(obj, valuePath, value)... obj: ' + obj + ' valuePath: ' + valuePath + ' value: ' + value)
+    console.log(e + ' Warning: There was an exception in setAt(obj, valuePath, value)... obj: ' + obj + ' valuePath: ' + valuePath + ' value: ' + value)
     valueReturn = FAILED
     return valueReturn
   }
   return valueReturn
+
+  function nameToIndex(obj, field)
+  {
+    if (Array.isArray(obj) && field === '$last') {
+      return obj.length - 1
+    }
+
+    if (Array.isArray(obj) && field === '$push') {
+      return obj.length 
+    }
+
+    if (Array.isArray(obj) && parseInt(field) < 0) {
+      return obj.length + parseInt(valuePathArray[i])
+    }
+
+    return field
+  }
 }
-// {
-//   let obj = {}
-//   setValueAtPath(obj, 'a', '8') //?
-//   obj //?
-//   let obj2 = {a:3}
-//   setValueAtPath(obj2, 'b', '8') //?
-//   setValueAtPath(obj2, 'a.b', '8') //?
-//   setValueAtPath(obj2, 'd.e', 'a') //?
-//   obj2
-//   setValueAtPath(obj2, 'd.f', 'b') //?
-//   setValueAtPath(obj2, 'd.e', 'aa') //?
-//   setValueAtPath(obj2, 'e.g', 'c') //?
-//   obj2 //?
-// }
+{
+  // let obj = {}
+  // setAt(obj, 'a', '8') //?
+  // obj //?
+  // let obj2 = {a:3,b:{c:1}}
+  // setAt(obj2, 'b', '8') //?
+  // setAt(obj2, 'a.b', '8') //?
+  // setAt(obj2, 'd.e', 'a') //?
+  // obj2 //?
+  // setAt(obj2, 'd.f', 'b') //?
+  // setAt(obj2, 'd.e', 'aa') //?
+  // setAt(obj2, 'e.g', 'c') //?
+  // setAt(obj2, 'a.b.0.0.c', 'c') //?
+  // obj2 //?
+  // let obj3 = [1,2,3,4,5]
+  // setAt(obj3,'-2',8) //?
+  // obj3 //?
+  // let obj4 = [1,2,3,4,5]
+  // setAt(obj4,'$last',8) //?
+  // obj4 //?
+  // let obj5 = [1,2,3,4,5]
+  // setAt(obj5,'$push',8) //?
+  // obj5 //?
+  // let obj6 = {
+  //   items: [ 
+  //     {}, 
+  //     { ar: [1, 2] }
+  //   ]
+  // }
+  // setAt(obj6,'items.$last.ar.$push',8) //?
+  // obj6 //?
+}
 
 const sorterByPaths = (paths, isAsc = true) => {
   let great = 1
@@ -1188,8 +1213,8 @@ const sorterByPaths = (paths, isAsc = true) => {
   return (objA, objB) => {
 
     for (let currentPath of pathArr) {
-      if (getValueAtPath(objA, currentPath) > getValueAtPath(objB, currentPath)) return great
-      else if (getValueAtPath(objA, currentPath) < getValueAtPath(objB, currentPath)) return less
+      if (getAt(objA, currentPath) > getAt(objB, currentPath)) return great
+      else if (getAt(objA, currentPath) < getAt(objB, currentPath)) return less
     }
 
     return 0
@@ -1421,8 +1446,8 @@ function pushUniqueKeyOrChange(newRow, table, indexes = [0], mergeFun) {
 //   (newRow, existingRow) => [newRow[0] + existingRow[0], newRow[1] + existingRow[1]]
 // ) //?
 
-function pushAt(pos,value, arr){
-  if(Array.isArray(arr) === false) throw new CustomError('PUSHAT_LAST_PARAMETER_MUST_BE_ARRAY')
+function pushAt(pos, value, arr) {
+  if (Array.isArray(arr) === false) throw new CustomError('PUSHAT_LAST_PARAMETER_MUST_BE_ARRAY')
 
   // if(pos >= arr.length) {
   //   arr[pos] = value 
@@ -1430,8 +1455,8 @@ function pushAt(pos,value, arr){
   // }
 
   const length = arr.length
-  repeat(arr.length - pos).times( index => arr[length - index] =  arr[length - index - 1] )
-  arr[pos] = value 
+  repeat(arr.length - pos).times(index => arr[length - index] = arr[length - index - 1])
+  arr[pos] = value
   return arr
 
 }
@@ -1616,8 +1641,7 @@ function processExit(error) {
   console.log(`Shutting down with error: ${error}`);
   try {
     process.exit(1)
-  }catch(e)
-  {
+  } catch (e) {
     console.log(e)
   }
 }
@@ -1637,8 +1661,8 @@ const jsUtils = {
   colorByStatus,
   findDeepKey,
   deepFreeze,
-  getValueAtPath,
-  setValueAtPath,
+  getAt,
+  setAt,
   sorterByPaths,
   filterFlatMap,
   arraySorter,
@@ -1699,8 +1723,8 @@ export {
   colorByStatus,
   findDeepKey,
   deepFreeze,
-  getValueAtPath,
-  setValueAtPath,
+  getAt,
+  setAt,
   sorterByPaths,
   filterFlatMap,
   arraySorter,
