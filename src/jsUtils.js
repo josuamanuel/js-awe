@@ -487,6 +487,18 @@ traverse.skip = Symbol()
 traverse.stop = Symbol()
 traverse.delete = Symbol()
 
+traverse.matchPath = function (pathStringQuery, path) {
+
+  let pathStringArr = pathStringQuery.split('.')
+
+  if ( pathStringArr.length !== path.length ) {
+    return false;
+  }
+
+  return pathStringArr.every(
+    (el, index) => el === '*' || el === path[index]
+  )
+}
 
 function traverseVertically(functionToRun, verFields, toTraverse)
 {
