@@ -133,6 +133,7 @@ export function removeDuplicates(arr: any): any[];
  * traverse.skip: stop accessing subtrees
  * traverse.stop: stop completly the object traverse
  * traverse.delete: delete the current node
+ * traverse.match(stringQuery, reviverPath) return true if reviverPath match query string
  * 
  * @param objIni The object to traverse.
  * @param reviver The function to be called for each node

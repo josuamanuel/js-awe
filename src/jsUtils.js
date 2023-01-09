@@ -487,16 +487,16 @@ traverse.skip = Symbol()
 traverse.stop = Symbol()
 traverse.delete = Symbol()
 
-traverse.matchPath = function (pathStringQuery, path) {
+traverse.matchPath = function (pathStringQuery, reviverPath) {
 
   let pathStringArr = pathStringQuery.split('.')
 
-  if ( pathStringArr.length !== path.length ) {
+  if ( pathStringArr.length !== reviverPath.length ) {
     return false;
   }
 
   return pathStringArr.every(
-    (el, index) => el === '*' || el === path[index]
+    (el, index) => el === '*' || el === reviverPath[index]
   )
 }
 
