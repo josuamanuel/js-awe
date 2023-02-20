@@ -114,6 +114,17 @@ export function findDeepKey(objIni: any, keyToFind: any): any[];
 export function deepFreeze(o: any): any;
 export function getAt(obj: any, valuePath: any): any;
 export function setAt(obj: any, valuePath: any, value: any): string;
+
+
+/**
+ * Create a sorter function to use as a parameter in array.prototype.sort(sorter):
+ * It can order by several fields. If fields are equal it will uneven using
+ * subsequent fields.
+ * @param paths List of paths to sort by. One path for each field to order by. Route path is
+ * of the shape. ex: 'person.details.age'. If it is only one field it can be a string.
+ * @param isAsc Optional. Default: true. true: to order ascending. false: to order descending
+ * @returns Return a sorter function to include in array.prototype.sort(sorter)
+ */
 export function sorterByPaths(paths: any, isAsc?: boolean): (objA: any, objB: any) => number;
 export function filterFlatMap(mapWithUndefinedFilterFun: any, data: any): any[];
 export function arraySorter(isAsc?: boolean): (a: any, b: any) => 1 | -1 | 0;
