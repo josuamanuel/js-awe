@@ -940,6 +940,17 @@ function getSameDateOrPreviousFridayForWeekends(date) {
 // ////2021-05-14T00:00:00.000Z
 // getSameDateOrPreviousFridayForWeekends(new Date('2021-05-16')).toISOString() //?
 
+function isDateMidnight(date) {
+  return date?.toISOString?.()?.substr(10, 14) === 'T00:00:00.000Z'
+}
+
+function setDateToMidnight(date) {
+  if (isDate(date) === false) return date
+
+  if (isDateMidnight(date) === true) return date
+
+  return new Date(date.toISOString().substr(0, 10))
+}
 
 const {
   colors,
@@ -1698,6 +1709,8 @@ const jsUtils = {
   addDays,
   previousDayOfWeek,
   getSameDateOrPreviousFridayForWeekends,
+  isDateMidnight,
+  setDateToMidnight,
   replaceAll,
   cleanString,
   repeat,
@@ -1760,6 +1773,8 @@ export {
   addDays,
   previousDayOfWeek,
   getSameDateOrPreviousFridayForWeekends,
+  isDateMidnight,
+  setDateToMidnight,
   replaceAll,
   cleanString,
   repeat,

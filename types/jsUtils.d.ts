@@ -226,6 +226,8 @@ export function diffInDaysYYYY_MM_DD(iniDate: any, endDate: any): number;
 export function subtractDays(daysToSubtract: any, date: any): any;
 export function previousDayOfWeek(dayOfWeek: any, date: any): any;
 export function getSameDateOrPreviousFridayForWeekends(date: any): any;
+export function isDateMidnight(date: Date):boolean;
+export function setDateToMidnight(date: Date): Date;
 export function replaceAll(str: any, ...fromTo: any[]): any;
 export function cleanString(str: any): any;
 export function repeat(numberOfTimes: any): {
