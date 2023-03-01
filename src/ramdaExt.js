@@ -245,9 +245,12 @@ const filterMap = R.curry(
   (filter, map, data) =>
     R.reduce(
       (acum, current) =>
-        filter(current) ?
-          R.append(map(current), acum) :
-          acum, [], data)
+        filter(current)
+          ? R.append(map(current), acum)
+          : acum,
+      [], 
+      data
+    )
 )
 RE.filterMap = filterMap
 

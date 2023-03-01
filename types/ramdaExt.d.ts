@@ -118,7 +118,7 @@ export const updateWithHashKeys: any;
 export const between: any;
 export const matchByPropId: any;
 export const splitCond: any;
-export const filterMap: any;
+export function filterMap<T>(filterFun:(el:T)=>boolean, mapFun:(el:T)=>T, data:T[]): T[];
 export const mapWithNext: any;
 export const mapWithPrevious: any;
 export function pipeWithChain(...func: any[]): (...params: any[]) => any;
