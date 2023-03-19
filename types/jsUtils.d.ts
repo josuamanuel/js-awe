@@ -250,6 +250,6 @@ export function runEvery(period: any): {
   };
 };
 export function loopIndexGenerator(initValue: any, iterations: any): Generator<any, void, unknown>;
-export function retryWithSleep(times: any, updateSleepTimeFun: any, funToRun: any, funToRunParams: any, shouldStopRetrying: any): Promise<any>;
+export function retryWithSleep<T>(times: number, updateSleepTimeFun: (currentSleepTime?:number, index?:number)=>number, funToRun: (...params?:T[])=>any, funToRunParams: T[]|undefined, shouldStopRetrying?: (result?:any)=>boolean): Promise<any>;
 export function processExit(error: any): void;
 //# sourceMappingURL=jsUtils.d.ts.map
