@@ -46,6 +46,7 @@ declare namespace jsUtils {
   export { YYYY_MM_DD_hh_mm_ss_ToUtcDate };
   export { dateToObj };
   export { diffInDaysYYYY_MM_DD };
+  export { addDays };
   export { subtractDays };
   export { previousDayOfWeek };
   export { getSameDateOrPreviousFridayForWeekends };
@@ -207,13 +208,19 @@ export function memoize(): {
   memoizeWithHashFun: (func: any, hashFunc: any, ...params: any[]) => any;
 };
 export function fillWith(mapper: any, lenOrWhileTruthFun: any): any[];
+
+type Month = '01' | '02' | '03' | '04' | '05' | '06' | '07' | '08' | '09' | '10' | '11' | '12';
+type Day = '01' | '02' | '03' | '04' | '05' | '06' | '07' | '08' | '09' | '10' | '11' | '12' | '13' | '14' | '15' | '16' | '17' | '18' | '19' | '20' | '21' | '22' | '23' | '24' | '25' | '26' | '27' | '28' | '29' | '30' | '31';
+type Separator = '/' | '-'
+type StringDate = `${number}${Separator}${Month}${Separator}${Day}${string}`;
+
 export function isDate(d: any): boolean;
 export function isEmpty(value: any): boolean;
-export function isStringADate(stringDate: any): boolean;
-export function formatDate(format: any, date: any): any;
-export function dateFormatter(format: any): (date: any) => any;
-export function YYYY_MM_DD_hh_mm_ss_ToUtcDate(dateYYYY_MM_DD_hh_mm_ss: any): number;
-export function dateToObj(date: any): {
+export function isStringADate(stringDate: string): boolean;
+export function formatDate(format: any, date?: Date | StringDate): string | undefined;
+export function dateFormatter(format: string): (date: Date | StringDate) => string | undefined;
+export function YYYY_MM_DD_hh_mm_ss_ToUtcDate(dateYYYY_MM_DD_hh_mm_ss: string): number;
+export function dateToObj(date: Date | StringDate): {
   YYYY: number;
   MM: number;
   DD: number;
@@ -221,13 +228,14 @@ export function dateToObj(date: any): {
   mm: number;
   ss: number;
   mil: number;
-};
-export function diffInDaysYYYY_MM_DD(iniDate: any, endDate: any): number;
-export function subtractDays(daysToSubtract: any, date: any): any;
-export function previousDayOfWeek(dayOfWeek: any, date: any): any;
-export function getSameDateOrPreviousFridayForWeekends(date: any): any;
-export function isDateMidnight(date: Date):boolean;
-export function setDateToMidnight(date: Date): Date;
+} | undefined;
+export function diffInDaysYYYY_MM_DD(iniDate: Date | StringDate, endDate: Date | StringDate): number;
+export function addDays(daysToSubtract: number, date: Date | StringDate): Date;
+export function subtractDays(daysToSubtract: number, date: Date | StringDate): Date;
+export function previousDayOfWeek(dayOfWeek: 0 | 1 | 2 | 3 | 4 | 5 | 6, date: Date | StringDate): Date;
+export function getSameDateOrPreviousFridayForWeekends(date: Date | StringDate): Date;
+export function isDateMidnight(date: Date):boolean | undefined;
+export function setDateToMidnight(date: Date | StringDate): Date;
 export function replaceAll(str: any, ...fromTo: any[]): any;
 export function cleanString(str: any): any;
 export function repeat(numberOfTimes: any): {

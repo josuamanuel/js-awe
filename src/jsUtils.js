@@ -751,6 +751,14 @@ function indexOfNthMatch(string, toMatch, nth) {
   return string.split(toMatch, nth).join(toMatch).length
 }
 
+
+function toDate(date)
+{
+  return date
+      ? new Date(date)
+      : new Date()
+}
+
 function isDate(d) {
   return d instanceof Date && !isNaN(d);
 }
@@ -758,11 +766,7 @@ function isDate(d) {
 function isStringADate(stringDate) {
   if (typeof stringDate !== 'string') return false
 
-  const date = new Date(stringDate)
-
-  if (date >= new Date('0000-01-01') && date <= new Date('9999-12-31')) return true
-
-  return false
+  return isDate(new Date(stringDate))
 }
 
 function dateFormatter(format) {
@@ -770,8 +774,10 @@ function dateFormatter(format) {
 }
 
 function formatDate(format, date) {
+  let dateToProcess = toDate(date)
 
-  let dateToProcess = (date ? new Date(date) : new Date())
+  if (isDate(dateToProcess) === false) return undefined
+
 
   const months = new EnumMap({
     'January': '01',
@@ -804,17 +810,17 @@ function formatDate(format, date) {
 
   const dateIsoString = dateToProcess.toISOString()
 
-  const YYYY = dateIsoString.substr(0, 4)
-  const YY = dateIsoString.substr(2, 2)
-  const MM = dateIsoString.substr(5, 2)
-  const DD = dateIsoString.substr(8, 2)
+  const YYYY = dateIsoString.substring(0, 4)
+  const YY = dateIsoString.substring(2, 4)
+  const MM = dateIsoString.substring(5, 7)
+  const DD = dateIsoString.substring(8, 10)
   const D = parseInt(DD, 10).toString()
-  const hh = dateIsoString.substr(11, 2)
+  const hh = dateIsoString.substring(11, 13)
   const h = parseInt(hh, 10).toString()
-  const mm = dateIsoString.substr(14, 2)
-  const ss = dateIsoString.substr(17, 2)
-  const mil = dateIsoString.substr(20, 3)
-  const mi = dateIsoString.substr(20, 2)
+  const mm = dateIsoString.substring(14, 16)
+  const ss = dateIsoString.substring(17, 19)
+  const mil = dateIsoString.substring(20, 23)
+  const mi = dateIsoString.substring(20, 22)
 
   const month = indexMonths[MM]
   const dayOfWeek = indexDays[dateToProcess.getDay()]
@@ -839,28 +845,31 @@ function formatDate(format, date) {
 
 function YYYY_MM_DD_hh_mm_ss_ToUtcDate(dateYYYY_MM_DD_hh_mm_ss) {
   // Input format has 1 char (any could work) between each elements: years, months, days, hours, minutes and seconds
-  const dateYYYY = parseInt(dateYYYY_MM_DD_hh_mm_ss.substr(0, 4))
-  const dateMM = parseInt(dateYYYY_MM_DD_hh_mm_ss.substr(5, 2)) - 1 // Months start with 0
-  const dateDD = parseInt(dateYYYY_MM_DD_hh_mm_ss.substr(8, 2))
-  const datehh = parseInt(dateYYYY_MM_DD_hh_mm_ss.substr(11, 2))
-  const datemm = parseInt(dateYYYY_MM_DD_hh_mm_ss.substr(14, 2))
-  const datess = parseInt(dateYYYY_MM_DD_hh_mm_ss.substr(17, 2))
+  const dateYYYY = parseInt(dateYYYY_MM_DD_hh_mm_ss.substring(0, 4))
+  const dateMM = parseInt(dateYYYY_MM_DD_hh_mm_ss.substring(5, 7)) - 1 // Months start with 0
+  const dateDD = parseInt(dateYYYY_MM_DD_hh_mm_ss.substring(8, 10))
+  const datehh = parseInt(dateYYYY_MM_DD_hh_mm_ss.substring(11, 13))
+  const datemm = parseInt(dateYYYY_MM_DD_hh_mm_ss.substring(14, 16))
+  const datess = parseInt(dateYYYY_MM_DD_hh_mm_ss.substring(17, 19))
 
   return Date.UTC(dateYYYY, dateMM, dateDD, datehh, datemm, datess)
 }
 
 function dateToObj(date) {
-  let dateToProcess = new Date(date) ?? new Date()
+  let dateToProcess = toDate(date)
+
+  if (isDate(dateToProcess) === false) return undefined
+
   let ISODate = dateToProcess.toISOString()
 
   return {
-    YYYY: parseInt(ISODate.substr(0, 4)),
-    MM: parseInt(ISODate.substr(5, 2)),
-    DD: parseInt(ISODate.substr(8, 2)),
-    hh: parseInt(ISODate.substr(11, 2)),
-    mm: parseInt(ISODate.substr(14, 2)),
-    ss: parseInt(ISODate.substr(17, 2)),
-    mil: parseInt(ISODate.substr(20, 3))
+    YYYY: parseInt(ISODate.substring(0, 4)),
+    MM: parseInt(ISODate.substring(5, 7)),
+    DD: parseInt(ISODate.substring(8, 10)),
+    hh: parseInt(ISODate.substring(11, 13)),
+    mm: parseInt(ISODate.substring(14, 16)),
+    ss: parseInt(ISODate.substring(17, 19)),
+    mil: parseInt(ISODate.substring(20, 23))
   }
 }
 //dateToObj() //?
@@ -877,62 +886,56 @@ function diffInDaysYYYY_MM_DD(iniDate, endDate) {
 }
 
 function subtractDays(daysToSubtract, date) {
-  let dateToReturn =
-    date
-      ? new Date(date)
-      : new Date()
+  let dateToProcess = toDate(date)
 
-  if (isDate(dateToReturn) === false) return date
+  if (isDate(dateToProcess) === false) return dateToProcess
 
-  dateToReturn.setDate(dateToReturn.getDate() - daysToSubtract);
-  return dateToReturn
+  dateToProcess.setDate(dateToProcess.getDate() - daysToSubtract);
+  return dateToProcess
 }
 //subtractDays(40).toISOString() //?
 //subtractDays(3, new Date('2021-03-25')) //?
 
 function addDays(daysToAdd, date) {
-  let dateToReturn =
-    date
-      ? new Date(date)
-      : new Date()
+  let dateToProcess = toDate(date)
 
-  if (isDate(dateToReturn) === false) return date
+  if (isDate(dateToProcess) === false) return dateToProcess
 
-  dateToReturn.setDate(dateToReturn.getDate() + daysToAdd);
-  return dateToReturn
+  dateToProcess.setDate(dateToProcess.getDate() + daysToAdd);
+  return dateToProcess
 }
 // addDays(2, "2022-01-01") //?
 
 function previousDayOfWeek(dayOfWeek, date) {
-  let dateObj = date ?? new Date()
+  let dateToProcess = toDate(date)
 
-  if (isDate(dateObj) === false) return date
+  if (isDate(dateToProcess) === false) return dateToProcess
 
-  let diffInDaysOfWeek = dateObj.getDay() - dayOfWeek
+  let diffInDaysOfWeek = dateToProcess.getDay() - dayOfWeek
 
   let toSubtract = diffInDaysOfWeek >= 0
     ? diffInDaysOfWeek
     : 7 + diffInDaysOfWeek
 
-  return subtractDays(toSubtract, dateObj)
+  return subtractDays(toSubtract, dateToProcess)
 }
 //previousDayOfWeek(6,new Date('2021-05-07')) //?
 //previousDayOfWeek(1,new Date('2021-03-25')) //?
 
 function getSameDateOrPreviousFridayForWeekends(date) {
-  let dateObj = date ?? new Date()
+  let dateToProcess = toDate(date)
 
-  if (isDate(dateObj) === false) return date
+  if (isDate(dateToProcess) === false) return dateToProcess
 
-  const dayOfWeek = dateObj.getUTCDay()
+  const dayOfWeek = dateToProcess.getUTCDay()
 
-  if (dayOfWeek > 0 && dayOfWeek < 6) return dateObj
+  if (dayOfWeek > 0 && dayOfWeek < 6) return dateToProcess
 
   //Sunday
-  if (dayOfWeek === 0) return subtractDays(2, dateObj)
+  if (dayOfWeek === 0) return subtractDays(2, dateToProcess)
 
   //Saturday (dayOfWeek === 6)
-  return subtractDays(1, dateObj)
+  return subtractDays(1, dateToProcess)
 }
 // getSameDateOrPreviousFridayForWeekends() //?
 // //2021-05-14T00:00:00.000Z
@@ -941,15 +944,17 @@ function getSameDateOrPreviousFridayForWeekends(date) {
 // getSameDateOrPreviousFridayForWeekends(new Date('2021-05-16')).toISOString() //?
 
 function isDateMidnight(date) {
-  return date?.toISOString?.()?.substr(10, 14) === 'T00:00:00.000Z'
+  return date?.toISOString?.()?.substring(10, 24) === 'T00:00:00.000Z'
 }
 
 function setDateToMidnight(date) {
-  if (isDate(date) === false) return date
+  let dateToProcess = toDate(date)
 
-  if (isDateMidnight(date) === true) return date
+  if (isDate(dateToProcess) === false) return dateToProcess
 
-  return new Date(date.toISOString().substr(0, 10))
+  if (isDateMidnight(dateToProcess) === true) return dateToProcess
+
+  return new Date(dateToProcess.toISOString().substring(0, 10))
 }
 
 const {
