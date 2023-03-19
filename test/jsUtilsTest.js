@@ -1,5 +1,5 @@
 import { strict as assert } from 'assert'
-import { EnumMap, Enum, formatDate, CustomError, findDeepKey, traverse, traverseVertically } from '../src/jsUtils.js'
+import { EnumMap, Enum, formatDate, addDays, subtractDays, diffInDaysYYYY_MM_DD, previousDayOfWeek, CustomError, findDeepKey, traverse, traverseVertically } from '../src/jsUtils.js'
 import clone from 'just-clone'
 
 describe('jsUtils', () => {
@@ -371,6 +371,38 @@ describe('jsUtils', () => {
 
   it('formatDate new Date, $YYYY$MM$DD$hh$mm$ss$mil', () => {
     assert.strictEqual(formatDate('$YYYY$MM$DD$hh$mm$ss$mil', new Date(2020, 12 - 1, 9, 23, 21, 45, 999)), '20201209232145999')
+  })
+
+  it('addDays', () => {
+    assert.strictEqual(addDays(3, new Date('2023-02-27')).toISOString(), new Date('2023-03-02').toISOString())
+  })
+
+  it('subtractDays', () => {
+    assert.strictEqual(subtractDays(3, new Date('2023-03-02')).toISOString(), new Date('2023-02-27').toISOString())
+  })
+
+  it('diffInDaysYYYY_MM_DD', () => {
+    assert.strictEqual(diffInDaysYYYY_MM_DD('2023-02-27', '2023-03-02'), 3)
+  })
+
+  it('previousDayOfWeek', () => {
+    assert.strictEqual(previousDayOfWeek(6, new Date('2023-03-19')).toISOString(), new Date('2023-03-18').toISOString())
+  })
+
+  it('previousDayOfWeek return the same date when the input date is the day of the week requested', () => {
+    assert.strictEqual(previousDayOfWeek(0, new Date('2023-03-19')).toISOString(), new Date('2023-03-19').toISOString())
+  })
+
+  it('previousDayOfWeek return the same date when the input date is the day of the week requested', () => {
+    assert.strictEqual(previousDayOfWeek(4, new Date('2023-03-16')).toISOString(), new Date('2023-03-16').toISOString())
+  })
+
+  it('previousDayOfWeek', () => {
+    assert.strictEqual(previousDayOfWeek(4, new Date('2023-03-19')).toISOString(), new Date('2023-03-16').toISOString())
+  })
+
+  it('previousDayOfWeek. You can use string date format', () => {
+    assert.strictEqual(previousDayOfWeek(4, '2023-03-19').toISOString(), new Date('2023-03-16').toISOString())
   })
 
   const findDeepKeyObjSubject = {
