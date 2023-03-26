@@ -1132,6 +1132,7 @@ export {
   filterMap,
   mapWithNext,
   mapWithPrevious,
+  exclude,
   pipeWithChain,
   pipe,
   pipeWhile,
