@@ -121,6 +121,14 @@ export const splitCond: any;
 export function filterMap<T>(filterFun:(el:T)=>boolean, mapFun:(el:T)=>T, data:T[]): T[];
 export const mapWithNext: any;
 export const mapWithPrevious: any;
+/**
+* Exclude elements of the subject Array that matches
+* the valuesToRemove.
+* You can specify the field in both Arrays for the match.
+* a field with value undefined will math using the value instead
+* of the values of the property indicated by the field
+*/
+export function exclude<T>(fieldToRemove:string|undefined, valuesToRemove: any[], fieldSubject:string|undefined, subjectArray:T[]):T[];
 export function pipeWithChain(...func: any[]): (...params: any[]) => any;
 export function pipe(...func: any[]): (...params: any[]) => any;
 export function pipeWhile(funCond: any, ini: any): (...funcs: any[]) => (...inputs: any[]) => any;

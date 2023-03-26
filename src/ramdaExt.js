@@ -280,6 +280,33 @@ const mapWithPrevious = R.curry(
 )
 RE.mapWithPrevious = mapWithPrevious
 
+
+const exclude = R.curry(
+  (fieldToRemove, valuesToRemove, fieldSubject, subjectArray) => 
+    subjectArray.filter(
+      (subjectEl) => {
+        let finalSubjectEl = subjectEl
+
+        
+        if(fieldSubject !== undefined && fieldSubject !== null) 
+          finalSubjectEl = subjectEl[fieldSubject]
+
+        return !valuesToRemove.find(
+          (valToRemove) => {
+            let finalValToRemove = valToRemove
+            if(fieldToRemove !== undefined && fieldToRemove !== null) 
+              finalValToRemove = valToRemove[fieldToRemove]
+
+            return finalSubjectEl === finalValToRemove
+          } 
+        )
+      }    
+    )
+)
+RE.exclude = exclude
+//exclude('id',[{id:2},{id:6}], undefined, [1,2,3,4,5,6,7,8]) //?
+//exclude('id',[{id:2},{id:6}], 'key', [{key:1, age:1},{key:2, age:2},{key:4, age:4},{key:5, age:5}]) //?
+
 const n0IsNotUnfold =
   R.pipe(
     R.propEq('0', 'unfold'),
