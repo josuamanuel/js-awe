@@ -38,15 +38,16 @@ RE.groupByWithCalc = groupByWithCalc
 //   (row) => row.date,
 //   {
 //     total:(l,r) => (l??0) + r,
-//     count:(l,r) => (l??0) + 1
+//     count:(l,r) => (l??0) + 1,
+//     line:(l,r) => l??r
 //   },
 // )(
 //   [
-//     {date:'2020-01-02', total:6}, 
-//     {date:'2020-01-03', total:5}, 
-//     {date:'2020-01-02', total:11}, 
-//     {date:'2020-01-03', total:6}, 
-//     {date:'2020-01-02', total:-5}
+//     {date:'2020-01-02', line:1, total:6}, 
+//     {date:'2020-01-03', line:2, total:5}, 
+//     {date:'2020-01-02', line:3, total:11}, 
+//     {date:'2020-01-03', line:4, total:6}, 
+//     {date:'2020-01-02', line:5, total:-5}
 //   ]
 // )//?
 
