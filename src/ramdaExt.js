@@ -20,7 +20,7 @@ const groupByWithCalcUnc = (cond, keyOp) => data => {
       opsToApply.forEach(
         ([key, opFunc]) => {
           acum[indexRow] = acum[indexRow] ?? {}
-          acum[indexRow][key] = opFunc(acum[indexRow]?.[key], current?.[key])
+          acum[indexRow][key] = opFunc(acum[indexRow]?.[key], current?.[key], acum[indexRow], current )
         }
       )
       acum[indexRow] = { ...current, ...acum[indexRow] }
@@ -37,9 +37,10 @@ RE.groupByWithCalc = groupByWithCalc
 // RE.groupByWithCalc(
 //   (row) => row.date,
 //   {
-//     total:(l,r) => (l??0) + r,
-//     count:(l,r) => (l??0) + 1,
-//     line:(l,r) => l??r
+//     total:(acum,current) => (acum??0) + current,
+//     count:(acum,current) => (acum??0) + 1,
+//     line:(acum,current) => acum??current,
+//     rowCalc:(acum,_,acumRow, currentRow) => (acum??0) + currentRow.line + currentRow.total
 //   },
 // )(
 //   [

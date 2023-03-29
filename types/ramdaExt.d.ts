@@ -26,12 +26,12 @@ export namespace RE {
 
 
 /**
-* Calculate the new value for the left and right of the match.
-* @param left first value always start with undefined. then it
-* will have the accumulation. Use (left??0) for safety.
-* @param right value of the field to merge.
+* Calculate the new value for the acum and current of the match.
+* @param acum first value always start with undefined. then it
+* will have the accumulation. Use (acum??0) for safety.
+* @param current value of the field to merge.
 */
-declare function mergeFields(left?:any,right?:any):any
+declare function mergeFields(acum?:any,current?:any, acumRow?:any, currentRow?:any):any
 
 type mergeFieldsType = typeof mergeFields
 
