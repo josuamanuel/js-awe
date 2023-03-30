@@ -1054,7 +1054,9 @@ function findDeepKey(objIni, keyToFind) {
   }
   return result
 }
-
+// {
+//   findDeepKey([{a:{astra:2}},{astra:5}], 'astra') //?
+// }
 function deepFreeze(o) {
   Object.getOwnPropertyNames(o).forEach(prop => {
     if (
