@@ -1,87 +1,94 @@
 import { strict as assert } from 'assert'
-import { EnumMap, Enum, formatDate, addDays, subtractDays, diffInDaysYYYY_MM_DD, previousDayOfWeek, CustomError, findDeepKey, traverse, traverseVertically } from '../src/jsUtils.js'
+import {
+  EnumMap,
+  Enum,
+  formatDate,
+  addDays,
+  subtractDays,
+  diffInDaysYYYY_MM_DD,
+  previousDayOfWeek,
+  CustomError,
+  findDeepKey,
+  traverse,
+  traverseVertically,
+} from '../src/jsUtils.js'
 import clone from 'just-clone'
 
 describe('jsUtils', () => {
-
   it('CustomError name property', () => {
     const result = new CustomError('MY_ERROR', 'this is my error')
 
     assert.strictEqual(result.name, 'MY_ERROR')
-
-
   })
 
   it('CustomError message property', () => {
     const result = new CustomError('MY_ERROR', 'this is my error')
 
     assert.strictEqual(result.message, 'this is my error')
-
   })
 
-
   const daysOfWeek = {
-    'SUNDAY': 0,
-    'MONDAY': 1,
-    'TUESDAY': 2,
-    'WEDNESDAY': 3,
-    'THURSDAY': 4,
-    'FRIDAY': 5,
-    'SATURDAY': 6
+    SUNDAY: 0,
+    MONDAY: 1,
+    TUESDAY: 2,
+    WEDNESDAY: 3,
+    THURSDAY: 4,
+    FRIDAY: 5,
+    SATURDAY: 6,
   }
 
   it('EnumMap check first element of new EnumMap', () => {
     const result = new EnumMap(daysOfWeek)
     assert.strictEqual(result.SUNDAY, 0)
-
   })
 
   it('EnuMap check second-last of new EnumMap', () => {
     const result = new EnumMap(daysOfWeek)
     assert.strictEqual(result.FRIDAY, 5)
-
   })
 
   it('EnumMap check last element of new EnumMap', () => {
     const result = new EnumMap(daysOfWeek)
     assert.strictEqual(result.SATURDAY, 6)
-
   })
 
   it('EnumMap check exception element not found', () => {
-    let ex;
+    let ex
 
     try {
       const result = new EnumMap(daysOfWeek)
       result.MONDAYlOl
-    } catch (e) { ex = e }
+    } catch (e) {
+      ex = e
+    }
 
     assert.strictEqual(ex.name, 'ENUM_OUT_OF_RANGE')
-
   })
 
   it('EnumMap cannot be modified', () => {
-    let ex;
+    let ex
 
     try {
       const result = new EnumMap(daysOfWeek)
       result['MONDAY'] = 7
-    } catch (e) { ex = e }
+    } catch (e) {
+      ex = e
+    }
 
     assert.strictEqual(ex.name, 'ENUM_NOT_MODIFIABLE')
-
   })
 
   it('EnumMap cannot add a new constant after being created', () => {
-    let ex;
+    let ex
 
     try {
       const result = new EnumMap(daysOfWeek)
       result['THEIGHT'] = 7
-    } catch (e) { ex = e }
+    } catch (e) {
+      ex = e
+    }
 
     assert.strictEqual(ex.name, 'ENUM_NOT_MODIFIABLE')
-
   })
 
   it('check first element of new EnumMap and using invert', () => {
@@ -90,13 +97,13 @@ describe('jsUtils', () => {
   })
 
   const typeOfFood = {
-    'apple': 'fruit',
-    'salmon': 'fish',
-    'seabas': 'fish',
-    'beef': 'meet',
-    'lamb': 'meet',
-    'orange': 'fruit',
-    'pig': 'meet'
+    apple: 'fruit',
+    salmon: 'fish',
+    seabas: 'fish',
+    beef: 'meet',
+    lamb: 'meet',
+    orange: 'fruit',
+    pig: 'meet',
   }
 
   it('EnumMap invert with repetition', () => {
@@ -119,24 +126,46 @@ describe('jsUtils', () => {
   })
 
   it('Enum Test case ', () => {
-    const result = new Enum(['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'])
+    const result = new Enum([
+      'SUNDAY',
+      'MONDAY',
+      'TUESDAY',
+      'WEDNESDAY',
+      'THURSDAY',
+      'FRIDAY',
+      'SATURDAY',
+    ])
 
     assert.strictEqual(result.SUNDAY, true)
     assert.strictEqual(result.TUESDAY, false)
-
   })
 
   it('Enum Test case. I can change values', () => {
-    const result = new Enum(['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'])
+    const result = new Enum([
+      'SUNDAY',
+      'MONDAY',
+      'TUESDAY',
+      'WEDNESDAY',
+      'THURSDAY',
+      'FRIDAY',
+      'SATURDAY',
+    ])
 
     result.MONDAY = true
     assert.strictEqual(result.MONDAY, true)
     assert.strictEqual(result.SUNDAY, false)
-
   })
 
   it('Enum Test case. I can obtain the current value with getValue()', () => {
-    const result = new Enum(['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'])
+    const result = new Enum([
+      'SUNDAY',
+      'MONDAY',
+      'TUESDAY',
+      'WEDNESDAY',
+      'THURSDAY',
+      'FRIDAY',
+      'SATURDAY',
+    ])
 
     result.MONDAY = true
     assert.strictEqual(result.getValue(), 'MONDAY')
@@ -155,42 +184,78 @@ describe('jsUtils', () => {
   })
 
   it('Enum Test case throwing an exception invalid property', () => {
-    const result = new Enum(['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'])
+    const result = new Enum([
+      'SUNDAY',
+      'MONDAY',
+      'TUESDAY',
+      'WEDNESDAY',
+      'THURSDAY',
+      'FRIDAY',
+      'SATURDAY',
+    ])
 
     let ex
     try {
       result.MONDAYlOl
-    } catch (e) { ex = e }
+    } catch (e) {
+      ex = e
+    }
 
     assert.strictEqual(ex.name, 'ENUM_INVALID_PROPERTY')
   })
 
   it('Enum Test case of a simple throwing an exception with value different than true', () => {
-    const result = new Enum(['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'])
+    const result = new Enum([
+      'SUNDAY',
+      'MONDAY',
+      'TUESDAY',
+      'WEDNESDAY',
+      'THURSDAY',
+      'FRIDAY',
+      'SATURDAY',
+    ])
 
     let ex
     try {
       result.MONDAY = 'TUESDAY'
-    } catch (e) { ex = e }
+    } catch (e) {
+      ex = e
+    }
 
     assert.strictEqual(ex.name, 'ENUM_ACTIVATION_NO_TRUE')
   })
 
-
   it('Enum Test case. throwing an exception invalid property', () => {
-    const result = new Enum(['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'])
+    const result = new Enum([
+      'SUNDAY',
+      'MONDAY',
+      'TUESDAY',
+      'WEDNESDAY',
+      'THURSDAY',
+      'FRIDAY',
+      'SATURDAY',
+    ])
 
     let ex
     try {
       result.MONDAYltr = true
-    } catch (e) { ex = e }
+    } catch (e) {
+      ex = e
+    }
 
     assert.strictEqual(ex.name, 'ENUM_INVALID_PROPERTY')
   })
 
   it('Enum sevaral activations', () => {
-    const result = new Enum(['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'])
-
+    const result = new Enum([
+      'SUNDAY',
+      'MONDAY',
+      'TUESDAY',
+      'WEDNESDAY',
+      'THURSDAY',
+      'FRIDAY',
+      'SATURDAY',
+    ])
 
     assert.strictEqual(result.SUNDAY, true)
 
@@ -198,23 +263,19 @@ describe('jsUtils', () => {
 
     assert.strictEqual(result.SUNDAY, false)
     assert.strictEqual(result.TUESDAY, true)
-
   })
-
 
   it('Enum with Transitions with rules bad format.. SPEEDRT not registered in enum', () => {
     let ex
     try {
-      const result = new Enum(
-        ['UNDEFINED', 'START', 'SPEED', 'BREAK', 'STOP', 'ABANDONED'],
-        {
-          'UNDEFINED': ['START'],
-          'START': ['SPEED', 'BREAK', 'STOP'],
-          'SPEEDRT': ['BREAK', 'STOP'],
-        }
-      )
-
-    } catch (e) { ex = e }
+      const result = new Enum(['UNDEFINED', 'START', 'SPEED', 'BREAK', 'STOP', 'ABANDONED'], {
+        UNDEFINED: ['START'],
+        START: ['SPEED', 'BREAK', 'STOP'],
+        SPEEDRT: ['BREAK', 'STOP'],
+      })
+    } catch (e) {
+      ex = e
+    }
 
     assert.strictEqual(ex.name, 'ENUM_RULES_BAD_FORMAT')
   })
@@ -222,16 +283,14 @@ describe('jsUtils', () => {
   it('Enum with Transitions with rules bad format.. an attribute doesnt exist', () => {
     let ex
     try {
-      const result = new Enum(
-        ['UNDEFINED', 'START', 'SPEED', 'BREAK', 'STOP', 'ABANDONED'],
-        {
-          'UNDEFINED': ['START'],
-          'SSDSD': [],
-          'SPEED': ['BREAK', 'STOP'],
-        }
-      )
-
-    } catch (e) { ex = e }
+      const result = new Enum(['UNDEFINED', 'START', 'SPEED', 'BREAK', 'STOP', 'ABANDONED'], {
+        UNDEFINED: ['START'],
+        SSDSD: [],
+        SPEED: ['BREAK', 'STOP'],
+      })
+    } catch (e) {
+      ex = e
+    }
 
     assert.strictEqual(ex.name, 'ENUM_RULES_BAD_FORMAT')
   })
@@ -239,16 +298,14 @@ describe('jsUtils', () => {
   it('Enum with Transitions with rules bad format.. one of the values in the the rule doesnt exist', () => {
     let ex
     try {
-      const result = new Enum(
-        ['UNDEFINED', 'START', 'SPEED', 'BREAK', 'STOP', 'ABANDONED'],
-        {
-          'UNDEFINED': ['START'],
-          'START': ['START', 'TRTRTR'],
-          'SPEED': ['BREAK', 'STOP'],
-        }
-      )
-
-    } catch (e) { ex = e }
+      const result = new Enum(['UNDEFINED', 'START', 'SPEED', 'BREAK', 'STOP', 'ABANDONED'], {
+        UNDEFINED: ['START'],
+        START: ['START', 'TRTRTR'],
+        SPEED: ['BREAK', 'STOP'],
+      })
+    } catch (e) {
+      ex = e
+    }
 
     assert.strictEqual(ex.name, 'ENUM_RULES_BAD_FORMAT')
   })
@@ -256,16 +313,14 @@ describe('jsUtils', () => {
   it('Enum with Transitions with rules bad format.. one of the values in the the rule is not an array', () => {
     let ex
     try {
-      const result = new Enum(
-        ['UNDEFINED', 'START', 'SPEED', 'BREAK', 'STOP', 'ABANDONED'],
-        {
-          'UNDEFINED': ['START'],
-          'START': ['START'],
-          'SPEED': { 0: 'BREAK', 1: 'STOP' },
-        }
-      )
-
-    } catch (e) { ex = e }
+      const result = new Enum(['UNDEFINED', 'START', 'SPEED', 'BREAK', 'STOP', 'ABANDONED'], {
+        UNDEFINED: ['START'],
+        START: ['START'],
+        SPEED: { 0: 'BREAK', 1: 'STOP' },
+      })
+    } catch (e) {
+      ex = e
+    }
 
     assert.strictEqual(ex.name, 'ENUM_RULES_BAD_FORMAT')
   })
@@ -274,22 +329,19 @@ describe('jsUtils', () => {
     let ex
     let result
     try {
-      result = new Enum(
-        ['UNDEFINED', 'START', 'SPEED', 'BREAK', 'STOP', 'ABANDONED', 'VANISH'],
-        {
-          'UNDEFINED': ['UNDEFINED', 'START'],
-          'START': ['SPEED', 'BREAK', 'STOP'],
-          'SPEED': ['BREAK', 'STOP'],
-        }
-      )
+      result = new Enum(['UNDEFINED', 'START', 'SPEED', 'BREAK', 'STOP', 'ABANDONED', 'VANISH'], {
+        UNDEFINED: ['UNDEFINED', 'START'],
+        START: ['SPEED', 'BREAK', 'STOP'],
+        SPEED: ['BREAK', 'STOP'],
+      })
 
       result.UNDEFINED = true
       result.UNDEFINED = true
       result.START = true
       result.SPEED = true
-
-    } catch (e) { ex = e }
-
+    } catch (e) {
+      ex = e
+    }
 
     assert.strictEqual(result.SPEED, true)
     assert.strictEqual(ex, undefined)
@@ -301,28 +353,26 @@ describe('jsUtils', () => {
       ex = e
     }
     assert.strictEqual(ex.name, 'ENUM_TRANSITION_NOT_ALLOWED')
-
   })
 
   it('Enum with Transitions', () => {
-    const result = new Enum(
-      ['UNDEFINED', 'START', 'SPEED', 'BREAK', 'STOP', 'ABANDONED'],
-      {
-        'UNDEFINED': ['START'],
-        'START': ['SPEED', 'BREAK', 'STOP'],
-        'SPEED': ['SPEED', 'BREAK', 'STOP'],
-        'BREAK': ['SPEED', 'STOP'],
-        'STOP': ['START', 'ABANDONED'],
-        'ABANDONED': [],
-      }
-    )
+    const result = new Enum(['UNDEFINED', 'START', 'SPEED', 'BREAK', 'STOP', 'ABANDONED'], {
+      UNDEFINED: ['START'],
+      START: ['SPEED', 'BREAK', 'STOP'],
+      SPEED: ['SPEED', 'BREAK', 'STOP'],
+      BREAK: ['SPEED', 'STOP'],
+      STOP: ['START', 'ABANDONED'],
+      ABANDONED: [],
+    })
 
     assert.strictEqual(result['UNDEFINED'], true)
 
     let ex
     try {
       result.START = false
-    } catch (e) { ex = e }
+    } catch (e) {
+      ex = e
+    }
 
     assert.strictEqual(ex.name, 'ENUM_ACTIVATION_NO_TRUE')
     result.START = true
@@ -331,17 +381,20 @@ describe('jsUtils', () => {
     ex = ''
     try {
       result.ABANDONED = true
-    } catch (e) { ex = e }
+    } catch (e) {
+      ex = e
+    }
 
     assert.strictEqual(ex.name, 'ENUM_TRANSITION_NOT_ALLOWED')
 
     ex = ''
     try {
       result.START = true
-    } catch (e) { ex = e }
+    } catch (e) {
+      ex = e
+    }
 
     assert.strictEqual(ex.name, 'ENUM_TRANSITION_NOT_ALLOWED')
-
 
     result.SPEED = true
     assert.strictEqual(result.SPEED, true)
@@ -357,28 +410,42 @@ describe('jsUtils', () => {
     ex = ''
     try {
       result.START = true
-    } catch (e) { ex = e }
+    } catch (e) {
+      ex = e
+    }
 
     assert.strictEqual(ex.name, 'ENUM_TRANSITION_NOT_ALLOWED')
-
   })
-
 
   it('formatDate YYYY-MM-DD...', () => {
-    assert.strictEqual(formatDate('$YYYY-$MM-$DDT$hh:$mm:$ss.$milZ, $dayOfWeek $D of $month', new Date(2020, 12 - 1, 9, 23, 21, 45, 999)), '2020-12-09T23:21:45.999Z, Wednesday 9 of December')
+    assert.strictEqual(
+      formatDate(
+        '$YYYY-$MM-$DDT$hh:$mm:$ss.$milZ, $dayOfWeek $D of $month',
+        new Date(2020, 12 - 1, 9, 23, 21, 45, 999)
+      ),
+      '2020-12-09T23:21:45.999Z, Wednesday 9 of December'
+    )
   })
 
-
   it('formatDate new Date, $YYYY$MM$DD$hh$mm$ss$mil', () => {
-    assert.strictEqual(formatDate('$YYYY$MM$DD$hh$mm$ss$mil', new Date(2020, 12 - 1, 9, 23, 21, 45, 999)), '20201209232145999')
+    assert.strictEqual(
+      formatDate('$YYYY$MM$DD$hh$mm$ss$mil', new Date(2020, 12 - 1, 9, 23, 21, 45, 999)),
+      '20201209232145999'
+    )
   })
 
   it('addDays', () => {
-    assert.strictEqual(addDays(3, new Date('2023-02-27')).toISOString(), new Date('2023-03-02').toISOString())
+    assert.strictEqual(
+      addDays(3, new Date('2023-02-27')).toISOString(),
+      new Date('2023-03-02').toISOString()
+    )
   })
 
   it('subtractDays', () => {
-    assert.strictEqual(subtractDays(3, new Date('2023-03-02')).toISOString(), new Date('2023-02-27').toISOString())
+    assert.strictEqual(
+      subtractDays(3, new Date('2023-03-02')).toISOString(),
+      new Date('2023-02-27').toISOString()
+    )
   })
 
   it('diffInDaysYYYY_MM_DD', () => {
@@ -386,51 +453,61 @@ describe('jsUtils', () => {
   })
 
   it('previousDayOfWeek', () => {
-    assert.strictEqual(previousDayOfWeek(6, new Date('2023-03-19')).toISOString(), new Date('2023-03-18').toISOString())
+    assert.strictEqual(
+      previousDayOfWeek(6, new Date('2023-03-19')).toISOString(),
+      new Date('2023-03-18').toISOString()
+    )
   })
 
   it('previousDayOfWeek return the same date when the input date is the day of the week requested', () => {
-    assert.strictEqual(previousDayOfWeek(0, new Date('2023-03-19')).toISOString(), new Date('2023-03-19').toISOString())
+    assert.strictEqual(
+      previousDayOfWeek(0, new Date('2023-03-19')).toISOString(),
+      new Date('2023-03-19').toISOString()
+    )
   })
 
   it('previousDayOfWeek return the same date when the input date is the day of the week requested', () => {
-    assert.strictEqual(previousDayOfWeek(4, new Date('2023-03-16')).toISOString(), new Date('2023-03-16').toISOString())
+    assert.strictEqual(
+      previousDayOfWeek(4, new Date('2023-03-16')).toISOString(),
+      new Date('2023-03-16').toISOString()
+    )
   })
 
   it('previousDayOfWeek', () => {
-    assert.strictEqual(previousDayOfWeek(4, new Date('2023-03-19')).toISOString(), new Date('2023-03-16').toISOString())
+    assert.strictEqual(
+      previousDayOfWeek(4, new Date('2023-03-19')).toISOString(),
+      new Date('2023-03-16').toISOString()
+    )
   })
 
   it('previousDayOfWeek. You can use string date format', () => {
-    assert.strictEqual(previousDayOfWeek(4, '2023-03-19').toISOString(), new Date('2023-03-16').toISOString())
+    assert.strictEqual(
+      previousDayOfWeek(4, '2023-03-19').toISOString(),
+      new Date('2023-03-16').toISOString()
+    )
   })
 
   const findDeepKeyObjSubject = {
-    house:
-    {
+    house: {
       room: [
         {
           table: {},
           wardrove: {
             jean: 'green',
-            sweatter: 'red'
+            sweatter: 'red',
           },
-          bed: [
-            'doubleBed', 'singleBed', 'queenBed'
-          ],
+          bed: ['doubleBed', 'singleBed', 'queenBed'],
           draw: {
             jean: 'green',
-            sweatter: 'red'
+            sweatter: 'red',
           },
         },
         {
-          bed: [
-            'doubleBed', 'singleBed'
-          ]
+          bed: ['doubleBed', 'singleBed'],
         },
-        {}
-      ]
-    }
+        {},
+      ],
+    },
   }
 
   it('findDeepKey multiple values', () => {
@@ -439,7 +516,7 @@ describe('jsUtils', () => {
       ['house', 'room', '0', 'bed'],
       ['doubleBed', 'singleBed', 'queenBed'],
       ['house', 'room', '1', 'bed'],
-      ['doubleBed', 'singleBed']
+      ['doubleBed', 'singleBed'],
     ])
   })
 
@@ -453,41 +530,34 @@ describe('jsUtils', () => {
     assert.deepStrictEqual(result, [['house'], findDeepKeyObjSubject.house])
   })
 
-
   //traverse()
   const subjectBase = {
-    house:
-    {
+    house: {
       room: [
         {
           table: {},
           wardrove: {
             jean: 'green',
-            sweatter: 'red'
+            sweatter: 'red',
           },
-          bed: [
-            'doubleBed', 'singleBed', 'queenBed'
-          ],
+          bed: ['doubleBed', 'singleBed', 'queenBed'],
           draw: {
             jean: 'green',
-            sweatter: 'red'
+            sweatter: 'red',
           },
         },
         {
-          bed: [
-            'doubleBed', 'singleBed'
-          ]
+          bed: ['doubleBed', 'singleBed'],
         },
         {},
         {
-          bed: []
-        }
-      ]
-    }
+          bed: [],
+        },
+      ],
+    },
   }
 
   it('traverse with reviver', () => {
-
     //Arrange
     //subject
     const subject = clone(subjectBase)
@@ -497,7 +567,7 @@ describe('jsUtils', () => {
 
     //Act
     const actual = traverse(subject, (obj, path) => {
-      if (path.join('.') === 'root.house.room.0.wardrove.jean') {
+      if (path.join('.') === '$.house.room.0.wardrove.jean') {
         return 'red'
       }
     })
@@ -507,7 +577,6 @@ describe('jsUtils', () => {
   })
 
   it('traverse with several conditions and null', () => {
-
     //Arrange
     //subject
     const subject = clone(subjectBase)
@@ -518,11 +587,11 @@ describe('jsUtils', () => {
 
     //Act
     const actual = traverse(subject, (obj, path) => {
-      if (path.join('.') === 'root.house.room.0.wardrove.jean') {
+      if (path.join('.') === '$.house.room.0.wardrove.jean') {
         return 'red'
       }
 
-      if (path.join('.') === 'root.house.room.1.bed') {
+      if (path.join('.') === '$.house.room.1.bed') {
         return null
       }
     })
@@ -540,14 +609,11 @@ describe('jsUtils', () => {
     expected.house.room[0].wardrove.jean = 'red'
 
     //Act
-    const actual = traverse(
-      subject,
-      (obj, path) => {
-        if (path.join('.') === 'root.house.room.0.wardrove.jean') return 'red'
-        if (path.join('.') === 'root.house.room.1.bed') return null
-        if (path.join('.') === 'root.house.room.1') return traverse.stop
-      }
-    )
+    const actual = traverse(subject, (obj, path) => {
+      if (path.join('.') === '$.house.room.0.wardrove.jean') return 'red'
+      if (path.join('.') === '$.house.room.1.bed') return null
+      if (path.join('.') === '$.house.room.1') return traverse.stop
+    })
 
     //Assert
     assert.deepStrictEqual(actual, expected)
@@ -562,273 +628,233 @@ describe('jsUtils', () => {
     expected.house.room[0].wardrove.jean = 'red'
     expected.house.room[2] = 'nothing'
 
-    const actual = traverse(
-      subjectBase,
-      (obj, path) => {
-        if (path.join('.') === 'root.house.room.0.wardrove.jean') return 'red'
-        if (path.join('.') === 'root.house.room.1.bed') return null
-        if (path.join('.') === 'root.house.room.2') return 'nothing'
-        if (path.join('.') === 'root.house.room.1') return traverse.skip
-      }
-    )
+    const actual = traverse(subjectBase, (obj, path) => {
+      if (path.join('.') === '$.house.room.0.wardrove.jean') return 'red'
+      if (path.join('.') === '$.house.room.1.bed') return null
+      if (path.join('.') === '$.house.room.2') return 'nothing'
+      if (path.join('.') === '$.house.room.1') return traverse.skip
+    })
 
     assert.deepStrictEqual(actual, expected)
   })
 
   it('traverse to extract data by keys', () => {
     let extract = []
-    const actual = traverse(
-      subjectBase,
-      (obj, path) => {
-        if (path.join('.') === 'root.house.room.0.wardrove.jean') extract.push(path.join('.'), obj)
-        if (path.join('.') === 'root.house.room.1.bed') extract.push(path.join('.'), obj)
-        if (path.join('.') === 'root.house.room.2') extract.push(path.join('.'), obj)
-      }
-    )
+    const actual = traverse(subjectBase, (obj, path) => {
+      if (path.join('.') === '$.house.room.0.wardrove.jean') extract.push(path.join('.'), obj)
+      if (path.join('.') === '$.house.room.1.bed') extract.push(path.join('.'), obj)
+      if (path.join('.') === '$.house.room.2') extract.push(path.join('.'), obj)
+    })
 
     assert.deepStrictEqual(extract, [
-      'root.house.room.0.wardrove.jean',
+      '$.house.room.0.wardrove.jean',
       'green',
-      'root.house.room.1.bed',
+      '$.house.room.1.bed',
       ['doubleBed', 'singleBed'],
-      'root.house.room.2',
-      {}
+      '$.house.room.2',
+      {},
     ])
-
   })
 
   it('traverse to extract data and use stop', () => {
     let extract = []
-    const actual = traverse(
-      subjectBase,
-      (obj, path) => {
-        if (path.join('.') === 'root.house.room.0') return traverse.stop
-        if (path[path.length - 1] === 'bed') extract.push(obj)
-      }
-    )
+    const actual = traverse(subjectBase, (obj, path) => {
+      if (path.join('.') === '$.house.room.0') return traverse.stop
+      if (path[path.length - 1] === 'bed') extract.push(obj)
+    })
 
     assert.deepStrictEqual(extract, [])
-
   })
 
   it('traverse to extract data and use skip', () => {
     let extract = []
-    const actual = traverse(
-      subjectBase,
-      (obj, path) => {
-        if (path.join('.') === 'root.house.room.0') return traverse.skip
-        if (path[path.length - 1] === 'bed') extract.push(obj)
-      }
-    )
+    const actual = traverse(subjectBase, (obj, path) => {
+      if (path.join('.') === '$.house.room.0') return traverse.skip
+      if (path[path.length - 1] === 'bed') extract.push(obj)
+    })
 
-    assert.deepStrictEqual(extract, [
-      ['doubleBed', 'singleBed'],
-      []
-    ])
-
+    assert.deepStrictEqual(extract, [['doubleBed', 'singleBed'], []])
   })
 
   it('traverse to extract data and use of two skips', () => {
     let extract = []
-    const actual = traverse(
-      subjectBase,
-      (obj, path) => {
-        if (path.join('.') === 'root.house.room.1') return traverse.skip
-        if (path.join('.') === 'root.house.room.3') return traverse.skip
-        if (path[path.length - 1] === 'bed') extract.push(obj)
-      }
-    )
+    const actual = traverse(subjectBase, (obj, path) => {
+      if (path.join('.') === '$.house.room.1') return traverse.skip
+      if (path.join('.') === '$.house.room.3') return traverse.skip
+      if (path[path.length - 1] === 'bed') extract.push(obj)
+    })
 
-    assert.deepStrictEqual(extract, [
-      ['doubleBed', 'singleBed', 'queenBed']
-    ])
-
+    assert.deepStrictEqual(extract, [['doubleBed', 'singleBed', 'queenBed']])
   })
 
   it('traverse to delete data', () => {
-    const actual = traverse(
-      subjectBase,
-      (obj, path) => {
-        if (Array.isArray(obj)) return traverse.delete
-      }
-    )
+    const actual = traverse(subjectBase, (obj, path) => {
+      if (Array.isArray(obj)) return traverse.delete
+    })
 
-    assert.deepStrictEqual(actual,
-      {
-        house:
-        {
-          room: undefined
-        }
-      }
-    )
-
+    assert.deepStrictEqual(actual, {
+      house: {
+        room: undefined,
+      },
+    })
   })
-
 
   //traverseVertically()
   const subjectTV = [
     {
-      name:'apple',
-      avge:[
+      name: 'apple',
+      avge: [
         {
-          date:"2022-01-01",
-          close: 22.1
+          date: '2022-01-01',
+          close: 22.1,
         },
         {
-          date:"2022-01-02",
-        }
+          date: '2022-01-02',
+        },
       ],
-      hist:[
+      hist: [
         {
-          date:"2022-01-01",
-          close: 22.1
+          date: '2022-01-01',
+          close: 22.1,
         },
         {
-          date:"2022-01-02",
-        }
-      ]
+          date: '2022-01-02',
+        },
+      ],
     },
     {
-      name:'microsoft',
-      avge:[
+      name: 'microsoft',
+      avge: [
         {
-          date:"2022-01-01",
-          close: 22.1
+          date: '2022-01-01',
+          close: 22.1,
         },
         {
-          date:"2022-01-02",
-        }
+          date: '2022-01-02',
+        },
       ],
-      hist:[
+      hist: [
         {
-          date:"2022-01-01",
+          date: '2022-01-01',
         },
         {
-          date:"2022-01-02",
+          date: '2022-01-02',
         },
         {
-          date:"2022-01-03",
-          close:99
-        }
-      ]
-    }
+          date: '2022-01-03',
+          close: 99,
+        },
+      ],
+    },
   ]
 
   it('traverseVertically a complex array', () => {
     let calledWithIndex = []
-    traverseVertically( 
-      (verticalSlice, runIndex)=> {
+    traverseVertically(
+      (verticalSlice, runIndex) => {
         calledWithIndex[runIndex] = true
-        if(runIndex === 0) {
-          assert.deepEqual(
-            verticalSlice, 
-            [
-              {
-                name:'apple',
-                avge:{ date:"2022-01-01", close: 22.1},
-                hist:{ date:"2022-01-01", close: 22.1},
-              },
-              {
-                name:'microsoft',
-                avge: { date:"2022-01-01", close: 22.1 },
-                hist: { date:"2022-01-01"},
-              }
-            ]
-          )
+        if (runIndex === 0) {
+          assert.deepEqual(verticalSlice, [
+            {
+              name: 'apple',
+              avge: { date: '2022-01-01', close: 22.1 },
+              hist: { date: '2022-01-01', close: 22.1 },
+            },
+            {
+              name: 'microsoft',
+              avge: { date: '2022-01-01', close: 22.1 },
+              hist: { date: '2022-01-01' },
+            },
+          ])
         }
 
-        if(runIndex === 1) {
-          assert.deepEqual(
-            verticalSlice, 
-            [
-              {
-                name:'apple',
-                avge: { date:"2022-01-02" },
-                hist: { date:"2022-01-02" }
-              },
-              {
-                name:'microsoft',
-                avge: { date:"2022-01-02" },
-                hist: { date:"2022-01-02" }
-              }
-            ]
-          )
+        if (runIndex === 1) {
+          assert.deepEqual(verticalSlice, [
+            {
+              name: 'apple',
+              avge: { date: '2022-01-02' },
+              hist: { date: '2022-01-02' },
+            },
+            {
+              name: 'microsoft',
+              avge: { date: '2022-01-02' },
+              hist: { date: '2022-01-02' },
+            },
+          ])
         }
 
-        if(runIndex === 2) {
-          assert.deepEqual(
-            verticalSlice, 
-            [
-              {
-                name:'apple',
-                avge:undefined,
-                hist:undefined,
-              },
-              {
-                name:'microsoft',
-                avge: undefined,
-                hist: { date:"2022-01-03", close:99},
-              }
-            ]
-
-          )
-        }      
-
-      }, 
-      ['avge','hist'], 
+        if (runIndex === 2) {
+          assert.deepEqual(verticalSlice, [
+            {
+              name: 'apple',
+              avge: undefined,
+              hist: undefined,
+            },
+            {
+              name: 'microsoft',
+              avge: undefined,
+              hist: { date: '2022-01-03', close: 99 },
+            },
+          ])
+        }
+      },
+      ['avge', 'hist'],
       subjectTV
     )
 
-    assert.deepEqual(calledWithIndex, [true,true,true], 'Index for false values indicates that functionToRun was omitted and over run')
+    assert.deepEqual(
+      calledWithIndex,
+      [true, true, true],
+      'Index for false values indicates that functionToRun was omitted and over run'
+    )
   })
 
   it('traverseVertically an undefined object', () =>
-    traverseVertically( 
-        ()=> {assert.fail('It should not have called functionToRun')}, 
-        ['result'], 
-        undefined
-    )
-  )
+    traverseVertically(
+      () => {
+        assert.fail('It should not have called functionToRun')
+      },
+      ['result'],
+      undefined
+    ))
 
   it('traverseVertically an empty array', () =>
-    traverseVertically( 
-      ()=> {assert.fail('It should not have called functionToRun')}, 
-      ['result'], 
+    traverseVertically(
+      () => {
+        assert.fail('It should not have called functionToRun')
+      },
+      ['result'],
       []
-    )
-  )
+    ))
 
   it('traverseVertically an array with all vertical fields not being arrays', () =>
-    traverseVertically( 
-      ()=> {assert.fail('It should not have called functionToRun')}, 
-      ['result'], 
-      [{result:12}]
-    )
-  )
+    traverseVertically(
+      () => {
+        assert.fail('It should not have called functionToRun')
+      },
+      ['result'],
+      [{ result: 12 }]
+    ))
 
   it('traverseVertically an array with null, empty objects, and one that has a vertical field match', () => {
     let wasCalled = false
     traverseVertically(
       (verticalSlice, runIndex) => {
-        if(runIndex === 0) {
+        if (runIndex === 0) {
           wasCalled = true
-          assert.deepEqual(
-            verticalSlice, 
-            [
-              { hist: undefined, avge: undefined },
-              { hist: undefined, avge: undefined },
-              { avge: undefined, hist: undefined },
-              { hist: undefined, avge: undefined },
-              { name: 'apple', hist: 12, avge: undefined }
-            ]
-          )
+          assert.deepEqual(verticalSlice, [
+            { hist: undefined, avge: undefined },
+            { hist: undefined, avge: undefined },
+            { avge: undefined, hist: undefined },
+            { hist: undefined, avge: undefined },
+            { name: 'apple', hist: 12, avge: undefined },
+          ])
         }
       },
       ['hist', 'avge'],
-      [{},{hist:undefined},{avge:[]}, null,{name:'apple',hist:[12]}]  
+      [{}, { hist: undefined }, { avge: [] }, null, { name: 'apple', hist: [12] }]
     )
-    
-    if(wasCalled === false) assert.fail('It should have called functionToRun passed as argument')
-  })
 
+    if (wasCalled === false) assert.fail('It should have called functionToRun passed as argument')
+  })
 })

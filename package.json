@@ -4,9 +4,9 @@
   "homepage": "https://github.com/josuamanuel/js-awe",
   "author": "josuamanuel@hotmail.com",
   "repository": "github:josuamanuel/jsTrading",
-  "bugs":{
-    "url" : "https://github.com/josuamanuel/jsTrading/issues",
-    "email" : "josuamanuel@hotmail.com"
+  "bugs": {
+    "url": "https://github.com/josuamanuel/jsTrading/issues",
+    "email": "josuamanuel@hotmail.com"
   },
   "description": "Awesome js utils and constructs",
   "type": "module",
@@ -23,6 +23,7 @@
   "dependencies": {
     "@types/node": "^18.6.1",
     "fluture": "^14.0.0",
+    "jsonpath-plus": "^7.2.0",
     "just-clone": "^6.1.1",
     "just-compare": "^2.2.2",
     "just-deep-map-values": "^1.1.1",

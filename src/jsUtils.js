@@ -1,5 +1,7 @@
 'use strict'
 import clone from 'just-clone'
+import { JSONPath } from 'jsonpath-plus'
+
 const logWithPrefix = (title, displayFunc) => (message) => {
 
   let finalMessage = message
@@ -396,7 +398,7 @@ function reviverPromiseForCloneDeep(value) {
 
 // reviver is called for each node as: reviver(nodeRef, currentPath, parent, key). 
 // For example: being objIni={a:{b:{c:3}},d:4} the reviver to call node a.b will be
-// reviver({c:3}, ['a','b'], {b:{c:3}}, 'b') currentPath=['root', 'parent', 'son', '0', 'jose']
+// reviver({c:3}, ['a','b'], {b:{c:3}}, 'b') currentPath=['$', 'parent', 'son', '0', 'jose']
 // reviver return value will impact traverse: 
 //  undefined: do nothing.
 //  Any value: assign this value (parent[key])
@@ -406,25 +408,25 @@ function reviverPromiseForCloneDeep(value) {
 
 
 function traverse(objIni, reviver, pureFunction = true) {
-  const currentPath = ['root']
+  const currentPath = ['$']
 
   const objClone = pureFunction ? clone(objIni, reviverPromiseForCloneDeep) : objIni
 
   let exitVar = false
   let objForReviver = {}
-  objForReviver['root'] = objClone
+  objForReviver['$'] = objClone
 
-  let isSkipNodeOnce = reviverProcess(reviver, objForReviver, 'root', currentPath)
+  let isSkipNodeOnce = reviverProcess(reviver, objForReviver, '$', currentPath)
 
-  if (objClone !== objForReviver['root']) return objForReviver['root']
+  if (objClone !== objForReviver['$']) return objForReviver['$']
 
-  if (exitVar === true) return objForReviver['root']
+  if (exitVar === true) return objForReviver['$']
 
   if (isSkipNodeOnce === false) {
-    traverseRec(objForReviver['root'])
+    traverseRec(objForReviver['$'])
   }
 
-  return objForReviver['root']
+  return objForReviver['$']
 
   function traverseRec(obj) {
 
@@ -519,6 +521,67 @@ function traverseVertically(functionToRun, verFields, toTraverse) {
     firstTime = false
   }
 }
+
+
+function project(paths, json) {
+  let copy
+  if (json === null || json === undefined ) return json
+  if (Array.isArray(json)) copy = []
+  else if (Object.getPrototypeOf(json) === Object.prototype) copy = {}
+  else if (Array.isArray(paths) === false) throw new Error('paths must be an array')
+  else if (paths.filter(el => el === '+$').length - paths.filter(el => el === '-$').length > 0) return json
+  else return undefined
+
+  paths.forEach((pathWithSign) => {
+    if (pathWithSign[0] !== '+' && pathWithSign[0] !== '-') {
+      throw new Error('ivanlid format')
+    }
+    const isInclude = pathWithSign[0] === '+'
+    const path = pathWithSign.substring(1)
+
+    const result = JSONPath({ resultType: 'all', path, json })
+
+    result.map((el) => el.path) // ?
+    result.forEach(({ pointer, value }) => {
+      const setAtPath = pointer.substring(1).split('/')
+
+      if (setAtPath.length === 1 && setAtPath[0] === '') copy = isInclude ? value : undefined
+      else setAt(copy, setAtPath, isInclude ? value : undefined)
+    })
+  })
+
+  return copy
+}
+//{
+  // const users = [
+  //   {
+  //     name: 'Jose',
+  //     age: 47,
+  //     salary: 52000,
+  //     posts: [
+  //       { id: 1, message: 'test', likes: 2 },
+  //       { id: 2, message: 'test1', likes: 2 },
+  //       { id: 3, message: 'test2', likes: 2 },
+  //     ],
+  //   },
+  //   {
+  //     name: 'Luchi',
+  //     age: 49,
+  //     salary: 52000,
+  //     posts: [
+  //       { id: 1, message: 'testL', likes: 2 },
+  //       { id: 2, message: 'testL1', likes: 2 },
+  //       { id: 3, message: 'testL2', likes: 2 },
+  //     ],
+  //   },
+  // ]
+
+  // const pathToSelect = ['+$', '-$[*].age', '-$[*].salary', '-$[*].posts[:-1]'] //, '-$[*].age'];
+
+  // project(pathToSelect, users) // ?
+  // project(['+$'], 2) //?
+//}
+
 
 function copyPropsWithValueUsingRules(objDest, copyRules, shouldUpdateOnlyEmptyFields = false) {
 
@@ -1694,6 +1757,7 @@ const jsUtils = {
   removeDuplicates,
   traverse,
   traverseVertically,
+  project,
   copyPropsWithValue,
   copyPropsWithValueUsingRules,
   EnumMap,
@@ -1758,6 +1822,7 @@ export {
   removeDuplicates,
   traverse,
   traverseVertically,
+  project,
   copyPropsWithValue,
   copyPropsWithValueUsingRules,
   EnumMap,

@@ -182,6 +182,14 @@ export namespace traverse {
  */
 export function traverseVertically(functionToRun: (verticalSlice: object, runIndex: number) => any, verFields: string[], toTraverse: any[]): void
 
+/**
+ * Totally recreate a new object with the selected values using jsonpath-plus format for queries.
+ * 
+ * @param paths Array with the queries for the projection. First char must be + to include or - to remove
+ * @param json Subject object to project.
+ * @returns any
+ */
+export function project(paths:string[], json:any):any
 export function copyPropsWithValue(objDest: any, shouldUpdateOnlyEmptyFields?: boolean): (input: any) => any;
 export function copyPropsWithValueUsingRules(objDest: any, copyRules: any, shouldUpdateOnlyEmptyFields?: boolean): (inputObj: any) => any;
 export class EnumMap {
