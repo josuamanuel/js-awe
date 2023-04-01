@@ -40,6 +40,7 @@ RE.groupByWithCalc = groupByWithCalc
 //     total:(acum,current) => (acum??0) + current,
 //     count:(acum,current) => (acum??0) + 1,
 //     line:(acum,current) => acum??current,
+//     listOfLines:(acum,current, acumRow, currentRow) =>{(acum=acum??[]).push(currentRow.line); return acum},
 //     rowCalc:(acum,_,acumRow, currentRow) => (acum??0) + currentRow.line + currentRow.total
 //   },
 // )(
