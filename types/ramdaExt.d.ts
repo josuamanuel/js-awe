@@ -82,9 +82,12 @@ declare function injectLeftData(leftData:any[]):typeof injectRightDataD
 
 /**
 * Right join using condition and merge function by keys.
+* Response will be for each record in the right will be match with 1..N records in the left.
+* Left record that dont mat will not be present in the response.
+* Each record will be composed of the sum of fields from right and left.
+* If there are coincident field names. the update function will be called to resolve the value.
+* If update is not present, the default behaviour will be to choose the value from right.
 * last chain function call is to introduce right Data.
-* It keeps records from the right and update with
-* the left data
 * @param leftRightMatching matchinf function
 * @param update update function
 * @param leftData leftData
@@ -92,7 +95,7 @@ declare function injectLeftData(leftData:any[]):typeof injectRightDataD
 */
 declare function innerRightJoinWith(
   leftRightMatching:typeof leftRightMatchingD,
-  update:typeof updateD,
+  update?:typeof updateD,
   leftData:any[]
 ):typeof injectRightDataD
 
