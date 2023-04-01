@@ -95,7 +95,7 @@ declare function injectLeftData(leftData:any[]):typeof injectRightDataD
 */
 declare function innerRightJoinWith(
   leftRightMatching:typeof leftRightMatchingD,
-  update?:typeof updateD,
+  update:undefined | typeof updateD,
   leftData:any[]
 ):typeof injectRightDataD
 
