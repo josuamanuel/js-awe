@@ -1,11 +1,11 @@
 {
   "name": "js-awe",
-  "version": "1.0.24",
+  "version": "1.0.25",
   "homepage": "https://github.com/josuamanuel/js-awe",
   "author": "josuamanuel@hotmail.com",
   "repository": "github:josuamanuel/jsTrading",
   "bugs": {
-    "url": "https://github.com/josuamanuel/jsTrading/issues",
+    "url": "https://github.com/josuamanuel/js-awe",
     "email": "josuamanuel@hotmail.com"
   },
   "description": "Awesome js utils and constructs",

@@ -10,7 +10,6 @@ type Draw = () => string
 type TableReturn = {
   addColumn: AddColumn
   auto: () => { draw: Draw }
-  draw: Draw
 }
 
 /**
