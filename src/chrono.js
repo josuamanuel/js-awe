@@ -323,14 +323,14 @@ function Chrono() {
   }
 
   function timelineReport(data) {
-    const timeline = Table()
+    const timeline = Table(data)
 
     timeline.addColumn({ type: Text(), id: 'event', title: 'Events' })
     timeline.addColumn({ type: Timeline(), id: 'ranges' })
 
     console.log('')
     console.log('Timeline of events:')
-    console.log(timeline.draw(data))
+    console.log(timeline.draw())
 
     return data
   }

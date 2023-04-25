@@ -1,8 +1,25 @@
-
 import { R } from './../ramdaExt.js'
+import { Text } from './components/text.js'
 
-function Table()
-{
+const Index = Symbol()
+
+function Table(data) {
+  let tableData
+
+  if(Array.isArray(data)) {
+    tableData = data.map((row, index) => {
+      if(typeof row === 'object') return {[Index]: index, ...row}
+      else return {[Index]: index}
+    })
+  }
+
+  if(typeof data === 'object' && Array.isArray(data) === false) {
+    tableData = Object.entries(data).map(([key, value]) => {
+      if(typeof value === 'object') return {[Index]: key, ...value}
+      else return value = {[Index]: key}
+    })
+  }
+  
   const VERTICAL_LINE_CHAR = '│'
   const TOP_LEFT_CORNNER_CHAR = '┌'
   const TOP_RIGHT_CORNNER_CHAR = '┐'
@@ -17,50 +34,53 @@ function Table()
   const COLUMN_LEFT_MARGIN_CHARS = ' '
   const COLUMN_RIGHT_MARGIN_CHARS = ' '
   const TABLE_LEFT_MARGIN_CHARS = ''
-  const MARGINS_AND_VERTICAL_LINE_SIZE = 
+  const MARGINS_AND_VERTICAL_LINE_SIZE =
     COLUMN_LEFT_MARGIN_CHARS.length + COLUMN_RIGHT_MARGIN_CHARS.length + VERTICAL_LINE_CHAR.length
 
-  const listOfColumns = [
-  ]
+  const listOfColumns = []
 
   let horLine
 
-  function getTopLine()
-  {
+  function getTopLine() {
     return listOfColumns.reduce(
-      (line, column, index) => 
-          line + HORIZONTAL_LINE_CHAR + ''.padEnd(column.getSize(),  HORIZONTAL_LINE_CHAR) + 
-          HORIZONTAL_LINE_CHAR + 
-          (index < listOfColumns.length -1 ? TOP_COLUMN_SEPARATOR_CHAR : TOP_RIGHT_CORNNER_CHAR)
-      , TABLE_LEFT_MARGIN_CHARS  + TOP_LEFT_CORNNER_CHAR
+      (line, column, index) =>
+        line +
+        HORIZONTAL_LINE_CHAR +
+        ''.padEnd(column.getSize(), HORIZONTAL_LINE_CHAR) +
+        HORIZONTAL_LINE_CHAR +
+        (index < listOfColumns.length - 1 ? TOP_COLUMN_SEPARATOR_CHAR : TOP_RIGHT_CORNNER_CHAR),
+      TABLE_LEFT_MARGIN_CHARS + TOP_LEFT_CORNNER_CHAR
     )
   }
 
-  function getBottonLine()
-  {
+  function getBottonLine() {
     return listOfColumns.reduce(
-      (line, column, index) => 
-          line + HORIZONTAL_LINE_CHAR + ''.padEnd(column.getSize(),  HORIZONTAL_LINE_CHAR) + 
-          HORIZONTAL_LINE_CHAR + 
-          (index < listOfColumns.length -1 ? BOTTON_COLUMN_SEPARATOR_CHAR : BOTTON_RIGHT_CORNNER_CHAR)
-      , TABLE_LEFT_MARGIN_CHARS  + BOTTON_LEFT_CORNNER_CHAR
+      (line, column, index) =>
+        line +
+        HORIZONTAL_LINE_CHAR +
+        ''.padEnd(column.getSize(), HORIZONTAL_LINE_CHAR) +
+        HORIZONTAL_LINE_CHAR +
+        (index < listOfColumns.length - 1
+          ? BOTTON_COLUMN_SEPARATOR_CHAR
+          : BOTTON_RIGHT_CORNNER_CHAR),
+      TABLE_LEFT_MARGIN_CHARS + BOTTON_LEFT_CORNNER_CHAR
     )
   }
 
-  function getDownTableLine()
-  {
+  function getDownTableLine() {
     return listOfColumns.reduce(
-      (line, column, index) => 
-          line + HORIZONTAL_LINE_CHAR + ''.padEnd(column.getSize(),  HORIZONTAL_LINE_CHAR) + 
-          HORIZONTAL_LINE_CHAR + 
-          (index < listOfColumns.length -1 ? MIDDLE_COLUMN_SEPARATOR_CHAR : MIDDLE_RIGHT_SEPARATOR )
-      , TABLE_LEFT_MARGIN_CHARS  + MIDDLE_LEFT_SEPARATOR
-    )  
+      (line, column, index) =>
+        line +
+        HORIZONTAL_LINE_CHAR +
+        ''.padEnd(column.getSize(), HORIZONTAL_LINE_CHAR) +
+        HORIZONTAL_LINE_CHAR +
+        (index < listOfColumns.length - 1 ? MIDDLE_COLUMN_SEPARATOR_CHAR : MIDDLE_RIGHT_SEPARATOR),
+      TABLE_LEFT_MARGIN_CHARS + MIDDLE_LEFT_SEPARATOR
+    )
   }
 
-  function linesOfData(section)
-  {
-    let allValuesAreDone 
+  function linesOfData(section) {
+    let allValuesAreDone
     let lines = []
     let isFirstRow = true
     let values = {}
@@ -70,36 +90,36 @@ function Table()
     do {
       allValuesAreDone = true
 
-      const aLine = 
-        listOfColumns
-          .reduce(
-            (line, component, index) => {
-              if(isFirstRow) {
-                values[index] = component[section].nextValue()
-              }
-              const {value:columnValue, done} =values[index].next()
-              if(done !== true) allValuesAreDone = false
+      const aLine = listOfColumns.reduce((line, component, index) => {
+        if (isFirstRow) {
+          values[index] = component[section].nextValue()
+        }
+        const { value: columnValue, done } = values[index].next()
+        if (done !== true) allValuesAreDone = false
 
-              return line + 
-                    COLUMN_LEFT_MARGIN_CHARS + 
-                    ( columnValue ?? component.getUndefinedRepresentation() ) +
-                    COLUMN_RIGHT_MARGIN_CHARS + 
-                    VERTICAL_LINE_CHAR
-            },
-            TABLE_LEFT_MARGIN_CHARS + VERTICAL_LINE_CHAR
-          )
+        let valueCellPadded = COLUMN_LEFT_MARGIN_CHARS +
+          (columnValue ?? component.getUndefinedRepresentation()) +
+          COLUMN_RIGHT_MARGIN_CHARS
 
-      if(allValuesAreDone === false) lines.push(aLine)
+        if(component.getSize() > valueCellPadded.length)
+          valueCellPadded = valueCellPadded.padEnd(component.getSize() + 2, COLUMN_RIGHT_MARGIN_CHARS)
+
+        return (
+          line +
+          valueCellPadded +
+          VERTICAL_LINE_CHAR
+        )
+      }, TABLE_LEFT_MARGIN_CHARS + VERTICAL_LINE_CHAR)
+
+      if (allValuesAreDone === false) lines.push(aLine)
       isFirstRow = false
-    } while (allValuesAreDone === false);
+    } while (allValuesAreDone === false)
 
     return lines
   }
 
-  function draw(loadData)
-  {
-
-    listOfColumns.forEach(column => column.load(R.pluck(column.id)(loadData)))
+  function draw() {
+    listOfColumns.forEach((column) => column.load(R.pluck(column.id)(tableData)))
 
     const lines = [
       // Top Line
@@ -115,20 +135,32 @@ function Table()
     ]
 
     return lines.join('\n')
-
   }
 
-  function addColumn({type, id, title })
-  {
-    let column = type.loadParams(id)(title)
+  function addColumn({ type, id, title }) {
+    let column = type.loadParams(id)(title??id)
     listOfColumns.push(column)
+    return {
+      addColumn,
+      draw
+    }
+  }
+
+  function auto() {
+    tableData.map((row) => {
+        Object.keys(row).map((id) => {
+          if(listOfColumns.find((el) => el.id === id) === undefined)
+            addColumn({type: Text(), id})
+        })
+    })
+
+    return { draw }
   }
 
   return {
     addColumn,
-    draw
+    auto
   }
 }
 
-
-export { Table }
+export { Table, Index }
