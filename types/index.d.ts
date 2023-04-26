@@ -9,4 +9,7 @@ export * from "./ramdaExt.js";
 export * from "./plan.js";
 export * from "./sanitizer.js";
 export * from "./streamUtils.js";
+export * from './table/table.js';
+export * from './table/components/text.js';
+export * from './table/components/timeline.js';
 //# sourceMappingURL=index.d.ts.map

@@ -101,8 +101,8 @@ function Table(data) {
           (columnValue ?? component.getUndefinedRepresentation()) +
           COLUMN_RIGHT_MARGIN_CHARS
 
-        if(component.getSize() > valueCellPadded.length)
-          valueCellPadded = valueCellPadded.padEnd(component.getSize() + 2, COLUMN_RIGHT_MARGIN_CHARS)
+        //if(component.getSize() > valueCellPadded.length)
+        //  valueCellPadded = valueCellPadded.padEnd(component.getSize() + 2, COLUMN_RIGHT_MARGIN_CHARS)
 
         return (
           line +

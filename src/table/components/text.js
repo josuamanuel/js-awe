@@ -18,14 +18,15 @@ function Text({ HEADING_IDENTATION, ROW_IDENTATION } = { HEADING_IDENTATION: cen
         load: columnData => {
           data = columnData
           size = data.reduce(
-            (acum, current) =>
-              acum < current.length
-                ? current.length
-                : acum
-            , 0
+            (acum, current) => {
+              let currentCellLength = ('' + (current??'')).length
+              if(acum < currentCellLength)
+                return currentCellLength
+              else
+                return acum
+            }
+            , title.length
           )
-
-          size = Math.max(size, title.length ?? 0)
         },
 
         getUndefinedRepresentation: () => ''.padEnd(size),
