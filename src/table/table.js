@@ -114,6 +114,8 @@ function Table(data) {
   function draw() {
     listOfColumns.forEach((column) => column.load(R.pluck(column.id)(tableData)))
 
+    if(listOfColumns.length === 0) return ('[]')
+    
     const lines = [
       // Top Line
       getTopLine(),

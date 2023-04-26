@@ -93,3 +93,6 @@ let semaforoAlcistaExample = [
 ]
 
 console.log(Table(semaforoAlcistaExample).auto().draw())
+console.log(Table([]).auto().draw())
+console.log(Table([{}]).auto().draw())
+console.log(Table([undefined, {a:2},{b:undefined}]).auto().draw())
