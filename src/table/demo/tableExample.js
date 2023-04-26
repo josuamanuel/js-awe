@@ -61,5 +61,5 @@ console.log(Table({
   .addColumn({ type: Text(), id: 'beespot', title: 'b'})
   .draw())
 
-console.log(Table([{a:1,b:2},{a:3,b:4},{a:5,b:6}]).auto().draw())
+console.log(Table([{a:1,b:2},{a:3,b:443},{a:5,b:6}]).auto().draw())
 console.log(Table(timelineData).auto().draw())

@@ -39,8 +39,6 @@ function Table(data) {
 
   const listOfColumns = []
 
-  let horLine
-
   function getTopLine() {
     return listOfColumns.reduce(
       (line, column, index) =>
@@ -97,16 +95,11 @@ function Table(data) {
         const { value: columnValue, done } = values[index].next()
         if (done !== true) allValuesAreDone = false
 
-        let valueCellPadded = COLUMN_LEFT_MARGIN_CHARS +
-          (columnValue ?? component.getUndefinedRepresentation()) +
-          COLUMN_RIGHT_MARGIN_CHARS
-
-        //if(component.getSize() > valueCellPadded.length)
-        //  valueCellPadded = valueCellPadded.padEnd(component.getSize() + 2, COLUMN_RIGHT_MARGIN_CHARS)
-
         return (
           line +
-          valueCellPadded +
+          COLUMN_LEFT_MARGIN_CHARS +
+          columnValue +
+          COLUMN_RIGHT_MARGIN_CHARS +
           VERTICAL_LINE_CHAR
         )
       }, TABLE_LEFT_MARGIN_CHARS + VERTICAL_LINE_CHAR)

@@ -41,7 +41,7 @@ function Text({ HEADING_IDENTATION, ROW_IDENTATION } = { HEADING_IDENTATION: cen
         row: {
           nextValue: function* () {
             for (let el of data)
-              yield ROW_IDENTATION(el, size)
+              yield ROW_IDENTATION((''+ el??getUndefinedRepresentation()), size)
           }
         }
       }
