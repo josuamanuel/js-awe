@@ -98,7 +98,6 @@ function Timeline()
 
           size = timelineScale.label.length + 1 + LENGTH_IN_CHARS_OF_INI_END_TIMELINE + LAST_SCALE_VALUE_MARGIN
         },
-        getUndefinedRepresentation: ()=>''.padEnd(size),
         getSize: () => size,
 
         heading: {

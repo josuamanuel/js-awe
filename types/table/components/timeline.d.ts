@@ -2,7 +2,6 @@ export function Timeline(): {
     loadParams: (paramId: any) => (paramTitle: any) => {
         id: any;
         load: (columnData: any) => void;
-        getUndefinedRepresentation: () => string;
         getSize: () => any;
         heading: {
             nextValue: () => Generator<any, void, unknown>;

@@ -63,3 +63,33 @@ console.log(Table({
 
 console.log(Table([{a:1,b:2},{a:3,b:443},{a:5,b:6}]).auto().draw())
 console.log(Table(timelineData).auto().draw())
+
+let semaforoAlcistaExample = [
+  {
+    "symbol": "DTY.L",
+    "RIC": undefined,
+    "name": "Dignity PLC",
+    "refIndex": "T5700P",
+    "refIndexDesc": "EU Travel & Leisure",
+    "close": "550.00",
+    "stopLoss": "500.26"
+  }, {
+    "symbol": "PTEC.L",
+    "RIC": "PTEC.L",
+    "name": "Playtech",
+    "refIndex": "T5700P",
+    "refIndexDesc": "EU Travel & Leisure",
+    "close": "573.50",
+    "stopLoss": "541.65"
+  }, {
+    "symbol": "FPE.DE",
+    "RIC": "FPEG.DE",
+    "name": "Fuchs Petrolub AG",
+    "refIndex": "SX4P",
+    "refIndexDesc": "EU 600 Chemicals",
+    "close": "32.35",
+    "stopLoss": "29.75"
+  }
+]
+
+console.log(Table(semaforoAlcistaExample).auto().draw())

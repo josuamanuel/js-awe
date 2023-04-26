@@ -29,7 +29,6 @@ function Text({ HEADING_IDENTATION, ROW_IDENTATION } = { HEADING_IDENTATION: cen
           )
         },
 
-        getUndefinedRepresentation: () => ''.padEnd(size),
         getSize: () => size,
 
         heading: {
@@ -41,7 +40,7 @@ function Text({ HEADING_IDENTATION, ROW_IDENTATION } = { HEADING_IDENTATION: cen
         row: {
           nextValue: function* () {
             for (let el of data)
-              yield ROW_IDENTATION((''+ el??getUndefinedRepresentation()), size)
+              yield ROW_IDENTATION(''+ (el ?? ''), size)
           }
         }
       }

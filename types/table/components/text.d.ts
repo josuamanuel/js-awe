@@ -5,7 +5,6 @@ export function Text({ HEADING_IDENTATION, ROW_IDENTATION }?: {
     loadParams: (paramId: any) => (paramTitle: any) => {
         id: any;
         load: (columnData: any) => void;
-        getUndefinedRepresentation: () => string;
         getSize: () => any;
         heading: {
             nextValue: () => Generator<any, void, unknown>;
