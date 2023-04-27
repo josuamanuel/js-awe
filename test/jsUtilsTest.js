@@ -436,15 +436,15 @@ describe('jsUtils', () => {
 
   it('addDays', () => {
     assert.strictEqual(
-      addDays(3, new Date('2023-02-27')).toISOString(),
-      new Date('2023-03-02').toISOString()
+      addDays(3, new Date('2023-03-24')).toISOString(),
+      new Date('2023-03-27').toISOString()
     )
   })
 
   it('subtractDays', () => {
     assert.strictEqual(
-      subtractDays(3, new Date('2023-03-02')).toISOString(),
-      new Date('2023-02-27').toISOString()
+      subtractDays(3, new Date('2023-03-27')).toISOString(),
+      new Date('2023-03-24').toISOString()
     )
   })
 
