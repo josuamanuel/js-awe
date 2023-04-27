@@ -953,21 +953,23 @@ function subtractDays(daysToSubtract, date) {
 
   if (isDate(dateToProcess) === false) return dateToProcess
 
-  dateToProcess.setDate(dateToProcess.getDate() - daysToSubtract);
-  return dateToProcess
+  return new Date(dateToProcess.valueOf() - 864E5*daysToSubtract)
 }
-//subtractDays(40).toISOString() //?
-//subtractDays(3, new Date('2021-03-25')) //?
+// subtractDays(2, "2023-03-26").toISOString() //?
+// subtractDays(3, "2023-03-27").toISOString() //?
+// subtractDays(9, "2023-04-02").toISOString() //?
 
 function addDays(daysToAdd, date) {
   let dateToProcess = toDate(date)
 
   if (isDate(dateToProcess) === false) return dateToProcess
 
-  dateToProcess.setDate(dateToProcess.getDate() + daysToAdd);
-  return dateToProcess
+  return new Date(dateToProcess.valueOf()+864E5*daysToAdd)
 }
-// addDays(2, "2022-01-01") //?
+// addDays(2, "2023-03-24").toISOString() //?
+// addDays(3, "2023-03-24").toISOString() //?
+// addDays(9, "2023-03-24").toISOString() //?
+
 
 function previousDayOfWeek(dayOfWeek, date) {
   let dateToProcess = toDate(date)
