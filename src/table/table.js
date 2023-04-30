@@ -154,7 +154,8 @@ function Table(data) {
 
   return {
     addColumn,
-    auto
+    auto,
+    draw
   }
 }
 
