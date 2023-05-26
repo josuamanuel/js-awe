@@ -8,27 +8,43 @@ npm install js-awe
 
 ## New functional async style. Avoid await contamination
 
-Async await has done a lot to improve the readibility of code when compared with callbacks style. But sometimes it is not a good construct, specially if you want to use it in a functional style!!!
+Async await has done a lot to improve the readability of code when compared with callbacks style. But sometimes it is not a good construct, specially if you want to use it in a functional style!!!
 
-One problem I see, is the spread of async await around the source code wherever it is handy. Everytime we use await, an async branch will be created. The result will be a execution flow with the shape of a tree, with some chain functions running in sequence and others running concurrently. Understanding the tree of execution flow turns difficult. This is mainly by the fact that the construct of the tree is not explicitly coded in one place.
+One problem I see, is the spread of async await around the source code wherever it is handy. Every-time we use await, an async branch will be created. The result will be an execution flow with the shape of a tree, with some chain functions running in sequence and others running concurrently. Understanding the tree of execution flow turns difficult. This is mainly by the fact that the construct of the tree is not explicitly coded in one place.
 
-"Plan" tries to solve this problem by declaring this tree explicitly in one place and in a symple elegant way. "Plan" is an execution planner that pipe functions to run in sequence and functions to run concurrently. It handle for you promise chainning and data passing **so you can write pure functions free of async await**.
+js-awe library has a “plan” function that can help you on that.
 
-The construct to run in sequence: [fun1, fun2, fun3]
+“plan” tries to solve this problem by declaring this tree explicitly in one place and in a simple elegant way. It uses array nesting to define this tree. It does not use weird DSL. “plan” is an execution planner that pipe functions to run in sequence and functions to run concurrently. It handle for you the promise chaining and data passing **so you can write pure functions free of async await**.
 
-```comments
+The construct to run in sequence:
+
+```Plain text
+[ fun1, fun2, fun3 ]
+
+execution flow:
+
 fun1 -> fun2 -> fun3
 ```
 
-The construct ro run concurrently [[fun1],[fun2], fun3]
+The construct ro run concurrently:
 
-```comments
-fun1 --|
-        > fun3
-fun2 --|
+```Plain text
+[ fun1, [fun2], [fun3], fun4 ]
+
+execution flow:
+
+       |-> fun2 --|
+fun1 --|          |-> fun4
+       |-> fun3 --|
 ```
 
-The best thing is to view an example of an API to get all the Bank contracts (savings and loans) with its balances for a customer:
+The best thing is to view an example. First, we need to install it:
+
+```Bash
+npm install js-awe
+```
+
+The below is a simple example of its use. This could be part of an API to get the bank balances of all the holdings (savings and loans) for a specific customer:
 
 ```javascript
 import { plan } from 'js-awe'
@@ -45,7 +61,7 @@ console.log(await getCustomerBalances('F12'))
 
 Execution:
 
-```comments
+```Plain Text
              |->filterSavings -> getSavingBalances -|
 getAccounts -|                                      |-> formatCustomerBalances
              |->filterLoans   -> getLoanBalances   -|
@@ -96,8 +112,6 @@ function getLoanBalances(loanAccounts) {
 function formatCustomerBalances([savingBalances, loanBalances]) {
   return [...savingBalances, ...loanBalances]
 }
-
-
 ```
 
 the Plan utility is recommended when we have a complex tree, and you want to manifest explicitly this async flow. For example, This utility would be a good tool for an API that generate its response based in different calls to other APIS. Specially if some of the calls needs to be call in sequence and others can be run concurrently.
