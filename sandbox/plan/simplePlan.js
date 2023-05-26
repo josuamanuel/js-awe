@@ -7,7 +7,7 @@ const getCustomerBalances = plan([
   formatCustomerBalances,
 ])
 
-console.log(await getCustomerBalances('F12'))
+console.log(await getCustomerBalances('0396d9b0'))
 
 function getAccounts(customerId) {
   return Promise.resolve([

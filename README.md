@@ -85,7 +85,7 @@ const getCustomerBalances = plan([
   formatCustomerBalances,
 ])
 
-console.log(await getCustomerBalances('F12'))
+console.log(await getCustomerBalances('0396d9b0'))
 
 function getAccounts(customerId) {
   return Promise.resolve([
@@ -140,7 +140,7 @@ Timeline of events:
 │ step3  │                                              |-----------------------------|          │
 └────────┴───────────────────────────────────────────────────────────────────────────────────────┘
 
-Total elapse Time of each event: 
+Total elapse Time of each event:
 ┌─────────┬─────────┬────────┬────────────┐
 │ (index) │  name   │ elapse │ percentage │
 ├─────────┼─────────┼────────┼────────────┤
@@ -149,7 +149,7 @@ Total elapse Time of each event:
 │    2    │ 'step3' │  501   │   28.36    │
 └─────────┴─────────┴────────┴────────────┘
 
-Coinciding Events timeline: 
+Coinciding Events timeline:
 ┌─────────┬──────────────────────┬──────────┬────────────┐
 │ (index) │    runningEvents     │ elapseMs │ percentage │
 ├─────────┼──────────────────────┼──────────┼────────────┤
