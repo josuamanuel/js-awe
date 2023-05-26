@@ -2,6 +2,10 @@
 
 javascript utilities and extensions. Taking javascript to the next level.
 
+to install:
+
+npm install js-awe
+
 ## New functional async style. Avoid await contamination
 
 Async await has done a lot to improve the readibility of code when compared with callbacks style. But sometimes it is not a good construct, specially if you want to use it in a functional style!!!
