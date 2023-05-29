@@ -161,7 +161,11 @@ Coinciding Events timeline:
 
 ## And much more
 
-For you to explore... or help with documentation.
+For you to explore... Don't hesitate to explore the code: table.js, sanitizer.js, jsUtils.js...
+
+Most of the functions has TS types. But more documentation will be needed. So if you want to help others:
+
+please PULL REQUEST!!! with your changes.
 
 ## Generating types
 
