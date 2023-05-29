@@ -1,5 +1,9 @@
 import { arraySorter, pushUniqueKeyOrChange, sorterByPaths, pushUniqueKey, CustomError, pushAt } from './jsUtils.js';
-import { groupByWithCalc, R } from './ramdaExt.js';
+import { groupByWithCalc} from './ramdaExt.js';
+import pipe from 'ramda/src/pipe'
+import map from 'ramda/src/map'
+import sort from 'ramda/src/sort'
+
 import { Table, consoleTable } from './table/table.js'
 import { Text } from './table/components/text.js'
 import { Timeline } from './table/components/timeline.js'
@@ -304,12 +308,12 @@ function Chrono() {
 
   function coincidingEventsReport(elapseTable) {
 
-    R.pipe(
+    pipe(
       groupByWithCalc(
         (row) => JSON.stringify(row.runningEvents.sort(arraySorter())),
         { percentage: (l, r) => (l ?? 0) + r, elapseMs: (l, r) => (l ?? 0) + r }
       ),
-      R.map(row => ({ ...row, elapseMs: Math.floor(row.elapseMs), percentage: Number(row.percentage.toFixed(2)) })),
+      map(row => ({ ...row, elapseMs: Math.floor(row.elapseMs), percentage: Number(row.percentage.toFixed(2)) })),
       (coincidingEvents) => {
         console.log('')
         console.log('Coinciding Events timeline: ')
@@ -357,7 +361,7 @@ function Chrono() {
   function report() {
     createTimeEvent('report')
     chronoReport()
-    R.pipe(
+    pipe(
       //RE.RLog('0-->: '),
       formatReportAndReturnInputParam,
       eventsReport,
@@ -367,7 +371,7 @@ function Chrono() {
       //RE.RLog('2-->: '),
       compactListOfNameRanges,
       //RE.RLog('3-->: '),
-      R.sort(sorterByPaths('range.start')),
+      sort(sorterByPaths('range.start')),
       reportListOfNameRanges,
       //RE.RLog('4-->: '),
       coincidingEventsReport
