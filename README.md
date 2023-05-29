@@ -10,7 +10,7 @@ npm install js-awe
 
 Async await has done a lot to improve the readability of code when compared with the callback style. But sometimes it is not a good construct, especially if you want to use it in a functional style!!!
 
-One problem I see, is the spread of async await around the source code wherever it is handy. Every time we use await, an async branch will be created. The result will be an execution flow with the shape of a tree, with some chain functions running in sequence and others running concurrently. Understanding the tree of execution flow turns difficult. This is mainly by the fact that the construct of the tree is not explicitly coded in one place.
+One problem I see, is the spread of casual async await around the source code wherever it is handy. Every time we use await, an async branch will be created. The result will be an execution flow with the shape of a tree, with some chain functions running in sequence and others running concurrently. Understanding the tree of execution flow turns difficult. This is mainly by the fact that the construct of the tree is not explicitly coded in one place.
 
 js-awe library has a “plan” function that can help you with that.
 
@@ -114,7 +114,7 @@ function formatCustomerBalances([savingBalances, loanBalances]) {
 }
 ```
 
-the Plan utility is recommended when we have a complex tree, and you want to manifest explicitly this async flow. For example, This utility would be a good tool for an API that generates its response based on different calls to other APIS. Especially if some of the calls need to be called in sequence and others can be run concurrently.
+The Plan utility is recommended when we have a complex tree, and you want to manifest explicitly this async flow. For example, This utility would be a good tool for an API that generates its response based on different calls to other APIS. Especially if some of the calls need to be called in sequence and others can be run concurrently.
 
 When it is not recommended:
 
@@ -127,7 +127,7 @@ Chrono time events and visualize them.
 
 [chronoExampl.js](https://github.com/josuamanuel/js-awe/blob/main/sandbox/Chrono/chronoExample.js)
 
-```logs
+```Plaintext
 chronoCreation :  2023-05-25T20:58:17.175Z
 report :  2023-05-25T20:58:18.480Z
 
@@ -156,7 +156,7 @@ Coinciding Events timeline:
 │    0    │     [ 'step1' ]      │   650    │   51.38    │
 │    1    │     [ 'step2' ]      │   114    │    9.04    │
 │    2    │ [ 'step2', 'step3' ] │   501    │   39.58    │
-└─────────┴──────────────────────┴──────────┴─────
+└─────────┴──────────────────────┴──────────┴────────────┘
 ```
 
 ## And much more
