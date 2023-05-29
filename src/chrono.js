@@ -297,8 +297,7 @@ function Chrono() {
 
     console.log('')
     console.log('Total elapse Time of each event: ')
-
-
+    consoleTable(toLog)
 
     return events
   }
