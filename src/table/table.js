@@ -1,4 +1,3 @@
-import { R } from './../ramdaExt.js'
 import { Text } from './components/text.js'
 
 const Index = Symbol()
@@ -112,7 +111,7 @@ function Table(data) {
   }
 
   function draw() {
-    listOfColumns.forEach((column) => column.load(R.pluck(column.id)(tableData)))
+    listOfColumns.forEach((column) => column.load(tableData.map(row => row[column.id])))
 
     if(listOfColumns.length === 0) return ('[]')
     

@@ -1,6 +1,5 @@
 
 import { arraySorter } from '../../jsUtils.js'
-import { R } from '../../ramdaExt.js'
 import { putCenteredValueAtPosIfFit, putValueAtPos }from '../tableUtils.js'
 
 const LENGTH_IN_CHARS_OF_INI_END_TIMELINE = 80
@@ -84,7 +83,7 @@ function Timeline()
 
           scalePoints = 
             [...new Set(
-              data.flatMap(R.identity).reduce(
+              data.flatMap(el => el).reduce(
                 (scalePoints, point) =>
                   [...scalePoints, point.start, point.end],
                 []
