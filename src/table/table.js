@@ -159,4 +159,17 @@ function Table(data) {
   }
 }
 
-export { Table, Index }
+function consoleTable(toLog)
+{
+  console.log(Table(toLog).auto().draw())
+}
+
+function consoleTableExtended(toLog)
+{
+  if (console.table) {
+    if(globalThis?.process?.argv0 === 'bun') console.log(Table(toLog).auto().draw())
+    else console.table(toLog)
+  }else console.log(toLog)  
+}
+
+export { Table, Index, consoleTable, consoleTableExtended }

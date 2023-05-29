@@ -1,6 +1,6 @@
 import { arraySorter, pushUniqueKeyOrChange, sorterByPaths, pushUniqueKey, CustomError, pushAt } from './jsUtils.js';
 import { groupByWithCalc, R } from './ramdaExt.js';
-import { Table } from './table/table.js'
+import { Table, consoleTable } from './table/table.js'
 import { Text } from './table/components/text.js'
 import { Timeline } from './table/components/timeline.js'
 import { performance } from 'node:perf_hooks'
@@ -297,8 +297,7 @@ function Chrono() {
     console.log('')
     console.log('Total elapse Time of each event: ')
 
-    if (console.table) console.table(toLog)
-    else console.log(toLog)
+
 
     return events
   }
@@ -314,8 +313,7 @@ function Chrono() {
       (coincidingEvents) => {
         console.log('')
         console.log('Coinciding Events timeline: ')
-        if (console.table) console.table(coincidingEvents)
-        else console.log(coincidingEvents)
+        consoleTable(coincidingEvents)
       }
     )(elapseTable)
 

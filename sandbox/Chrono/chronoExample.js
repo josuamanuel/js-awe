@@ -4,10 +4,12 @@ import { sleepWithFunction } from '../../src/jsUtils.js'
 let chrono = Chrono()
 
 chrono.time('step1')
+
 tasks().then(()=>{
   chrono.timeEnd('step1')
   chrono.report()
 })
+
 
 async function tasks()
 {
@@ -49,48 +51,6 @@ async function tasks()
     15,
     () => {
       chrono.time('step1')
-    }
-  )
-}
-
-
-
-// let chrono2 = Chrono()
-
-// chrono2.time('step1')
-// tasks2().then(()=>{
-//   chrono2.timeEnd('step1')
-//   chrono2.report()
-// })
-
-async function tasks2()
-{
-
-  await sleepWithFunction(
-    650,
-    () => {
-      chrono2.timeEnd('step1')
-    }
-  )
-
-  await sleepWithFunction(
-    300,
-    () => {
-      chrono2.time('step1')
-    }
-  )
-
-  await sleepWithFunction(
-    400,
-    () => {
-      chrono2.timeEnd('step1')
-    }
-  )
-
-  await sleepWithFunction(
-    500,
-    () => {
-      chrono2.time('step1')
     }
   )
 }
