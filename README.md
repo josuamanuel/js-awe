@@ -125,7 +125,7 @@ When it is not recommended:
 
 Chrono time events and visualize them.
 
-[chronoExampl.js](https://github.com/josuamanuel/js-awe/blob/main/sandbox/Chrono/chronoExample.js)
+[chronoExample.js](https://github.com/josuamanuel/js-awe/blob/main/sandbox/Chrono/chronoExample.js)
 
 ```Plaintext
 chronoCreation :  2023-05-25T20:58:17.175Z
