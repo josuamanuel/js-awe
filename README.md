@@ -27,10 +27,10 @@ execution and data flow coincides:
 
 fun1 -> fun2 -> fun3
 
-* fun1 will receive as input all the parameters when running the plan:
-   plan(...)(param1, param2)
-* fun2 will receive 1 input parameter corresponding with output from fun1
-* fun3 will receive 1 input parameter corresponding with output from fun2
+* fun1 receives all the parameters when running the plan:
+   plan().build(...)(param1, param2)
+* fun2 receives output from fun1
+* fun3 receives output from fun2
 ```
 
 The construct to run concurrently:
@@ -44,11 +44,11 @@ execution and data flow coincides:
 fun1 --|          |-> fun4
        |-> fun3 --|
 
-* fun1 will receive as input all the parameters when running the plan:
-  plan(...)(param1, param2)
-* fun2 will receive 1 input parameter corresponding with output from fun1
-* fun3 will receive 1 input parameter corresponding with output from fun1
-* fun4 will receive 1 input parameter of type Array that contains two values:
+* fun1 receives all the parameters when running the plan:
+   plan().build(...)(param1, param2)
+* fun2 receives output from fun1
+* fun3 receives output from fun1
+* fun4 receives an array that contains two values:
   [outputFromfun2, outputFromFun3]
 ```
 
