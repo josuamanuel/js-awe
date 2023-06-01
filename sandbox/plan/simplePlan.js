@@ -1,36 +1,60 @@
 import { plan } from '../../src/plan.js'
 
 const getCustomerBalances = plan([
-  getAccounts,
+  fetchAccounts,
   [filterSavings, getSavingBalances],
   [filterLoans, getLoanBalances],
-  formatCustomerBalances,
+  format,
 ])
 
-console.log(await getCustomerBalances('0396d9b0'))
-
-function getAccounts(customerId) {
-  return Promise.resolve([
-    { id: 1, type: 'saving' },
-    { id: 2, type: 'loan' },
-  ])
-}
+console.log('result: ', await getCustomerBalances('0396d9b0'))
 
 function filterSavings(accounts) {
   return accounts.filter((account) => account.type === 'saving')
 }
 
 function getSavingBalances(savingAccounts) {
-  return Promise.resolve(savingAccounts.map((account) => ({ balance: 5, ...account })))
+  const listOfAcccountsToFetch = savingAccounts.map((account) => account.id)
+  return fetchSavingBalances(listOfAcccountsToFetch)
 }
 
 function filterLoans(accounts) {
   return accounts.filter((account) => account.type === 'loan')
 }
 function getLoanBalances(loanAccounts) {
-  return Promise.resolve(loanAccounts.map((account) => ({ balance: 4, ...account })))
+  const listOfAcccountsToFetch = loanAccounts.map((account) => account.id)
+  return fetchLoanBalances(listOfAcccountsToFetch)
 }
 
-function formatCustomerBalances([savingBalances, loanBalances]) {
+function format([savingBalances, loanBalances]) {
   return [...savingBalances, ...loanBalances]
+}
+
+// Data fetch services are mocked for local running.
+// In production they should be fetch APIs to real implementations.
+function fetchAccounts(customerId) {
+  return Promise.resolve([
+    { id: 1, type: 'saving' },
+    { id: 2, type: 'loan' },
+  ])
+}
+
+function fetchSavingBalances(listOfAcccountsToFetch) {
+  return Promise.resolve([
+    {
+      id: 1,
+      type: 'saving',
+      balance: 13,
+    },
+  ])
+}
+
+function fetchLoanBalances(listOfAcccountsToFetch) {
+  return Promise.resolve([
+    {
+      id: 2,
+      type: 'loan',
+      balance: 24,
+    },
+  ])
 }
