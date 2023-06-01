@@ -273,24 +273,48 @@ function changeFunWithMockupsObj(mockupsObj)
   }
 }
 
-function plan(plan, {numberOfThreads, mockupsObj} = {numberOfThreads: Infinity, mockupsObj: {}})
+function plan({numberOfThreads=Infinity, mockupsObj={}} = {numberOfThreads: Infinity, mockupsObj: {}})
 {
 
-  return pipe(
-    generateStack,
-    changeFunWithMockupsObj(mockupsObj),
-    pipeWhile(stack => stack.length > 1)(
-      pipeWhile(...lengthStackPrevLessThanCurr())
-      (
-        acumSiblings,
-        acumParallel(numberOfThreads),
-      ),
-      reduceNesting,
-    ),
-    extractFinalValue,
-  )(plan)
-}
+  function build(planDef)
+  {
+    const toExec = pipe(
+        generateStack,
+        changeFunWithMockupsObj(mockupsObj),
+        pipeWhile(stack => stack.length > 1)(
+          pipeWhile(...lengthStackPrevLessThanCurr())
+          (
+            acumSiblings,
+            acumParallel(numberOfThreads),
+          ),
+          reduceNesting,
+        ),
+        extractFinalValue,
+      )(planDef)
 
+      toExec.rebuild = (options) => {
+        setOptions(options)
+        return build(planDef)
+      }
+      return toExec
+  }
+
+  function setOptions(options) {
+    ({numberOfThreads, mockupsObj} = options)
+  }
+
+  function map(fun, mapThreads=numberOfThreads) {
+
+    return (data) => {
+      if(Array.isArray(data)) return runFunctionsSyncOrParallel(mapThreads)(data.map(param => fun.bind(fun, param)))()
+      
+      return [fun(data)]
+    }
+  }
+
+  return { build, map }
+
+}
 
 
 export { plan }

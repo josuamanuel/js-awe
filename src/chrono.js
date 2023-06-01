@@ -519,9 +519,16 @@ function Chrono() {
     )
   }
 
+  function reset()
+  {
+    historyTimeIntervals = {}
+    chronoEvents = { chronoCreation:chronoEvents['chronoCreation'] }
+  }
+
   return {
     time, timeEnd, report, setTime, setTimeEnd, logReport,
-    getChronoState, setChronoStateUsingPerformanceAPIFormat, getChronoStateUsingPerformanceAPIFormat, average
+    getChronoState, setChronoStateUsingPerformanceAPIFormat, getChronoStateUsingPerformanceAPIFormat, average,
+    reset
   }
 }
 

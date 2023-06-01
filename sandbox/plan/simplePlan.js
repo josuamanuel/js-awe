@@ -1,6 +1,6 @@
 import { plan } from '../../src/plan.js'
 
-const getCustomerBalances = plan([
+const getCustomerBalances = plan().build([
   fetchAccounts,
   [filterSavings, getSavingBalances],
   [filterLoans, getLoanBalances],
