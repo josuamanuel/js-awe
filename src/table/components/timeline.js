@@ -40,7 +40,7 @@ function drawInterval(line, startInterval, endInterval)
     ''.padEnd(endInterval - startInterval - 1, INTERVAL_UNIT_CHAR) + 
     END_OF_INTERVAL_CHAR
 
-  return putValueAtPos(line, value, startInterval, 0)
+  return putValueAtPos(line, value, startInterval)
 }
 
 function Timeline()
