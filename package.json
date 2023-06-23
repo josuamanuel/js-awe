@@ -16,7 +16,8 @@
     "planner",
     "Chrono",
     "timeline",
-    "utils"
+    "utils",
+    "console.table"
   ],
   "type": "module",
   "main": "src/index.js",
