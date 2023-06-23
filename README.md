@@ -1,10 +1,24 @@
 # js-awe
 
-javascript utilities and extensions. Taking javascript to the next level.
+javascript awesome utilities and extensions. Taking javascript to the next level.
 
-to install:
+**NodeJS:**
 
+```Bash
 npm install js-awe
+```
+
+**100% compatible with bun:**
+
+```Bash
+bun install js-awe
+```
+
+Includes ```consoleTable([{a:1,b2},{a:2,b:3}])``` an equivalent implementatation of node console.table() producing similar visualization.
+
+**Web:**
+
+A minified version soon to come...
 
 ## New functional async style. Avoid await contamination
 
@@ -167,6 +181,15 @@ When it is not recommended:
 Chrono time events and visualize them.
 
 [chronoExample.js](https://github.com/josuamanuel/js-awe/blob/main/sandbox/Chrono/chronoExample.js)
+
+Spread around your async code some:
+
+```Javascript
+chrono.time('step1')
+chrono.timeEnd('step1')
+```
+
+And then ```chrono.report()``` to log the timeline and some stats.
 
 ```Plaintext
 chronoCreation :  2023-05-25T20:58:17.175Z
