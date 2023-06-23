@@ -180,9 +180,7 @@ When it is not recommended:
 
 Chrono time events and visualize them.
 
-[chronoExample.js](https://github.com/josuamanuel/js-awe/blob/main/sandbox/Chrono/chronoExample.js)
-
-Spread around your async code some:
+Spread in your Async code some:
 
 ```Javascript
 chrono.time('step1')
@@ -190,6 +188,8 @@ chrono.timeEnd('step1')
 ```
 
 And then ```chrono.report()``` to log the timeline and some stats.
+
+Full example: [chronoExample.js](https://github.com/josuamanuel/js-awe/blob/main/sandbox/Chrono/chronoExample.js)
 
 ```Plaintext
 chronoCreation :  2023-05-25T20:58:17.175Z
