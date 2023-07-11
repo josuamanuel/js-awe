@@ -523,7 +523,8 @@ function traverseVertically(functionToRun, verFields, toTraverse) {
 }
 
 
-function project(paths, json) {
+function project(paths, json, removeWithDelete=true) {
+  const toDelete = Symbol()
   let copy
   if (json === null || json === undefined ) return json
   if (Array.isArray(json)) copy = []
@@ -541,46 +542,73 @@ function project(paths, json) {
 
     const result = JSONPath({ resultType: 'all', path, json })
 
-    result.map((el) => el.path) // ?
-    result.forEach(({ pointer, value }) => {
+    let pendingToFilter= new Map()
+
+    result.forEach(({ pointer, value }, index) => {
       const setAtPath = pointer.substring(1).split('/')
 
-      if (setAtPath.length === 1 && setAtPath[0] === '') copy = isInclude ? value : undefined
-      else setAt(copy, setAtPath, isInclude ? value : undefined)
+      if (setAtPath.length === 1 && setAtPath[0] === '') copy = isInclude ? clone(value) : undefined 
+      else {
+        if(removeWithDelete === true && isInclude === false) {
+          const parentPath = setAtPath.slice(0,-1)
+          const parent = getAt(copy, parentPath)
+        
+          if(Array.isArray(parent) === true) {
+            // Arrays are stored in a map to be reviewed later to filter out the items mark for deletion.
+            pendingToFilter.set(parentPath.join('/'), parent)
+            // mark element for deletion
+            setAt(copy, setAtPath, toDelete)
+          }else {
+            const fieldToDelete = setAtPath[setAtPath.length -1]
+            delete parent[fieldToDelete]
+            setAt(copy, parentPath, parent)
+          }
+
+        }else
+          setAt(copy, setAtPath, isInclude ? clone(value) : undefined)
+      }
     })
+    
+    pendingToFilter.forEach((parent, parentPath) => {
+      const compactingDeleteItems = parent.filter(el => el !== toDelete)
+      setAt(copy, parentPath.split('/'), compactingDeleteItems)
+    })
+
   })
 
   return copy
 }
-//{
-  // const users = [
-  //   {
-  //     name: 'Jose',
-  //     age: 47,
-  //     salary: 52000,
-  //     posts: [
-  //       { id: 1, message: 'test', likes: 2 },
-  //       { id: 2, message: 'test1', likes: 2 },
-  //       { id: 3, message: 'test2', likes: 2 },
-  //     ],
-  //   },
-  //   {
-  //     name: 'Luchi',
-  //     age: 49,
-  //     salary: 52000,
-  //     posts: [
-  //       { id: 1, message: 'testL', likes: 2 },
-  //       { id: 2, message: 'testL1', likes: 2 },
-  //       { id: 3, message: 'testL2', likes: 2 },
-  //     ],
-  //   },
-  // ]
+// {
+//   const users = [
+//     {
+//       name: 'Jose',
+//       age: 47,
+//       salary: 52000,
+//       posts: [
+//         { id: 1, message: 'test', likes: 2 },
+//         { id: 2, message: 'test1', likes: 2 },
+//         { id: 3, message: 'test2', likes: 2 },
+//       ],
+//     },
+//     {
+//       name: 'Luchi',
+//       age: 49,
+//       salary: 52000,
+//       twoLevels: {a:3},
+//       posts: [
+//         { id: 1, message: 'testL', likes: 2 },
+//         { id: 2, message: 'testL1', likes: 2 },
+//         { id: 3, message: 'testL2', likes: 2 },
+//       ],
+//     },
+//   ]
 
-  // const pathToSelect = ['+$', '-$[*].age', '-$[*].salary', '-$[*].posts[:-1]'] //, '-$[*].age'];
+//   const pathToSelect = ['+$', '-$[*].age', '-$[*].twoLevels.a', '-$[*].posts[:-1]'] //, '-$[*].age'];
 
-  // project(pathToSelect, users) // ?
-  // project(['+$'], 2) //?
-//}
+//   project(pathToSelect, users)
+//   project(['+$[*].posts[0,2]', '-$[*].posts[1]'], users)
+//   project(['+$'], 2) //?
+// }
 
 
 function copyPropsWithValueUsingRules(objDest, copyRules, shouldUpdateOnlyEmptyFields = false) {
