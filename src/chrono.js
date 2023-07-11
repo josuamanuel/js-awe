@@ -4,7 +4,20 @@ import { groupByWithCalc, R} from './ramdaExt.js';
 import { Table, consoleTable } from './table/table.js'
 import { Text } from './table/components/text.js'
 import { Timeline } from './table/components/timeline.js'
-import { performance } from 'node:perf_hooks'
+
+
+let myGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : typeof this !== 'undefined' ? this : {};
+
+let performance = myGlobal?.performance
+
+if(performance === undefined) {
+  try {
+    performance = (await import('perf_hooks')).performance
+  }catch(e){}
+}
+
+if(performance === undefined) performance = {}
+   
 
 // needed only for debuging
 //import { RE } from './ramdaExt.js';
@@ -320,17 +333,19 @@ function Chrono() {
     return elapseTable
   }
 
-  function timelineReport(data) {
+  function logTimeline(timeline) {
+    console.log('')
+    console.log('Timeline of events:')
+    console.log(timeline.draw())
+  }
+
+  function createTimeline(data) {
     const timeline = Table(data)
 
     timeline.addColumn({ type: Text(), id: 'event', title: 'Events' })
     timeline.addColumn({ type: Timeline(), id: 'ranges' })
 
-    console.log('')
-    console.log('Timeline of events:')
-    console.log(timeline.draw())
-
-    return data
+    return timeline
   }
 
   function formatReportAndReturnInputParam(data) {
@@ -342,9 +357,22 @@ function Chrono() {
             ({ start, end }) => ({ start: Math.floor(start), end: Math.floor(end) })
           )
         }))
-    timelineReport(toReport)
+    const toLog = createTimeline(toReport)
+    logTimeline(toLog)
 
     return data
+  }
+
+  function timelineLines() {
+    let toReport = Object.entries(historyTimeIntervals).map(
+      ([eventName, event]) => (
+        {
+          event: eventName,
+          ranges: event.ranges.map(
+            ({ start, end }) => ({ start: Math.floor(start), end: Math.floor(end) })
+          )
+        }))
+    return createTimeline(toReport).draw()
   }
 
   function chronoReport() {
@@ -526,7 +554,7 @@ function Chrono() {
   }
 
   return {
-    time, timeEnd, report, setTime, setTimeEnd, logReport,
+    time, timeEnd, report, setTime, setTimeEnd, logReport, timelineLines,
     getChronoState, setChronoStateUsingPerformanceAPIFormat, getChronoStateUsingPerformanceAPIFormat, average,
     reset
   }

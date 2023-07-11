@@ -1,4 +1,3 @@
-import fetch from 'node-fetch'
 
 async function fetchImproved(...args) {
   const result = await fetch(...args)
@@ -7,4 +6,4 @@ async function fetchImproved(...args) {
   return { status: result.status, body }
 }
 
-export { fetch, fetchImproved }
+export { fetchImproved }

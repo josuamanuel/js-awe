@@ -1,4 +1,4 @@
-import fetch from "node-fetch";
+
 declare function fetchImproved(...args: any[]): Promise<{
     status: number;
     body: unknown;

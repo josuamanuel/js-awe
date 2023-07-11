@@ -165,8 +165,11 @@ function consoleTable(toLog)
 
 function consoleTableExtended(toLog)
 {
+
+  let myGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : typeof this !== 'undefined' ? this : {};
+
   if (console.table) {
-    if(globalThis?.process?.argv0 === 'bun') console.log(Table(toLog).auto().draw())
+    if(myGlobal?.process?.argv0 === 'bun') console.log(Table(toLog).auto().draw())
     else console.table(toLog)
   }else console.log(toLog)  
 }
