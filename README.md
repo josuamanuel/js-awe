@@ -18,7 +18,24 @@ Includes ```consoleTable([{a:1,b2},{a:2,b:3}])``` an equivalent implementatation
 
 **Web:**
 
-A minified version soon to come...
+Grab the minified version at:
+
+<https://raw.githubusercontent.com/josuamanuel/js-awe/main/dist/js-awe.min.js>
+
+Then copy it in your project and work with it in your html:
+
+```html
+...
+<body>
+  <script type="module">
+    import { firstCapital} from './js-awe.min.js'
+
+    document.write(firstCapital("library is loaded correctly..."));
+    
+  </script>
+</body>
+...
+```
 
 ## New functional async style. Avoid await contamination
 
