@@ -4,20 +4,10 @@ import { groupByWithCalc, R} from './ramdaExt.js';
 import { Table, consoleTable } from './table/table.js'
 import { Text } from './table/components/text.js'
 import { Timeline } from './table/components/timeline.js'
-
+import { performance } from 'node:perf_hooks'
 
 let myGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : typeof this !== 'undefined' ? this : {};
 
-let performance = myGlobal?.performance
-
-if(performance === undefined) {
-  try {
-    performance = (await import('perf_hooks')).performance
-  }catch(e){}
-}
-
-if(performance === undefined) performance = {}
-   
 
 // needed only for debuging
 //import { RE } from './ramdaExt.js';
