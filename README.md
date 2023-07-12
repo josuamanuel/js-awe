@@ -2,10 +2,24 @@
 
 javascript awesome utilities and extensions. Taking javascript to the next level.
 
+## installation
+
 **NodeJS:**
 
 ```Bash
 npm install js-awe
+```
+
+supporting import (ES Modules) and require (commonjs)
+
+```javascript
+import { plan } from 'js-awe'
+```
+
+or
+
+```javascript
+const { plan } = require('js-awe')
 ```
 
 **100% compatible with bun:**
@@ -41,6 +55,30 @@ Then copy it in your project and work with it in your html:
 
 ## New functional async style. Avoid await contamination
 
+***The libary handles the mixing of sync and async functions seamlessly***
+
+```javascript
+const { plan } = require("js-awe")
+
+const result = plan().build([
+  val1 => Promise.resolve(val1 * 2),                          // fun1: 3*2 = 6
+  [val2 => Promise.resolve(val2 + 1), val3 => val3 + 3],      // fun2A: 6 + 1 = 7; fun3: 7 + 3 = 10  
+  [val2 => Promise.resolve(val2 - 1), val4 => val4 + 2],      // fun2B: 6 - 1 = 5; fun4: 5 + 2 = 7
+  ([val4, val5]) => val4 + val5                               // fun5: 10 + 7 = 17; Promise.resolve(17)
+])(3)
+
+result.then(result => console.log(result)) //=> 17
+```
+
+***Simple declarative way to specify running functions sequencially or concurrently***
+
+```plainText
+       |-> fun2A -> fun3-|
+fun1 --|                 |-> fun5
+       |-> fun2B -> fun4-|
+```
+
+***The purpose:***
 Async await has done a lot to improve the readability of code when compared with callbacks style. But sometimes it is not a good construct, especially if you want to use it in a functional style!!!
 
 One problem I see, is the spread of async await around the source code wherever it is handy. This casual handling of await usually makes code non performant.
@@ -91,7 +129,7 @@ The best thing is to view an example. First, we need to install it:
 npm install js-awe
 ```
 
-You can see below is a simple example of its use. This could be part of an API to get the bank balances of all the holdings (savings and loans) for a specific customer:
+You can see below a more realistic example of its use. This could be part of an API to get the bank balances of all the holdings (savings and loans) for a specific customer:
 
 ```javascript
 import { plan } from 'js-awe'
