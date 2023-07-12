@@ -28,10 +28,12 @@ Then copy it in your project and work with it in your html:
 ...
 <body>
   <script type="module">
-    import { firstCapital} from './js-awe.min.js'
+    import { firstCapital } from './js-awe.min.js';
 
-    document.write(firstCapital("library is loaded correctly..."));
-    
+    const newDiv = document.createElement('div');
+    newDiv.innerText = firstCapital('library is loaded correctly...');
+    document.body.appendChild(newDiv);
+
   </script>
 </body>
 ...
