@@ -77,6 +77,23 @@ export class CustomError extends Error {
     map(func: any): this;
     chain(func: any): this;
 }
+export function createCustomErrorClass(errorName: any): {
+    new (name: any, message: any, data: any): {
+        name: any;
+        data: {
+            status: number;
+        };
+        map(func: any): any;
+        chain(func: any): any;
+        message: string;
+        stack?: string | undefined;
+        cause?: unknown;
+    };
+    of: typeof CustomError;
+    captureStackTrace(targetObject: object, constructorOpt?: Function | undefined): void;
+    prepareStackTrace?: ((err: Error, stackTraces: NodeJS.CallSite[]) => any) | undefined;
+    stackTraceLimit: number;
+};
 export function urlCompose(gatewayUrl: any, serviceName: any, servicePath: any): {
     gatewayUrl: any;
     serviceName: any;

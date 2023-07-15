@@ -12,8 +12,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.addDays = exports.subtractDays = exports.diffInDaysYYYY_MM_DD = exports.dateToObj = exports.YYYY_MM_DD_hh_mm_ss_ToUtcDate = exports.dateFormatter = exports.formatDate = exports.isStringADate = exports.isEmpty = exports.isDate = exports.fillWith = exports.memoize = exports.pushAt = exports.pushUniqueKeyOrChange = exports.pushUniqueKey = exports.transition = exports.Enum = exports.EnumMap = exports.copyPropsWithValueUsingRules = exports.copyPropsWithValue = exports.project = exports.traverseVertically = exports.traverse = exports.removeDuplicates = exports.arrayOfObjectsToObject = exports.arrayToObject = exports.notTo = exports.sleepWithFunction = exports.sleepWithValue = exports.sleep = exports.isPromise = exports.arraySorter = exports.filterFlatMap = exports.sorterByPaths = exports.setAt = exports.getAt = exports.deepFreeze = exports.findDeepKey = exports.colorByStatus = exports.colorMessageByStatus = exports.colorMessage = exports.colors = exports.indexOfNthMatch = exports.urlDecompose = exports.urlCompose = exports.CustomError = exports.queryObjToStr = exports.varSubsDoubleBracket = exports.firstCapital = exports.logWithPrefix = void 0;
-exports.processExit = exports.retryWithSleep = exports.loopIndexGenerator = exports.runEvery = exports.repeat = exports.cleanString = exports.replaceAll = exports.setDateToMidnight = exports.isDateMidnight = exports.getSameDateOrPreviousFridayForWeekends = exports.previousDayOfWeek = void 0;
+exports.subtractDays = exports.diffInDaysYYYY_MM_DD = exports.dateToObj = exports.YYYY_MM_DD_hh_mm_ss_ToUtcDate = exports.dateFormatter = exports.formatDate = exports.isStringADate = exports.isEmpty = exports.isDate = exports.fillWith = exports.memoize = exports.pushAt = exports.pushUniqueKeyOrChange = exports.pushUniqueKey = exports.transition = exports.Enum = exports.EnumMap = exports.copyPropsWithValueUsingRules = exports.copyPropsWithValue = exports.project = exports.traverseVertically = exports.traverse = exports.removeDuplicates = exports.arrayOfObjectsToObject = exports.arrayToObject = exports.notTo = exports.sleepWithFunction = exports.sleepWithValue = exports.sleep = exports.isPromise = exports.arraySorter = exports.filterFlatMap = exports.sorterByPaths = exports.setAt = exports.getAt = exports.deepFreeze = exports.findDeepKey = exports.colorByStatus = exports.colorMessageByStatus = exports.colorMessage = exports.colors = exports.indexOfNthMatch = exports.urlDecompose = exports.urlCompose = exports.createCustomErrorClass = exports.CustomError = exports.queryObjToStr = exports.varSubsDoubleBracket = exports.firstCapital = exports.logWithPrefix = void 0;
+exports.processExit = exports.retryWithSleep = exports.loopIndexGenerator = exports.runEvery = exports.repeat = exports.cleanString = exports.replaceAll = exports.setDateToMidnight = exports.isDateMidnight = exports.getSameDateOrPreviousFridayForWeekends = exports.previousDayOfWeek = exports.addDays = void 0;
 const just_clone_1 = __importDefault(require("just-clone"));
 const jsonpath_plus_1 = require("jsonpath-plus");
 const logWithPrefix = (title, displayFunc) => (message) => {
@@ -60,6 +60,16 @@ CustomError.of = CustomError;
 //   console.log(`It shouldn't print this`)
 //   return a +2
 // })(divide(8,0)) //?
+function createCustomErrorClass(errorName) {
+    const errorClass = class extends CustomError {
+        constructor(name, message, data) {
+            super(name, message, data);
+            this.name = errorName;
+        }
+    };
+    return errorClass;
+}
+exports.createCustomErrorClass = createCustomErrorClass;
 class Enum {
     constructor(values, rules) {
         // activeObjectKey will be an object with keys from values array and only one current key active: {ON:false,OFF:true}

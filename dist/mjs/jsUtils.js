@@ -43,6 +43,15 @@ class CustomError extends Error {
 //   console.log(`It shouldn't print this`)
 //   return a +2
 // })(divide(8,0)) //?
+function createCustomErrorClass(errorName) {
+    const errorClass = class extends CustomError {
+        constructor(name, message, data) {
+            super(name, message, data);
+            this.name = errorName;
+        }
+    };
+    return errorClass;
+}
 class Enum {
     constructor(values, rules) {
         // activeObjectKey will be an object with keys from values array and only one current key active: {ON:false,OFF:true}
@@ -1501,4 +1510,4 @@ const jsUtils = {
     processExit
 };
 export default jsUtils;
-export { logWithPrefix, firstCapital, varSubsDoubleBracket, queryObjToStr, CustomError, urlCompose, urlDecompose, indexOfNthMatch, colors, colorMessage, colorMessageByStatus, colorByStatus, findDeepKey, deepFreeze, getAt, setAt, sorterByPaths, filterFlatMap, arraySorter, isPromise, sleep, sleepWithValue, sleepWithFunction, notTo, arrayToObject, arrayOfObjectsToObject, removeDuplicates, traverse, traverseVertically, project, copyPropsWithValue, copyPropsWithValueUsingRules, EnumMap, Enum, transition, pushUniqueKey, pushUniqueKeyOrChange, pushAt, memoize, fillWith, isDate, isEmpty, isStringADate, formatDate, dateFormatter, YYYY_MM_DD_hh_mm_ss_ToUtcDate, dateToObj, diffInDaysYYYY_MM_DD, subtractDays, addDays, previousDayOfWeek, getSameDateOrPreviousFridayForWeekends, isDateMidnight, setDateToMidnight, replaceAll, cleanString, repeat, runEvery, loopIndexGenerator, retryWithSleep, processExit };
+export { logWithPrefix, firstCapital, varSubsDoubleBracket, queryObjToStr, CustomError, createCustomErrorClass, urlCompose, urlDecompose, indexOfNthMatch, colors, colorMessage, colorMessageByStatus, colorByStatus, findDeepKey, deepFreeze, getAt, setAt, sorterByPaths, filterFlatMap, arraySorter, isPromise, sleep, sleepWithValue, sleepWithFunction, notTo, arrayToObject, arrayOfObjectsToObject, removeDuplicates, traverse, traverseVertically, project, copyPropsWithValue, copyPropsWithValueUsingRules, EnumMap, Enum, transition, pushUniqueKey, pushUniqueKeyOrChange, pushAt, memoize, fillWith, isDate, isEmpty, isStringADate, formatDate, dateFormatter, YYYY_MM_DD_hh_mm_ss_ToUtcDate, dateToObj, diffInDaysYYYY_MM_DD, subtractDays, addDays, previousDayOfWeek, getSameDateOrPreviousFridayForWeekends, isDateMidnight, setDateToMidnight, replaceAll, cleanString, repeat, runEvery, loopIndexGenerator, retryWithSleep, processExit };

@@ -1,0 +1,1 @@
+genType d.ts.file
