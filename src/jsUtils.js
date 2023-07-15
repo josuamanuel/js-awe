@@ -58,6 +58,18 @@ class CustomError extends Error {
 //   return a +2
 // })(divide(8,0)) //?
 
+function createCustomErrorClass(errorName) {
+  const errorClass = class extends CustomError {
+    constructor(name, message, data) {
+      super(name, message, data);
+      this.name = errorName;
+    }
+  };
+
+  return errorClass;
+}
+
+
 class Enum {
 
   constructor(values, rules) {
@@ -1828,6 +1840,7 @@ export {
   varSubsDoubleBracket,
   queryObjToStr,
   CustomError,
+  createCustomErrorClass,
   urlCompose,
   urlDecompose,
   indexOfNthMatch,

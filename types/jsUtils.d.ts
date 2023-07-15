@@ -5,6 +5,7 @@ declare namespace jsUtils {
   export { varSubsDoubleBracket };
   export { queryObjToStr };
   export { CustomError };
+  export { createCustomErrorClass }
   export { urlCompose };
   export { urlDecompose };
   export { indexOfNthMatch };
@@ -70,6 +71,22 @@ export class CustomError extends Error {
     status: number;
   };
 }
+export function createCustomErrorClass(errorName: string): {
+  new (name?: string, message?: string, data?: { status: number}): {
+      name: string;
+      data: {
+          status: number;
+      };
+      map(func: Function): any;
+      chain(func: Function): any;
+      message: string;
+      stack?: string;
+  };
+  of: typeof CustomError;
+  captureStackTrace(targetObject: object, constructorOpt?: Function): void;
+  prepareStackTrace?: (err: Error, stackTraces: NodeJS.CallSite[]) => any;
+  stackTraceLimit: number;
+};
 export function urlCompose(gatewayUrl: any, serviceName: any, servicePath: any): {
   gatewayUrl: any;
   serviceName: any;
