@@ -29,13 +29,13 @@
   "main": "src/index.js",
   "types": "types/index.d.ts",
   "scripts": {
-    "test": "npm run testUT",
-    "testUT": "export CONFIG_ENV=Testing && export LOG_LEVEL=SILENT && mocha ./test/**/*.js",
+    "test": "export CONFIG_ENV=Testing && export LOG_LEVEL=SILENT && mocha ./test/**/*.js",
     "buildWeb": "rollup -c && ./awkChangenNodePerf.sh",
     "buildLib": "tsc -p tsconfig.json && tsc -p tsconfig-cjs.json && ./fixup",
     "buildTypes": "tsc -p tsconfig-types.json",
     "copyMapsAndTypes": "rsync -av --include '*/' --include '*.d.ts.map' --exclude '*' ./genTypes/ ./types/ && rsync -av --include '*/' --include '*.d.ts' --exclude '*' --ignore-existing ./genTypes/ ./types/",
-    "build": "npm run buildWeb && npm run buildLib && npm run buildTypes && npm run copyMapsAndTypes"
+    "genAndCopyTypes": "npm run buildTypes && copyMapsAndTypes",
+    "build": "npm test && npm run buildWeb && npm run buildLib && npm run genAndCopyTypes"
   },
   "license": "MIT",
   "devDependencies": {

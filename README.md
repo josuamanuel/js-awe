@@ -312,15 +312,24 @@ Most of the functions has TS types. But more documentation will be needed. So if
 
 please PULL REQUEST!!! with your changes.
 
+## build
+
+npm run build
+
+* Run the test. If it fails cancel the build.
+* This will build for nodeJs in ./dist with support for Module Es in mjs folder and commonjs in cjs.
+* Build for web in dist/js-awe.min.js
+* generate types and copy them to genTypes folder. see more details below
+
 ## Generating types
 
 The library offer typescript types in ./types/ for the consumer. Currently only the main functions are typed in detail.
 
-To generate types:
+To generate automatically a basic type definition (mainly all with generic any type) you can execute:
 
-tsc -p tsconfig-types.json
+npm run genAndCopyTypes
 
-This will output types in ./genTypes then we will need to copy the new type definitions into ./types/ . This is to keep the documentation that was already manually generated.
+This will output types in ./genTypes then it will copy the d.ts.map to ./types/ and d.ts files if they don't exist in ./types/. It is recommended to improve the automatic generation of types and to document with JsDoc.
 
 ## publishing lib to npm
 
