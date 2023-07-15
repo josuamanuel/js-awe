@@ -35,7 +35,7 @@
     "buildLib": "tsc -p tsconfig.json && tsc -p tsconfig-cjs.json && ./fixup",
     "buildTypes": "tsc -p tsconfig-types.json",
     "copyMapsAndTypes": "rsync -av --include '*/' --include '*.d.ts.map' --exclude '*' ./genTypes/ ./types/ && rsync -av --include '*/' --include '*.d.ts' --exclude '*' --ignore-existing ./genTypes/ ./types/",
-    "build": "npm run buildWeb && buildLib && buildTypes && copyMapsAndTypes"
+    "build": "npm run buildWeb && npm run buildLib && npm run buildTypes && copyMapsAndTypes"
   },
   "license": "MIT",
   "devDependencies": {
