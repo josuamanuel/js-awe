@@ -60,14 +60,14 @@ Then copy it in your project and work with it in your html:
 ```javascript
 const { plan } = require("js-awe")
 
-const result = plan().build([
+const myCalc = plan().build([
   val1 => Promise.resolve(val1 * 2),                          // fun1: 3*2 = 6
   [val2 => val2 + 1, val3 => Promise.resolve(val3 + 3)],      // fun2A: 6 + 1 = 7; fun3: 7 + 3 = 10  
   [val2 => Promise.resolve(val2 - 1), val4 => val4 + 2],      // fun2B: 6 - 1 = 5; fun4: 5 + 2 = 7
   ([val4, val5]) => val4 + val5                               // fun5: 10 + 7 = 17; Promise.resolve(17)
-])(3)
+])
 
-result.then(result => console.log(result)) //=> 17
+myCalc(3).then(result => console.log(result)) //=> 17
 ```
 
 ***Simple declarative way to specify running functions sequencially or concurrently***
@@ -80,25 +80,40 @@ fun1 --|                 |-> fun5
 
 ***No need to handle errors in all functions.***
 
-* Returning error or Promise.reject in a function will skip the rest of execution automatically.
+* Returning error or Promise.reject in a function will skip the rest of execution automatically. No need to throw exceptions.
 * Only add error handling when we want expressely to recover from the error at that point.
 
-```javacsript
-const {plan} = require('js-awe')
+```javascript
+const { plan } = require('js-awe')
 // import { plan } from 'js-awe'
 
 const result = plan().build([
   (val1, val2) => 
     val2 !==0
       ? Promise.resolve(val1 / val2)
-      : Promise.reject('Zero division'), // same with new Error('Zero division')
-  val3 => val3 + 1,  // This and subsequent functions are skiiped
-])(3, 0)
+      : Promise.reject(new Error('Zero division')),
+  val3 => {
+    const result = Math.sqrt(val3 - 5)
+    return Number.isNaN(result)
+      ? new Error('Root of negative')
+      : result
+  } 
+])
 
-result
-  .then(result => console.log(result))
+const handlingErrors = e => {
+  if(e.message === 'Zero division') console.log('ooops divison by zero')
+  if(e.message === 'Root of negative') console.log('ooops root of a negative value')
+  if(e.message !== 'Zero division' && e.message !== 'Root of negative') console.log(e)
+}
+
+result(3, 0)
+  .then(result => console.log(`result: ${result}`))
   // Error handling managed in one place
-  .catch(e => console.log('ooops divison by zero'))
+  .catch(handlingErrors)
+
+result(4,2)
+  .then(result => console.log(`result: ${result}`))
+  .catch(handlingErrors)
 ```
 
 ***The purpose:***
