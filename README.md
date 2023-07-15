@@ -62,7 +62,7 @@ const { plan } = require("js-awe")
 
 const result = plan().build([
   val1 => Promise.resolve(val1 * 2),                          // fun1: 3*2 = 6
-  [val2 => Promise.resolve(val2 + 1), val3 => val3 + 3],      // fun2A: 6 + 1 = 7; fun3: 7 + 3 = 10  
+  [val2 => val2 + 1, val3 => Promise.resolve(val3 + 3)],      // fun2A: 6 + 1 = 7; fun3: 7 + 3 = 10  
   [val2 => Promise.resolve(val2 - 1), val4 => val4 + 2],      // fun2B: 6 - 1 = 5; fun4: 5 + 2 = 7
   ([val4, val5]) => val4 + val5                               // fun5: 10 + 7 = 17; Promise.resolve(17)
 ])(3)
@@ -78,7 +78,31 @@ fun1 --|                 |-> fun5
        |-> fun2B -> fun4-|
 ```
 
+***No need to handle errors in all functions.***
+
+* Returning error or Promise.reject in a function will skip the rest of execution automatically.
+* Only add error handling when we want expressely to recover from the error at that point.
+
+```javacsript
+const {plan} = require('js-awe')
+// import { plan } from 'js-awe'
+
+const result = plan().build([
+  (val1, val2) => 
+    val2 !==0
+      ? Promise.resolve(val1 / val2)
+      : Promise.reject('Zero division'), // same with new Error('Zero division')
+  val3 => val3 + 1,  // This and subsequent functions are skiiped
+])(3, 0)
+
+result
+  .then(result => console.log(result))
+  // Error handling managed in one place
+  .catch(e => console.log('ooops divison by zero'))
+```
+
 ***The purpose:***
+
 Async await has done a lot to improve the readability of code when compared with callbacks style. But sometimes it is not a good construct, especially if you want to use it in a functional style!!!
 
 One problem I see, is the spread of async await around the source code wherever it is handy. This casual handling of await usually makes code non performant.
