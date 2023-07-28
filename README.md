@@ -55,16 +55,24 @@ Then copy it in your project and work with it in your html:
 
 ## New functional async style. Avoid await contamination
 
+* Pipe functions and forget if a function returns a promise or a real value. Next function always receives the real value.
+* Automatic control of error. Any return of type "Error" or "Promise.reject" will stop the execution of the pipe and return the error. There is no need to circuit break each function.
+* Define sequencial or concurrent execution through the use of array nesting. Pure javascript, no artifical syntax.
+
 ***The libary handles the mixing of sync and async functions seamlessly***
 
 ```javascript
 const { plan } = require("js-awe")
 
 const myCalc = plan().build([
-  val1 => Promise.resolve(val1 * 2),                          // fun1: 3*2 = 6
-  [val2 => val2 + 1, val3 => Promise.resolve(val3 + 3)],      // fun2A: 6 + 1 = 7; fun3: 7 + 3 = 10  
-  [val2 => Promise.resolve(val2 - 1), val4 => val4 + 2],      // fun2B: 6 - 1 = 5; fun4: 5 + 2 = 7
-  ([val4, val5]) => val4 + val5                               // fun5: 10 + 7 = 17; Promise.resolve(17)
+  // fun1: 3*2 = 6
+  val1 => Promise.resolve(val1 * 2),                      
+  // fun2A: 6 + 1 = 7; fun3: 7 + 3 = 10
+  [val2 => val2 + 1, val3 => Promise.resolve(val3 + 3)],
+  // fun2B: 6 - 1 = 5; fun4: 5 + 2 = 7
+  [val2 => Promise.resolve(val2 - 1), val4 => val4 + 2],
+  // fun5: 10 + 7 = 17; Promise.resolve(17)
+  ([val4, val5]) => val4 + val5                   
 ])
 
 myCalc(3).then(result => console.log(result)) //=> 17
@@ -194,8 +202,8 @@ getAccounts-|                                      |-> format
 
 The flow of data:
 
-- Return values from functions are passed to the next function to run, in a pipe-style way.
-- When the return value is a promise, the planner will wait for its resolution before calling the next function.
+* Return values from functions are passed to the next function to run, in a pipe-style way.
+* When the return value is a promise, the planner will wait for its resolution before calling the next function.
 
 You can see the whole example here:
 
@@ -267,10 +275,10 @@ The Plan utility is recommended when we have a complex tree, and you want to man
 
 When it is not recommended:
 
-- Simple async flows. Introducing another tool to learn may not be worth it.
-- You have the skills to do it better yourself: more flexible, readible and performance.
-- You are tired of new libraries, frameworks and abstractions. I get it!
-- You are happy with your current approach.
+* Simple async flows. Introducing another tool to learn may not be worth it.
+* You have the skills to do it better yourself: more flexible, readible and performance.
+* You are tired of new libraries, frameworks and abstractions. I get it!
+* You are happy with your current approach.
 
 ## Chrono
 

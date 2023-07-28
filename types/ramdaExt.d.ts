@@ -116,7 +116,14 @@ declare function innerRightJoinWith(
 
 export { innerRightJoinWith }
 
+/**
+* Add input rows which hash is not present in the target
+*/
 export const unionWithHashKeys: any;
+/**
+* Update target with input for rows with same hash
+* Add to target the new rows from input with new hash.
+*/
 export const updateWithHashKeys: any;
 export const between: any;
 export const matchByPropId: any;
