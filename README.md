@@ -276,6 +276,7 @@ The Plan utility is recommended when we have a complex tree, and you want to man
 When it is not recommended:
 
 * Simple async flows. Introducing another tool to learn may not be worth it.
+* Critical applications. It is not a contrasted solution with complex products using it in production.
 * You have the skills to do it better yourself: more flexible, readible and performance.
 * You are tired of new libraries, frameworks and abstractions. I get it!
 * You are happy with your current approach.
