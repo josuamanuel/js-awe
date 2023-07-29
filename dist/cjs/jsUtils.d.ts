@@ -207,7 +207,7 @@ export function addDays(daysToAdd: any, date: any): Date;
 export function previousDayOfWeek(dayOfWeek: any, date: any): Date;
 export function getSameDateOrPreviousFridayForWeekends(date: any): Date;
 export function isDateMidnight(date: any): boolean;
-export function setDateToMidnight(date: any): Date;
+export function setDateToMidnight(date: any): any;
 export function replaceAll(str: any, ...fromTo: any[]): any;
 export function cleanString(str: any): any;
 export function repeat(numberOfTimes: any): {

@@ -857,10 +857,16 @@ function isDateMidnight(date) {
     return date?.toISOString?.()?.substring(10, 24) === 'T00:00:00.000Z';
 }
 function setDateToMidnight(date) {
-    let dateToProcess = toDate(date);
-    if (isDate(dateToProcess) === false)
+    if (typeof date === 'string')
+        return new Date(date.substring(0, 10));
+    let dateToProcess = date === undefined
+        ? new Date()
+        : isDate(date)
+            ? date
+            : new Date(date);
+    if (isNaN(+dateToProcess))
         return dateToProcess;
-    if (isDateMidnight(dateToProcess) === true)
+    if (isDateMidnight(dateToProcess))
         return dateToProcess;
     return new Date(dateToProcess.toISOString().substring(0, 10));
 }
