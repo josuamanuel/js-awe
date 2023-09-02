@@ -180,6 +180,7 @@ You can see below a more realistic example of its use. This could be part of an 
 
 ```javascript
 import { plan } from 'js-awe'
+// const { plan } = require('js-awe')
 
 const getCustomerBalances = plan().build([
   fetchAccounts,
@@ -209,6 +210,7 @@ You can see the whole example here:
 
 ```javascript
 import { plan } from 'js-awe'
+// const { plan } = require('js-awe')
 
 const getCustomerBalances = plan().build([
   fetchAccounts,
