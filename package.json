@@ -1,6 +1,6 @@
 {
   "name": "js-awe",
-  "version": "1.0.46",
+  "version": "1.0.47",
   "homepage": "https://github.com/josuamanuel/js-awe",
   "author": "josuamanuel@hotmail.com",
   "repository": "github:josuamanuel/js-awe",
@@ -30,22 +30,22 @@
   "types": "types/index.d.ts",
   "scripts": {
     "test": "export CONFIG_ENV=Testing && export LOG_LEVEL=SILENT && mocha ./test/**/*.js",
-    "buildWeb": "rollup -c && ./awkChangenNodePerf.sh",
     "buildLib": "tsc -p tsconfig.json && tsc -p tsconfig-cjs.json && ./fixup",
     "buildTypes": "tsc -p tsconfig-types.json",
     "copyMapsAndTypes": "rsync -av --include '*/' --include '*.d.ts.map' --exclude '*' ./genTypes/ ./types/ && rsync -av --include '*/' --include '*.d.ts' --exclude '*' --ignore-existing ./genTypes/ ./types/",
     "genAndCopyTypes": "npm run buildTypes && npm run copyMapsAndTypes",
-    "build": "npm test && npm run buildWeb && npm run buildLib && npm run genAndCopyTypes"
+    "buildWeb": "rollup -c && ./awkChangenNodePerf.sh && rollup -c rollup.config.min.js",
+    "build": "npm test && npm run genAndCopyTypes && npm run buildLib && npm run buildWeb"
   },
   "license": "MIT",
   "devDependencies": {
     "@rollup/plugin-commonjs": "^25.0.4",
-    "@rollup/plugin-node-resolve": "^15.1.0",
+    "@rollup/plugin-node-resolve": "^15.2.1",
     "@rollup/plugin-terser": "^0.4.3",
     "@rollup/plugin-typescript": "^11.1.2",
     "@types/node": "^20.4.1",
     "mocha": "^10.2.0",
-    "rollup": "^3.26.2",
+    "rollup": "^3.28.1",
     "rollup-plugin-node-polyfills": "^0.2.1"
   },
   "dependencies": {

@@ -9,10 +9,9 @@ export default (async () => ({
 		resolve(),
 		commonjs(),
     nodePolyfills(),
-		//(await import('@rollup/plugin-terser')).default()
 	],
 	output: {
-		file: './dist/js-awe.min.js',
+		file: './dist/js-awe.js',
 		format: 'esm'
 	},
   context: "this"
