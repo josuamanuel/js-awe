@@ -1,6 +1,6 @@
 {
   "name": "js-awe",
-  "version": "1.0.44",
+  "version": "1.0.45",
   "homepage": "https://github.com/josuamanuel/js-awe",
   "author": "josuamanuel@hotmail.com",
   "repository": "github:josuamanuel/js-awe",
@@ -34,27 +34,27 @@
     "buildLib": "tsc -p tsconfig.json && tsc -p tsconfig-cjs.json && ./fixup",
     "buildTypes": "tsc -p tsconfig-types.json",
     "copyMapsAndTypes": "rsync -av --include '*/' --include '*.d.ts.map' --exclude '*' ./genTypes/ ./types/ && rsync -av --include '*/' --include '*.d.ts' --exclude '*' --ignore-existing ./genTypes/ ./types/",
-    "genAndCopyTypes": "npm run buildTypes && copyMapsAndTypes",
+    "genAndCopyTypes": "npm run buildTypes && npm run copyMapsAndTypes",
     "build": "npm test && npm run buildWeb && npm run buildLib && npm run genAndCopyTypes"
   },
   "license": "MIT",
   "devDependencies": {
+    "@rollup/plugin-commonjs": "^25.0.4",
     "@rollup/plugin-node-resolve": "^15.1.0",
     "@rollup/plugin-terser": "^0.4.3",
     "@rollup/plugin-typescript": "^11.1.2",
     "@types/node": "^20.4.1",
+    "mocha": "^10.2.0",
     "rollup": "^3.26.2",
     "rollup-plugin-node-polyfills": "^0.2.1"
   },
   "dependencies": {
-    "@rollup/plugin-commonjs": "^25.0.2",
     "fluture": "^14.0.0",
     "jsonpath-plus": "^7.2.0",
     "just-clone": "^6.1.1",
     "just-compare": "^2.2.2",
     "just-deep-map-values": "^1.1.1",
     "loglevel": "^1.8.0",
-    "mocha": "^10.2.0",
     "ramda": "^0.28.0"
   }
 }
