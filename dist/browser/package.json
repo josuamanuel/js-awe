@@ -1,14 +1,15 @@
 {
   "name": "@js-awe/min",
   "version": "1.0.48",
-  "homepage": "https://github.com/josuamanuel/js-awe",
-  "author": "josuamanuel@hotmail.com",
-  "repository": "github:josuamanuel/js-awe",
-  "bugs": {
-    "url": "https://github.com/josuamanuel/js-awe",
-    "email": "josuamanuel@hotmail.com"
+  "description": "Minified version for the browser",
+  "browser": "./js-awe.min.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "description": "Awesome js utils including - plan: An Asynchronous control flow with a functional taste - Chrono: record and visualize timelines in the console",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/josuamanuel/js-awe.git"
+  },
   "keywords": [
     "async",
     "control flow",
@@ -19,8 +20,11 @@
     "utils",
     "console.table"
   ],
-  "browser": "./dist/browser/js-awe.min.js",
+  "author": "josuamanuel@hotmail.com",
   "license": "MIT",
-  "dependencies": {
-  }
+  "bugs": {
+    "url": "https://github.com/josuamanuel/js-awe/issues",
+    "email": "josuamanuel@hotmail.com"
+  },
+  "homepage": "https://github.com/josuamanuel/js-awe#readme"
 }
