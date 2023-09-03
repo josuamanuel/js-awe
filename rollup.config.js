@@ -11,7 +11,7 @@ export default (async () => ({
     nodePolyfills(),
 	],
 	output: {
-		file: './dist/js-awe.js',
+		file: './dist/browser/js-awe.js',
 		format: 'esm'
 	},
   context: "this"

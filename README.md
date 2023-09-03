@@ -34,7 +34,7 @@ Includes ```consoleTable([{a:1,b2},{a:2,b:3}])``` an equivalent implementatation
 
 Grab the minified version at:
 
-<https://raw.githubusercontent.com/josuamanuel/js-awe/main/dist/js-awe.min.js>
+<https://raw.githubusercontent.com/josuamanuel/js-awe/main/dist/browser/js-awe.min.js>
 
 Then copy it in your project and work with it in your html:
 
@@ -344,7 +344,7 @@ npm run build
 
 * Run the test. If it fails cancel the build.
 * This will build for nodeJs in ./dist with support for Module Es in mjs folder and commonjs in cjs.
-* Build for web in dist/js-awe.min.js
+* Build for web in dist/browser/js-awe.min.js
 * generate types and copy them to genTypes folder. see more details below
 
 ## Generating types
