@@ -1,6 +1,6 @@
 {
   "name": "js-awe",
-  "version": "1.0.50",
+  "version": "1.0.51",
   "homepage": "https://github.com/josuamanuel/js-awe",
   "author": "josuamanuel@hotmail.com",
   "repository": "github:josuamanuel/js-awe",
@@ -26,6 +26,7 @@
       "require": "./dist/cjs/index.js"
     }
   },
+  "browser": "dist/browser/js-awe.min.js",
   "main": "src/index.js",
   "types": "types/index.d.ts",
   "scripts": {
