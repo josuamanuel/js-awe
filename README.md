@@ -53,6 +53,23 @@ Then copy it in your project and work with it in your html:
 ...
 ```
 
+or use CDN
+
+```html
+...
+<body>
+  <script type="module">
+    import { firstCapital } from 'https://cdn.jsdelivr.net/gh/josuamanuel/js-awe/dist/browser/js-awe.min.js'
+
+    const newDiv = document.createElement('div');
+    newDiv.innerText = firstCapital('library is loaded correctly...');
+    document.body.appendChild(newDiv);
+
+  </script>
+</body>
+...
+```
+
 ## New functional async style. Avoid await contamination
 
 * Pipe functions and forget if a function returns a promise or a real value. Next function always receives the real value.
