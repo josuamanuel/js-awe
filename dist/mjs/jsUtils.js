@@ -491,8 +491,9 @@ function project(paths, json, removeWithDelete = true) {
 //     },
 //   ]
 //   const pathToSelect = ['+$', '-$[*].age', '-$[*].twoLevels.a', '-$[*].posts[:-1]'] //, '-$[*].age'];
-//   project(pathToSelect, users)
-//   project(['+$[*].posts[0,2]', '-$[*].posts[1]'], users)
+//   project(pathToSelect, users) //?
+//   project(['+$[*].posts[0,2]', '-$[*].posts[1]'], users) //?
+//   project(['+$.a.b','-$.a.b.d'], {a:{b:{c:3,d:5,e:9}}}) //?
 //   project(['+$'], 2) //?
 // }
 function copyPropsWithValueUsingRules(objDest, copyRules, shouldUpdateOnlyEmptyFields = false) {

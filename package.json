@@ -1,6 +1,6 @@
 {
   "name": "js-awe",
-  "version": "1.0.51",
+  "version": "1.0.52",
   "homepage": "https://github.com/josuamanuel/js-awe",
   "author": "josuamanuel@hotmail.com",
   "repository": "github:josuamanuel/js-awe",
@@ -35,7 +35,7 @@
     "buildTypes": "tsc -p tsconfig-types.json",
     "copyMapsAndTypes": "rsync -av --include '*/' --include '*.d.ts.map' --exclude '*' ./genTypes/ ./types/ && rsync -av --include '*/' --include '*.d.ts' --exclude '*' --ignore-existing ./genTypes/ ./types/",
     "genAndCopyTypes": "npm run buildTypes && npm run copyMapsAndTypes",
-    "buildWeb": "rollup -c && ./awkChangenNodePerf.sh && rollup -c rollup.config.min.js",
+    "buildWeb": "rollup -c && ./awkChangenNodePerf.sh && rollup -c rollup.config.min.js && rollup -c rollup.config.dts.js",
     "build": "npm test && npm run genAndCopyTypes && npm run buildLib && npm run buildWeb"
   },
   "license": "MIT",
@@ -47,6 +47,7 @@
     "@types/node": "^20.4.1",
     "mocha": "^10.2.0",
     "rollup": "^3.28.1",
+    "rollup-plugin-dts": "^6.0.1",
     "rollup-plugin-node-polyfills": "^0.2.1"
   },
   "dependencies": {

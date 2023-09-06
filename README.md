@@ -32,7 +32,7 @@ Includes ```consoleTable([{a:1,b2},{a:2,b:3}])``` an equivalent implementatation
 
 **Web:**
 
-Grab the minified version at:
+**Option 1:** Grab the minified version at:
 
 <https://raw.githubusercontent.com/josuamanuel/js-awe/main/dist/browser/js-awe.min.js>
 
@@ -53,7 +53,11 @@ Then copy it in your project and work with it in your html:
 ...
 ```
 
-or use CDN
+If you want to have types and IntelliSense support in your javascript files, grab file js-awe.min.dts and copy to the same folder as you copied js-awe-min.js:
+
+<https://raw.githubusercontent.com/josuamanuel/js-awe/main/dist/browser/js-awe.min.d.ts>
+
+**Option 2:** CDN
 
 ```html
 ...
