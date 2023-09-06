@@ -204,6 +204,9 @@ export function traverseVertically(functionToRun: (verticalSlice: object, runInd
  * 
  * @param paths Array with the queries for the projection. First char must be + to include or - to remove
  * @param json Subject object to project.
+ * @example
+ * // returns {a:{b:{c:3,e:9}}}
+ * project(['+$.a.b','-$.a.b.d'], {a:{b:{c:3,d:5,e:9}}});
  * @returns any
  */
 export function project(paths:string[], json:any):any
