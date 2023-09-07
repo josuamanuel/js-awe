@@ -153,7 +153,7 @@ result(4,2)
 
 Async await has done a lot to improve the readability of code when compared with callbacks style. But sometimes it is not a good construct, especially if you want to use it in a functional style!!!
 
-One problem I see, is the spread of async await around the source code wherever it is handy. This casual handling of await usually makes code non performant.
+plan tries to solve the problem of too many async await all spreads in a messy way around the code wherever it is handy. This casual handling of await usually makes code non performant and it makes it difficult to reason about.
 
 Every-time we use await, an async branch will be created. The result will be an execution flow with the shape of a tree, with some chain functions running in sequence and others running concurrently.
 
