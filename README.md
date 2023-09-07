@@ -76,7 +76,7 @@ If you want to have types and IntelliSense support in your javascript files, gra
 
 ## New functional async style. Avoid await contamination
 
-* Pipe functions and forget if a function returns a promise or a real value. Next function always receives the real value.
+* using **plan**, it pipes functions and forget if a function returns a promise or a real value. Next function always receives the real value.
 * Automatic control of error. Any return of type "Error" or "Promise.reject" will stop the execution of the pipe and return the error. There is no need to circuit break each function.
 * Define sequencial or concurrent execution through the use of array nesting. Pure javascript, no artifical syntax.
 
@@ -85,21 +85,25 @@ If you want to have types and IntelliSense support in your javascript files, gra
 ```javascript
 const { plan } = require("js-awe")
 
+const fun1 = val1 => Promise.resolve(val1 * 2)    // fun1: 3*2 = 6
+const fun2A = val2 => val2 + 1                    // fun2A: 6 + 1 = 7
+const fun3 = val3 => Promise.resolve(val3 + 3)    // fun3: 7 + 3 = 10
+const fun2B = val2 => Promise.resolve(val2 - 1)   // fun2B: 6 - 1 = 5;
+const fun4 = val4 => val4 + 2                     // fun4: 5 + 2 = 7
+const fun5 = ([val4, val5]) => val4 + val5        // fun5: 10 + 7 = 17; Promise.resolve(17)
+
 const myCalc = plan().build([
-  // fun1: 3*2 = 6
-  val1 => Promise.resolve(val1 * 2),                      
-  // fun2A: 6 + 1 = 7; fun3: 7 + 3 = 10
-  [val2 => val2 + 1, val3 => Promise.resolve(val3 + 3)],
-  // fun2B: 6 - 1 = 5; fun4: 5 + 2 = 7
-  [val2 => Promise.resolve(val2 - 1), val4 => val4 + 2],
-  // fun5: 10 + 7 = 17; Promise.resolve(17)
-  ([val4, val5]) => val4 + val5                   
+  fun1,                      
+  [fun2A, fun3],
+  [fun2B, fun4],
+  fun5                  
 ])
+
 
 myCalc(3).then(result => console.log(result)) //=> 17
 ```
 
-***Simple declarative way to specify running functions sequencially or concurrently***
+***Simple declarative way to specify running functions sequencially or concurrently resulting in the below execution flow:***
 
 ```plainText
        |-> fun2A -> fun3-|
