@@ -155,11 +155,11 @@ Async await has done a lot to improve the readability of code when compared with
 
 **plan** tries to solve the problem of too many async await all spreads in a messy way around the code. It declares in just one point of your code the flow of execution, so you can work with pure functions that receives real values (no promises).
 
-How many times you have experienced the problem of expecting values and what you receive is a promise. How many times you solve this problem with an await making the code non performance as we end-up programming secuencially.
+How many times you have experienced the problem of expecting real values and what you receive is a promise. How many times you solve this problem with an await making the code non performant as we end-up programming secuencially.
 
 Every-time we use await, the execution flow split in two. If you spread await in different part of your code then it will create an execution flow in the shape of a tree. This means that you need to keep in your head and in sync a mental model for the data flow and a mental model of the execution flow. This makes the code difficult to reason about.
 
-“plan” tries to solve this problem by declaring this tree explicitly in one place and in a simple elegant way. It uses array nesting to define this tree. It does not use weird DSL. “plan” is an execution planner that pipe functions to run in sequence and functions to run concurrently. It handles for you the promise chaining and data passing **so you can write pure functions free of async await**.
+“plan” tries to solve this problem by declaring this tree explicitly in one place and in a simple elegant way. It uses array nesting to define this tree. It does not use weird DSL. “plan” is an execution planner that pipes functions to run in sequence and functions to run concurrently. It handles for you the promise chaining and data passing **so you can write pure functions free of async await**.
 
 The construct to run in sequence:
 
@@ -244,7 +244,7 @@ const getCustomerBalances = plan().build([
   format,
 ])
 
-console.log('result: ', await getCustomerBalances('0396d9b0'))
+getCustomerBalances('0396d9b0').then(result => console.log('result: ', result))
 
 function filterSavings(accounts) {
   return accounts.filter((account) => account.type === 'saving')
@@ -267,8 +267,8 @@ function format([savingBalances, loanBalances]) {
   return [...savingBalances, ...loanBalances]
 }
 
-// Data fetch services are mocked for local running.
-// In production they should be fetch APIs to real implementations.
+// Data fetch services below are mocked just for demonstration to run locally.
+// In production they should be fetch APIs of the real implementations that return promises.
 function fetchAccounts(customerId) {
   return Promise.resolve([
     { id: 1, type: 'saving' },
