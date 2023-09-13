@@ -99,7 +99,6 @@ const myCalc = plan().build([
   fun5                  
 ])
 
-
 myCalc(3).then(result => console.log(result)) //=> 17
 ```
 
@@ -214,7 +213,7 @@ const getCustomerBalances = plan().build([
   format,
 ])
 
-console.log('result: ', await getCustomerBalances('0396d9b0'))
+getCustomerBalances('0396d9b0').then(result => console.log('result: ', result))
 ```
 
 Execution:
