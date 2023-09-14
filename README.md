@@ -82,6 +82,16 @@ If you want to have types and IntelliSense support in your javascript files, gra
 
 ***The libary handles the mixing of sync and async functions seamlessly***
 
+***Simple declarative way to specify running functions sequencially or concurrently resulting in the below execution flow:***
+
+```plainText
+       |-> fun2A -> fun3-|
+fun1 --|                 |-> fun5
+       |-> fun2B -> fun4-|
+```
+
+
+
 ```javascript
 const { plan } = require("js-awe")
 
@@ -100,14 +110,6 @@ const myCalc = plan().build([
 ])
 
 myCalc(3).then(result => console.log(result)) //=> 17
-```
-
-***Simple declarative way to specify running functions sequencially or concurrently resulting in the below execution flow:***
-
-```plainText
-       |-> fun2A -> fun3-|
-fun1 --|                 |-> fun5
-       |-> fun2B -> fun4-|
 ```
 
 ***No need to handle errors in all functions.***
