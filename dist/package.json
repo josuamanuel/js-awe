@@ -1,0 +1,11 @@
+{
+  "name": "js-awe",
+  "version": "1.0.53",
+  "exports": {
+    ".": {
+      "import": "./mjs/index.js",
+      "require": "./cjs/index.js"
+    }
+  },
+  "types": "types/index.d.ts"
+}

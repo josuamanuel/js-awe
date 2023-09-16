@@ -6,7 +6,7 @@ export default [
     input: './types/index.d.ts',
     output: {
       file: './dist/browser/js-awe.min.d.ts',
-      format: 'es',
+      format: 'esm',
     },
     plugins: [
       dts(),

@@ -6,14 +6,14 @@ const ramdaExt_js_1 = require("./ramdaExt.js");
 const table_js_1 = require("./table/table.js");
 const text_js_1 = require("./table/components/text.js");
 const timeline_js_1 = require("./table/components/timeline.js");
-const node_perf_hooks_1 = require("node:perf_hooks");
+const perf_hooks_1 = require("perf_hooks");
 let myGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : typeof this !== 'undefined' ? this : {};
 // needed only for debuging
 //import { RE } from './ramdaExt.js';
 function Chrono() {
     let milisecondsNow;
-    if (node_perf_hooks_1.performance === null || node_perf_hooks_1.performance === void 0 ? void 0 : node_perf_hooks_1.performance.now)
-        milisecondsNow = () => node_perf_hooks_1.performance.now();
+    if (perf_hooks_1.performance === null || perf_hooks_1.performance === void 0 ? void 0 : perf_hooks_1.performance.now)
+        milisecondsNow = () => perf_hooks_1.performance.now();
     if (milisecondsNow === undefined)
         milisecondsNow = () => Date.now();
     let historyTimeIntervals = {};

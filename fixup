@@ -1,3 +1,25 @@
+jq '{
+  "name": .name,
+  "version": .version,
+  "exports": {
+    ".": {
+      "import": "./mjs/index.js",
+      "require": "./cjs/index.js"
+    }
+  },
+  "types": .types,
+}' ./package.json > ./dist/package.json && 
+
+cp ./README.md ./dist &&
+cp -r ./types ./dist &&
+cp -r ./examples ./dist &&
+rm -rf ./dist/examples/nodeImport/node_modules &&
+rm ./dist/examples/nodeImport/package.json &&
+rm ./dist/examples/nodeImport/package-lock.json &&
+rm -rf ./dist/examples/nodeRequire/node_modules &&
+rm ./dist/examples/nodeRequire/package.json &&
+rm ./dist/examples/nodeRequire/package-lock.json &&
+
 cat >./dist/cjs/package.json <<!EOF
 {
     "type": "commonjs"

@@ -1,1 +1,0 @@
-genType d.ts.file
