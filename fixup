@@ -1,6 +1,11 @@
 jq '{
   "name": .name,
   "version": .version,
+  "homepage": .homepage,
+  "repository": .repository,
+  "bugs": .bugs,
+  "description": .description,
+  "keywords": .keywords,
   "exports": {
     ".": {
       "import": "./mjs/index.js",
@@ -8,6 +13,7 @@ jq '{
     }
   },
   "types": .types,
+    "license": .license,
 }' ./package.json > ./dist/package.json && 
 
 cp ./README.md ./dist &&

@@ -1,11 +1,29 @@
 {
   "name": "js-awe",
-  "version": "1.0.53",
+  "version": "1.0.56",
+  "homepage": "https://github.com/josuamanuel/js-awe",
+  "repository": "github:josuamanuel/js-awe",
+  "bugs": {
+    "url": "https://github.com/josuamanuel/js-awe",
+    "email": "josuamanuel@hotmail.com"
+  },
+  "description": "Awesome js utils including - plan: An Asynchronous control flow with a functional taste - Chrono: record and visualize timelines in the console",
+  "keywords": [
+    "async",
+    "control flow",
+    "executor",
+    "planner",
+    "Chrono",
+    "timeline",
+    "utils",
+    "console.table"
+  ],
   "exports": {
     ".": {
       "import": "./mjs/index.js",
       "require": "./cjs/index.js"
     }
   },
-  "types": "types/index.d.ts"
+  "types": "types/index.d.ts",
+  "license": "MIT"
 }
