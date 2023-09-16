@@ -1,6 +1,6 @@
 {
   "name": "js-awe",
-  "version": "1.0.57",
+  "version": "1.0.58",
   "homepage": "https://github.com/josuamanuel/js-awe",
   "repository": "github:josuamanuel/js-awe",
   "bugs": {
@@ -18,6 +18,8 @@
     "utils",
     "console.table"
   ],
+  "type": "module",
+  "main": "./mjs/index.js",
   "exports": {
     ".": {
       "import": "./mjs/index.js",
