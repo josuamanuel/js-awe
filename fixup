@@ -13,7 +13,8 @@ jq '{
     }
   },
   "types": .types,
-    "license": .license,
+  "license": .license,
+  "dependencies": .dependencies
 }' ./package.json > ./dist/package.json && 
 
 cp ./README.md ./dist &&
