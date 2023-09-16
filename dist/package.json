@@ -1,6 +1,6 @@
 {
   "name": "js-awe",
-  "version": "1.0.56",
+  "version": "1.0.57",
   "homepage": "https://github.com/josuamanuel/js-awe",
   "repository": "github:josuamanuel/js-awe",
   "bugs": {
@@ -25,5 +25,14 @@
     }
   },
   "types": "types/index.d.ts",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "fluture": "^14.0.0",
+    "jsonpath-plus": "^7.2.0",
+    "just-clone": "^6.1.1",
+    "just-compare": "^2.2.2",
+    "just-deep-map-values": "^1.1.1",
+    "loglevel": "^1.8.0",
+    "ramda": "^0.28.0"
+  }
 }
