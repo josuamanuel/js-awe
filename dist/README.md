@@ -1,88 +1,19 @@
 # js-awe
 
-javascript awesome utilities and extensions. Taking javascript to the next level.
+Awesome javascript utilities and extensions. Taking javascript to the next level. Including:
 
-## installation
-
-**NodeJS:**
+* plan: New functional async style. Avoid await contamination
+* [Chrono](#chrono): Chrono time events and console.log using a visual charArt timeline.
 
 ```Bash
 npm install js-awe
 ```
 
-supporting import (ES Modules) and require (commonjs)
+Compatible with bun, web, CDN, import, require. To full guide on installation [Go to Section](#installation)
 
-```javascript
-import { plan } from 'js-awe'
-```
+## plan
 
-or
-
-```javascript
-const { plan } = require('js-awe')
-```
-
-**100% compatible with bun:**
-
-```Bash
-bun install js-awe
-```
-
-Includes ```consoleTable([{a:1,b2},{a:2,b:3}])``` an equivalent implementatation of node console.table() producing similar visualization.
-
-**Web:**
-
-**Option 1:** Grab the minified version at:
-
-<https://raw.githubusercontent.com/josuamanuel/js-awe/main/dist/browser/js-awe.min.js>
-
-Then copy it in your project and work with it in your html:
-
-```html
-...
-<body>
-  <script type="module">
-    import { firstCapital } from './js-awe.min.js';
-
-    const newDiv = document.createElement('div');
-    newDiv.innerText = firstCapital('library is loaded correctly...');
-    document.body.appendChild(newDiv);
-
-  </script>
-</body>
-...
-```
-
-If you want to have types and IntelliSense support in your javascript files, grab file js-awe.min.dts and copy to the same folder as you copied js-awe-min.js:
-
-<https://raw.githubusercontent.com/josuamanuel/js-awe/main/dist/browser/js-awe.min.d.ts>
-
-N.B.: vscode does not support IntelliSense inside html script tag, at least at current 1.82.1. So if you want to work with type support you will need to externalize your javascript code in an external file and add it to your html with ```<script type="module" src="filename.js"></script>```
-
-**Option 2:** CDN
-
-```html
-...
-<body>
-  <script type="module">
-    import { firstCapital } from 'https://cdn.jsdelivr.net/gh/josuamanuel/js-awe/dist/browser/js-awe.min.js'
-
-    const newDiv = document.createElement('div');
-    newDiv.innerText = firstCapital('library is loaded correctly...');
-    document.body.appendChild(newDiv);
-
-  </script>
-</body>
-...
-```
-
-## New functional async style. Avoid await contamination
-
-* using **plan**, it pipes functions and forget if a function returns a promise or a real value. Next function always receives the real value.
-* Automatic control of error. Any return of type "Error" or "Promise.reject" will stop the execution of the pipe and return the error. There is no need to circuit break each function.
-* Define sequencial or concurrent execution through the use of array nesting. Pure javascript, no artifical syntax.
-
-***The libary handles the mixing of sync and async functions seamlessly***
+### Example
 
 ***Simple declarative way to specify running functions sequencially or concurrently resulting in the below execution flow:***
 
@@ -91,8 +22,6 @@ N.B.: vscode does not support IntelliSense inside html script tag, at least at c
 fun1 --|                 |-> fun5
        |-> fun2B -> fun4-|
 ```
-
-
 
 ```javascript
 const { plan } = require("js-awe")
@@ -113,6 +42,14 @@ const myCalc = plan().build([
 
 myCalc(3).then(result => console.log(result)) //=> 17
 ```
+
+### New functional async style. Avoid await contamination
+
+* using **plan**, it pipes functions and forget if a function returns a promise or a real value. Next function always receives the real value.
+* Automatic control of error. Any return of type "Error" or "Promise.reject" will stop the execution of the pipe and return the error. There is no need to circuit break each function.
+* Define sequencial or concurrent execution through the use of array nesting. Pure javascript, no artifical syntax.
+
+***The libary handles the mixing of sync and async functions seamlessly***
 
 ***No need to handle errors in all functions.***
 
@@ -311,7 +248,7 @@ When it is not recommended:
 * You are tired of new libraries, frameworks and abstractions. I get it!
 * You are happy with your current approach.
 
-## Chrono
+## <a id="chrono"></a>Chrono
 
 Chrono time events and visualize them.
 
@@ -390,3 +327,77 @@ This will output types in ./genTypes then it will copy the d.ts.map to ./types/ 
 Change the version of the library in package.json version field. npm forces that each version published to have a unique version value.
 
 npm publish
+
+## <a id="installation"></a>Installation
+
+**NodeJS:**
+
+```Bash
+npm install js-awe
+```
+
+supporting import (ES Modules) and require (commonjs)
+
+```javascript
+import { plan } from 'js-awe'
+```
+
+or
+
+```javascript
+const { plan } = require('js-awe')
+```
+
+**100% compatible with bun:**
+
+```Bash
+bun install js-awe
+```
+
+Includes ```consoleTable([{a:1,b2},{a:2,b:3}])``` an equivalent implementatation of node console.table() producing similar visualization.
+
+**Web:**
+
+**Option 1:** Grab the minified version at:
+
+<https://raw.githubusercontent.com/josuamanuel/js-awe/main/dist/browser/js-awe.min.js>
+
+Then copy it in your project and work with it in your html:
+
+```html
+...
+<body>
+  <script type="module">
+    import { firstCapital } from './js-awe.min.js';
+
+    const newDiv = document.createElement('div');
+    newDiv.innerText = firstCapital('library is loaded correctly...');
+    document.body.appendChild(newDiv);
+
+  </script>
+</body>
+...
+```
+
+If you want to have types and IntelliSense support in your javascript files, grab file js-awe.min.dts and copy to the same folder as you copied js-awe-min.js:
+
+<https://raw.githubusercontent.com/josuamanuel/js-awe/main/dist/browser/js-awe.min.d.ts>
+
+N.B.: vscode does not support IntelliSense inside html script tag, at least at current 1.82.1. So if you want to work with type support you will need to externalize your javascript code in an external file and add it to your html with ```<script type="module" src="filename.js"></script>```
+
+**Option 2:** CDN
+
+```html
+...
+<body>
+  <script type="module">
+    import { firstCapital } from 'https://cdn.jsdelivr.net/gh/josuamanuel/js-awe/dist/browser/js-awe.min.js'
+
+    const newDiv = document.createElement('div');
+    newDiv.innerText = firstCapital('library is loaded correctly...');
+    document.body.appendChild(newDiv);
+
+  </script>
+</body>
+...
+```
