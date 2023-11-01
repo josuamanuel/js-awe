@@ -1,23 +1,23 @@
-jq '{
-  "name": .name,
-  "version": .version,
-  "homepage": .homepage,
-  "repository": .repository,
-  "bugs": .bugs,
-  "description": .description,
-  "keywords": .keywords,
-  "type": "module",
-  "main": "./mjs/index.js",
-  "exports": {
-    ".": {
-      "import": "./mjs/index.js",
-      "require": "./cjs/index.js"
-    }
-  },
-  "types": .types,
-  "license": .license,
-  "dependencies": .dependencies
-}' ./package.json > ./dist/package.json && 
+# jq '{
+#  "name": .name,
+#  "version": .version,
+#  "homepage": .homepage,
+#  "repository": .repository,
+#  "bugs": .bugs,
+#  "description": .description,
+#  "keywords": .keywords,
+#  "type": "module",
+#  "main": "./mjs/index.js",
+#  "exports": {
+#    ".": {
+#      "import": "./mjs/index.js",
+#      "require": "./cjs/index.js"
+#    }
+#  },
+#  "types": .types,
+#  "license": .license,
+#  "dependencies": .dependencies
+#}' ./package.json > ./dist/package.json && 
 
 cp ./README.md ./dist &&
 cp -r ./types ./dist &&
