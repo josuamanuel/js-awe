@@ -115,7 +115,7 @@ function sanitize(obj, sanitizers = ['ibmApis'], noSanitzedUptoLogLevel) {
             return false;
     }
     function customizer(leafValue, keyOfLeaf) {
-        if (leafValue === null || leafValue === undefined || leafValue === {})
+        if (leafValue === null || leafValue === undefined || Object.keys(leafValue).length === 0)
             return leafValue;
         for (let { field, value, type, sanitizer, replacer } of allGroupsConsolidated) {
             if (typeMet(leafValue, type) === false)
