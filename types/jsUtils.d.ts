@@ -61,7 +61,45 @@ declare namespace jsUtils {
 }
 export function logWithPrefix(title: any, displayFunc: any): (message: any) => any;
 export function firstCapital(str: any): any;
-export function varSubsDoubleBracket(strToResolveVars: any, state: any, mode: any): any;
+
+/**
+ * String template funcionality. Given a string with "text {{var1}} text2 {{var2}}""
+ * and an state object {var1: 'fool', var2: 'bar'}. It returns a string substituting
+ * the template variables for its value. "text fool text2 bar""
+ * state can be a string, an object or an array.
+ * For mode=url a state array is converted into a list of values separated by comma.
+ * For mode=url a state object is converted into query field=value separated by &
+ * If mode is different to url. state is stringigify.
+ * @example
+ * ```
+ * varSubsDoubleBracket(`
+ * {
+ *     "id": 1231,
+ *     "description": "{{description=\"This is a test\"}}",
+ *     "car": "{{plate}}",
+ * }`, {plate:{a:3}}) //?
+ * ```
+ * This will produce
+ * ```
+ * `{
+ *     "id": 1231,
+ *     "description": "{{description=\"This is a test\"}}",
+ *     "car": {a:3},
+ * }`
+ * ```
+ * varSubsDoubleBracket('https://bank.account?account={{account}}', {account:['10232-1232','2331-1233']},'url')
+ * https://bank.account?account=10232-1232,2331-1233
+ * 
+ * varSubsDoubleBracket('https://bank.account?{{params}}', {params:{a:'10232-1232',b:'2331-1233'}},'url')
+ * https://bank.account?a=10232-1232&b=2331-1233}
+ * 
+ * @param strToResolveVars string with variables to be substituted. The string can represent a Json or url.
+ * @param state state with the values to substitute the template vars.
+ * @param mode: url: for converting state arrays into separated comma field=value1,value2
+ * and objects into field=value & field2=value2. if mode is not specified: state is stringify.
+ * @returns string after substituting the template vars for its corresponding values from state object.
+ */
+export function varSubsDoubleBracket(strToResolveVars: string, state: any, mode?: 'url'): string;
 export function queryObjToStr(query: any): string;
 export class CustomError extends Error {
   constructor(name?: string, message?: string, data?: {

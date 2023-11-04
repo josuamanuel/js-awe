@@ -758,19 +758,6 @@ function varSubsDoubleBracket(strToResolveVars, state, mode) {
     return strToResolveVars
   }
 
-  /*
-    
-  {
-    "response": {
-      "id": 1231,
-      "description": "{{description=\"This is a test\"}}",
-      "car": "{{plate}}",
-      "active": "{{active=true}}",
-      "ratenumber": "{{rate=10}}"
-    }
-  }
-  */
-
   // regex to deal with the case the entire value is a substitution group
   let regexVar = /"{{(.*?)(?:=(.*?))?}}"/g
 
@@ -817,6 +804,19 @@ function varSubsDoubleBracket(strToResolveVars, state, mode) {
 
   return resultStrFinal
 }
+// varSubsDoubleBracket(`
+// {
+//   "response": {
+//     "id": 1231,
+//     "description": "{{description=\"This is a test\"}}",
+//     "car": "{{plate}}",
+//     "active": "{{active=true}}",
+//     "ratenumber": "{{rate=10}}"
+//   }
+// }`, {plate:{a:3}}) //?
+
+// varSubsDoubleBracket('https://bank.account?account={{account}}', {account:['10232-1232','2331-1233']},'url') //?
+// varSubsDoubleBracket('https://bank.account?{{params}}', {params:{a:'10232-1232',b:'2331-1233'}},'url') //?
 
 function arrayToListQuery(arr) {
   return arr.reduce((prev, curr) => prev + ',' + curr)
