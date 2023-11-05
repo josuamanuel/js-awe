@@ -18,6 +18,7 @@ type Plan = {
    *   [fun2B, fun4],
    *   fun5                  
    * ])
+   * ```
    */
   build: (planDef: any[]) => (...args: any[]) => any;
   /**
@@ -45,8 +46,8 @@ type Plan = {
  *        |-> fun2A -> fun3-|
  * fun1 --|                 |-> fun5
  *        |-> fun2B -> fun4-|
+ *              
  * ```
- *
  * ```javascript
  * const myCalc = plan().build([
  *   fun1,                      
@@ -56,6 +57,7 @@ type Plan = {
  * ])
  *
  * myCalc(3).then(result => console.log(result))
+ * ```
  * 
  * @param options: { numberOfThreads: 3 (default Infinity) 
  * , mockupsObj {fun1:3,fun5:Promise.resolve(4)}} (substitute the function for a value) } 
