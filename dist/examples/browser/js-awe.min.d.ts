@@ -25,23 +25,75 @@ declare function promiseAll(obj: any): any;
  * report()
  */
 declare interface Chrono {
+
   /**
    * Create event/s and start the timer.
    * @param eventNames name of the event or array with events
    */
   time(eventNames: string | string[]): void
+
   /**
    * Stop the timer for the envent/s.
    * @param eventNames name of the event or array with events
    */
   timeEnd(eventNames: string | string[]): void
+
   /**
-   * console.log the status of the events at time of the call.
+   * console.log the following report below:
+   * ```
+   * chronoCreation :  2023-11-05T11:50:54.798Z
+   * report :  2023-11-05T11:50:56.119Z
+   * 
+   * Timeline of events:
+   * ┌────────┬───────────────────────────────────────────────────────────────────────────────────────┐
+   * │ Events │ ms 0                                     656                             1198  1300   │
+   * ├────────┼───────────────────────────────────────────────────────────────────────────────────────┤
+   * │ step1  │    |--------------------------------------|                                        || │
+   * │ step2  │                                             |------------------------------------|    │
+   * │ step3  │                                              |-----------------------------|          │
+   * └────────┴───────────────────────────────────────────────────────────────────────────────────────┘
+   * 
+   * Total elapse Time of each event: 
+   * ┌───────┬────────┬────────────┐
+   * │ name  │ elapse │ percentage │
+   * ├───────┼────────┼────────────┤
+   * │ step1 │ 655    │ 36.85      │
+   * │ step2 │ 620    │ 34.86      │
+   * │ step3 │ 503    │ 28.29      │
+   * └───────┴────────┴────────────┘
+   * 
+   * Coinciding Events timeline: 
+   * ┌───────────────┬──────────┬────────────┐
+   * │ runningEvents │ elapseMs │ percentage │
+   * ├───────────────┼──────────┼────────────┤
+   * │ step1         │ 655      │ 51.39      │
+   * │ step2         │ 116      │ 9.16       │
+   * │ step2,step3   │ 503      │ 39.45      │
+   * └───────────────┴──────────┴────────────┘
+   * ```
    */
   report(): void
-  setTime: (event: any) => (data: any) => any;
-  setTimeEnd: (event: any) => (data: any) => any;
-  logReport: (data: any) => any;
+
+  /**
+   * This is an implementation of Chrono().time() to use in pipeline of functions. Prepaire the time event function that will be
+   * triggered in the execution of the pipeline. As this is for logging purposes data is passed to the next function. This function
+   * takes the input and passes it to the next function without modifications.
+   */
+  setTime: (event: string | string[]) => <T>(data: T) => T;
+
+  /**
+   * This is an implementation of Chrono().timeEnd() to use in pipeline of functions. Prepaire the timeEnd event function that will be
+   * triggered in the execution of the pipeline. As this is for logging purposes data is passed to the next function. This function
+   * takes the input and passes it to the next function without modifications.
+   */
+  setTimeEnd: (event: string | string[]) => <T>(data: T) => T;
+
+  /**
+   * This is an implementation of Chrono().report() to use in pipeline of functions. Its execution will log the event reports as in
+   * Chrono().report() and returns the same data received as input.
+   */
+  logReport: <T>(data: T) => T;
+
   getChronoState: () => {};
   setChronoStateUsingPerformanceAPIFormat: (performanceGetEntriesByTypeOjb: any) => void;
   getChronoStateUsingPerformanceAPIFormat: () => any[];
@@ -67,7 +119,45 @@ declare function ffletchMaker(fetchsDef: any, delay: any): (input: any) => F.Fut
 
 declare function logWithPrefix(title: any, displayFunc: any): (message: any) => any;
 declare function firstCapital(str: any): any;
-declare function varSubsDoubleBracket(strToResolveVars: any, state: any, mode: any): any;
+
+/**
+ * String template funcionality. Given a string with "text {{var1}} text2 {{var2}}""
+ * and an state object {var1: 'fool', var2: 'bar'}. It returns a string substituting
+ * the template variables for its value. "text fool text2 bar""
+ * state can be a string, an object or an array.
+ * For mode=url a state array is converted into a list of values separated by comma.
+ * For mode=url a state object is converted into query field=value separated by &
+ * If mode is different to url. state is stringigify.
+ * @example
+ * ```
+ * varSubsDoubleBracket(`
+ * {
+ *     "id": 1231,
+ *     "description": "{{description=\"This is a test\"}}",
+ *     "car": "{{plate}}",
+ * }`, {plate:{a:3}}) //?
+ * ```
+ * This will produce
+ * ```
+ * `{
+ *     "id": 1231,
+ *     "description": "{{description=\"This is a test\"}}",
+ *     "car": {a:3},
+ * }`
+ * ```
+ * varSubsDoubleBracket('https://bank.account?account={{account}}', {account:['10232-1232','2331-1233']},'url')
+ * https://bank.account?account=10232-1232,2331-1233
+ * 
+ * varSubsDoubleBracket('https://bank.account?{{params}}', {params:{a:'10232-1232',b:'2331-1233'}},'url')
+ * https://bank.account?a=10232-1232&b=2331-1233}
+ * 
+ * @param strToResolveVars string with variables to be substituted. The string can represent a Json or url.
+ * @param state state with the values to substitute the template vars.
+ * @param mode: url: for converting state arrays into separated comma field=value1,value2
+ * and objects into field=value & field2=value2. if mode is not specified: state is stringify.
+ * @returns string after substituting the template vars for its corresponding values from state object.
+ */
+declare function varSubsDoubleBracket(strToResolveVars: string, state: any, mode?: 'url'): string;
 declare function queryObjToStr(query: any): string;
 declare class CustomError extends Error {
   constructor(name?: string, message?: string, data?: {
@@ -442,10 +532,70 @@ declare const mergeArrayOfObjectsRenamingProps: any;
 declare function uncurry(withLog?: boolean): (funcParam: any) => (...args: any[]) => any;
 declare function partialAtPos(fun: any, pos: any): (...paramValues: any[]) => any;
 
-declare function plan(plan: any, { numberOfThreads, mockupsObj }?: {
-  numberOfThreads: number;
-  mockupsObj: {};
-}): any;
+type PlanOptions = {
+  numberOfThreads?: number;
+  mockupsObj?: object;
+};
+
+type Plan = {
+  /**
+   * ```plainText
+   *        |-> fun2A -> fun3-|
+   * fun1 --|                 |-> fun5
+   *        |-> fun2B -> fun4-|
+   * ```
+   *
+   * ```javascript
+   * const myCalc = plan().build([
+   *   fun1,                      
+   *   [fun2A, fun3],
+   *   [fun2B, fun4],
+   *   fun5                  
+   * ])
+   */
+  build: (planDef: any[]) => (...args: any[]) => any;
+  /**
+   * plan utility function to wrap a function to use in a plan pipeline. The tipical scenario for using this is:
+   * ```
+   * plan().build(
+   *  [
+   *     queryAllCustomersWithBalanceGreatThan2000,
+   *     map(fetchAddres, 5) // mapThreads = 5
+   *  ]
+   * )
+   * ```
+   * As queryAllCustomersWithBalanceGreatThan2000 could return 50k customers. We could be banned for the fetchAddress API.
+   * so we need to call in batch of 5 calls. This does not affect the the default value numberOfThreads=Infinity for the 
+   * rest of the pipeline.
+   * @param fun function to apply to every element of the input.
+   * @param mapThreads The functions will be run in batchs of size mapThreads.
+   * @returns a function that can be included in the pipeline.
+   */
+  map: (fun: (data: any ) => any, mapThreads?: number) => (data: any) => any[];
+};
+
+/**
+ * ```plainText
+ *        |-> fun2A -> fun3-|
+ * fun1 --|                 |-> fun5
+ *        |-> fun2B -> fun4-|
+ * ```
+ *
+ * ```javascript
+ * const myCalc = plan().build([
+ *   fun1,                      
+ *   [fun2A, fun3],
+ *   [fun2B, fun4],
+ *   fun5                  
+ * ])
+ *
+ * myCalc(3).then(result => console.log(result))
+ * 
+ * @param options: { numberOfThreads: 3 (default Infinity) 
+ * , mockupsObj {fun1:3,fun5:Promise.resolve(4)}} (substitute the function for a value) } 
+ * @return An object with two method functions: build, plan
+ */
+declare function plan(options?: PlanOptions): Plan;
 
 declare function sanitize(obj: any, sanitizers: string[], noSanitzedUptoLogLevel: any): any;
 declare function lengthSanitizer(_: any, value: any): string;
