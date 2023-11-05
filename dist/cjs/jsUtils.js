@@ -639,20 +639,10 @@ function varSubsDoubleBracket(strToResolveVars, state, mode) {
     if (typeof strToResolveVars !== 'string') {
         return strToResolveVars;
     }
-    /*
-      
-    {
-      "response": {
-        "id": 1231,
-        "description": "{{description=\"This is a test\"}}",
-        "car": "{{plate}}",
-        "active": "{{active=true}}",
-        "ratenumber": "{{rate=10}}"
-      }
-    }
-    */
     // regex to deal with the case the entire value is a substitution group
-    let regexVar = /"{{(.*?)(?:=(.*?))?}}"/g;
+    // let regexVar = /"{{(.*?)(?:=(.*?))?}}"/g
+    // ask ChatGPT to do a more performant regex without look ahead
+    let regexVar = /"{{([^=}]+)(?:=([^}]+))?}}"/g;
     let resultStr = strToResolveVars.replace(regexVar, (_notused, group1, group2) => {
         if (state && state[group1] !== undefined) {
             if (typeof state[group1] === 'string')
@@ -677,7 +667,9 @@ function varSubsDoubleBracket(strToResolveVars, state, mode) {
         }
     });
     // regex to do partial substitution of a group inside of a string value
-    let regexVarPartial = /{{(.*?)(?:=(.*?))?}}/g;
+    // let regexVarPartial = /{{(.*?)(?:=(.*?))?}}/g
+    // ask ChatGPT to do a more performant regex without look ahead
+    let regexVarPartial = /{{([^=}]+)(?:=([^}]+))?}}/g;
     let resultStrFinal = resultStr.replace(regexVarPartial, (_notused, group1, group2) => {
         if (state && state[group1] !== undefined) {
             if (typeof state[group1] === 'object') {
@@ -702,6 +694,19 @@ function varSubsDoubleBracket(strToResolveVars, state, mode) {
     return resultStrFinal;
 }
 exports.varSubsDoubleBracket = varSubsDoubleBracket;
+// varSubsDoubleBracket(`
+// {
+//   "response": {
+//     "id": 1231,
+//     "description": "{{description=\"This is a test\"}}",
+//     "car": "{{plate}}",
+//     "active": "{{active=true}}",
+//     "ratenumber": "{{rate=10}}"
+//   }
+// }`, {plate:{a:3}, active:false}) //?
+// varSubsDoubleBracket('https://bank.account?accounts={{accounts}}&c=3', {accounts:['10232-1232','2331-1233']},'url') //?
+// varSubsDoubleBracket('https://bank.account?{{params=a=1&b=2}}&c=3', {params:{a:'10232-1232',b:'2331-1233'}},'url') //?
+// varSubsDoubleBracket('https://bank.account?{{params=a=1&b=2}}&c=3', {},'url') //?
 function arrayToListQuery(arr) {
     return arr.reduce((prev, curr) => prev + ',' + curr);
 }
