@@ -543,6 +543,7 @@ type Plan = {
    *        |-> fun2A -> fun3-|
    * fun1 --|                 |-> fun5
    *        |-> fun2B -> fun4-|
+   *              
    * ```
    *
    * ```javascript
@@ -557,7 +558,7 @@ type Plan = {
   build: (planDef: any[]) => (...args: any[]) => any;
   /**
    * plan utility function to wrap a function to use in a plan pipeline. The tipical scenario for using this is:
-   * ```
+   * ```javascript
    * plan().build(
    *  [
    *     queryAllCustomersWithBalanceGreatThan2000,
