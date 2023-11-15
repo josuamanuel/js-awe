@@ -261,7 +261,7 @@ chrono.timeEnd('step1')
 
 And then ```chrono.report()``` to log the timeline and some stats.
 
-Full example: [chronoExample.js](https://github.com/josuamanuel/js-awe/blob/main/examples/Chrono/chronoExample.js)
+Full example: [chronoExample.js](https://github.com/josuamanuel/js-awe/blob/main/examples/nodeImport/chrono/chronoExample.js)
 
 ```Plaintext
 chronoCreation :  2023-05-25T20:58:17.175Z
