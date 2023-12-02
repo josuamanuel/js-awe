@@ -289,17 +289,23 @@ const exclude = R.curry(
     subjectArray.filter(
       (subjectEl) => {
         let finalSubjectEl = subjectEl
-
+    
         
-        if(fieldSubject !== undefined && fieldSubject !== null) 
+        if(fieldSubject !== undefined && fieldSubject !== null && typeof fieldSubject !== 'function') 
           finalSubjectEl = subjectEl[fieldSubject]
-
+    
+        if(fieldSubject !== undefined && fieldSubject !== null && typeof fieldSubject === 'function') 
+          finalSubjectEl = fieldSubject(subjectEl)
+    
         return !valuesToRemove.find(
           (valToRemove) => {
             let finalValToRemove = valToRemove
-            if(fieldToRemove !== undefined && fieldToRemove !== null) 
+            if(fieldToRemove !== undefined && fieldToRemove !== null && typeof fieldToRemove !== 'function') 
               finalValToRemove = valToRemove[fieldToRemove]
-
+    
+            if(fieldToRemove !== undefined && fieldToRemove !== null && typeof fieldToRemove === 'function') 
+              finalValToRemove = fieldToRemove(valToRemove)
+    
             return finalSubjectEl === finalValToRemove
           } 
         )
@@ -307,8 +313,14 @@ const exclude = R.curry(
     )
 )
 RE.exclude = exclude
-//exclude('id',[{id:2},{id:6}], undefined, [1,2,3,4,5,6,7,8]) //?
-//exclude('id',[{id:2},{id:6}], 'key', [{key:1, age:1},{key:2, age:2},{key:4, age:4},{key:5, age:5}]) //?
+// exclude('id',[{id:2},{id:6}], undefined, [1,2,3,4,5,6,7,8]) //?
+// exclude('id',[{id:2},{id:6}], 'key', [{key:1, age:1},{key:2, age:2},{key:4, age:4},{key:5, age:5}]) //?
+// exclude(
+//   (el=>el.date.toISOString()),
+//   [{date:new Date('2023-01-01')},{date:new Date('2023-03-03')}],
+//   (el=>el.myDate.toISOString()),
+//   [{myDate:new Date('2023-01-12'),a:2}, {myDate:new Date('2023-01-01')},{myDate:new Date('2023-01-12'),a:8},{myDate:new Date('2023-01-04')},{myDate:new Date('2023-03-03')}, {myDate:new Date('2023-03-01')}],
+// )//?
 
 const n0IsNotUnfold =
   R.pipe(
