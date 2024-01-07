@@ -13,7 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.subtractDays = exports.diffInDaysYYYY_MM_DD = exports.dateToObj = exports.YYYY_MM_DD_hh_mm_ss_ToUtcDate = exports.dateFormatter = exports.formatDate = exports.isStringADate = exports.isEmpty = exports.isDate = exports.fillWith = exports.memoize = exports.pushAt = exports.pushUniqueKeyOrChange = exports.pushUniqueKey = exports.transition = exports.Enum = exports.EnumMap = exports.copyPropsWithValueUsingRules = exports.copyPropsWithValue = exports.project = exports.traverseVertically = exports.traverse = exports.removeDuplicates = exports.arrayOfObjectsToObject = exports.arrayToObject = exports.notTo = exports.sleepWithFunction = exports.sleepWithValue = exports.sleep = exports.isPromise = exports.arraySorter = exports.filterFlatMap = exports.sorterByPaths = exports.setAt = exports.getAt = exports.deepFreeze = exports.findDeepKey = exports.colorByStatus = exports.colorMessageByStatus = exports.colorMessage = exports.colors = exports.indexOfNthMatch = exports.urlDecompose = exports.urlCompose = exports.createCustomErrorClass = exports.CustomError = exports.queryObjToStr = exports.varSubsDoubleBracket = exports.firstCapital = exports.logWithPrefix = void 0;
-exports.processExit = exports.retryWithSleep = exports.loopIndexGenerator = exports.runEvery = exports.repeat = exports.cleanString = exports.replaceAll = exports.setDateToMidnight = exports.isDateMidnight = exports.getSameDateOrPreviousFridayForWeekends = exports.previousDayOfWeek = exports.addDays = void 0;
+exports.processExit = exports.retryWithSleep = exports.loopIndexGenerator = exports.oneIn = exports.repeat = exports.cleanString = exports.replaceAll = exports.setDateToMidnight = exports.isDateMidnight = exports.getSameDateOrPreviousFridayForWeekends = exports.previousDayOfWeek = exports.addDays = void 0;
 const just_clone_1 = __importDefault(require("just-clone"));
 const jsonpath_plus_1 = require("jsonpath-plus");
 const logWithPrefix = (title, displayFunc) => (message) => {
@@ -1492,23 +1492,23 @@ exports.repeat = repeat;
 //   console.log(index)
 // })
 // repeat(8).value(0) //?
-function runEvery(period) {
+function oneIn(period) {
     let count = 0;
-    function calls(runFunc) {
+    function call(runFunc) {
         function toExecute(...args) {
-            count++;
-            if (count === period) {
-                count = 0;
+            if (count === 0) {
+                count = period - 1;
                 return runFunc(...args);
             }
+            count--;
         }
         toExecute.reset = () => count = 0;
         return toExecute;
     }
-    return { calls };
+    return { call };
 }
-exports.runEvery = runEvery;
-// let myRunEvery = runEvery(3).calls((txt1, txt2, txt3)=>{console.log(txt1, txt2, txt3);return 3})
+exports.oneIn = oneIn;
+// let myRunEvery = oneIn(3).call((txt1, txt2, txt3)=>{console.log(txt1, txt2, txt3);return 3})
 // myRunEvery('jose','is great', '...') //?
 // myRunEvery('jose','is great', '...') //?
 // myRunEvery('jose','is great', '...') //?
@@ -1600,7 +1600,7 @@ const jsUtils = {
     replaceAll,
     cleanString,
     repeat,
-    runEvery,
+    oneIn,
     loopIndexGenerator,
     retryWithSleep,
     processExit

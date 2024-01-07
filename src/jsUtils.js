@@ -1723,29 +1723,30 @@ function repeat(numberOfTimes) {
 
 // repeat(8).value(0) //?
 
-function runEvery(period) {
+function oneIn(period) {
 
-  let count = 0
+  let count = 0;
 
-  function calls(runFunc) {
+  function call(runFunc) {
 
     function toExecute(...args) {
-      count++
-      if (count === period) {
-        count = 0
+
+      if (count === 0) {
+        count = period - 1;
         return runFunc(...args)
       }
+      count--;
     }
 
-    toExecute.reset = () => count = 0
+    toExecute.reset = () => count = 0;
 
     return toExecute
   }
 
-  return { calls }
+  return { call }
 }
 
-// let myRunEvery = runEvery(3).calls((txt1, txt2, txt3)=>{console.log(txt1, txt2, txt3);return 3})
+// let myRunEvery = oneIn(3).call((txt1, txt2, txt3)=>{console.log(txt1, txt2, txt3);return 3})
 // myRunEvery('jose','is great', '...') //?
 // myRunEvery('jose','is great', '...') //?
 // myRunEvery('jose','is great', '...') //?
@@ -1841,7 +1842,7 @@ const jsUtils = {
   replaceAll,
   cleanString,
   repeat,
-  runEvery,
+  oneIn,
   loopIndexGenerator,
   retryWithSleep,
   processExit
@@ -1907,7 +1908,7 @@ export {
   replaceAll,
   cleanString,
   repeat,
-  runEvery,
+  oneIn,
   loopIndexGenerator,
   retryWithSleep,
   processExit

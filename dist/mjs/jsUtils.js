@@ -1411,22 +1411,22 @@ function repeat(numberOfTimes) {
 //   console.log(index)
 // })
 // repeat(8).value(0) //?
-function runEvery(period) {
+function oneIn(period) {
     let count = 0;
-    function calls(runFunc) {
+    function call(runFunc) {
         function toExecute(...args) {
-            count++;
-            if (count === period) {
-                count = 0;
+            if (count === 0) {
+                count = period - 1;
                 return runFunc(...args);
             }
+            count--;
         }
         toExecute.reset = () => count = 0;
         return toExecute;
     }
-    return { calls };
+    return { call };
 }
-// let myRunEvery = runEvery(3).calls((txt1, txt2, txt3)=>{console.log(txt1, txt2, txt3);return 3})
+// let myRunEvery = oneIn(3).call((txt1, txt2, txt3)=>{console.log(txt1, txt2, txt3);return 3})
 // myRunEvery('jose','is great', '...') //?
 // myRunEvery('jose','is great', '...') //?
 // myRunEvery('jose','is great', '...') //?
@@ -1516,10 +1516,10 @@ const jsUtils = {
     replaceAll,
     cleanString,
     repeat,
-    runEvery,
+    oneIn,
     loopIndexGenerator,
     retryWithSleep,
     processExit
 };
 export default jsUtils;
-export { logWithPrefix, firstCapital, varSubsDoubleBracket, queryObjToStr, CustomError, createCustomErrorClass, urlCompose, urlDecompose, indexOfNthMatch, colors, colorMessage, colorMessageByStatus, colorByStatus, findDeepKey, deepFreeze, getAt, setAt, sorterByPaths, filterFlatMap, arraySorter, isPromise, sleep, sleepWithValue, sleepWithFunction, notTo, arrayToObject, arrayOfObjectsToObject, removeDuplicates, traverse, traverseVertically, project, copyPropsWithValue, copyPropsWithValueUsingRules, EnumMap, Enum, transition, pushUniqueKey, pushUniqueKeyOrChange, pushAt, memoize, fillWith, isDate, isEmpty, isStringADate, formatDate, dateFormatter, YYYY_MM_DD_hh_mm_ss_ToUtcDate, dateToObj, diffInDaysYYYY_MM_DD, subtractDays, addDays, previousDayOfWeek, getSameDateOrPreviousFridayForWeekends, isDateMidnight, setDateToMidnight, replaceAll, cleanString, repeat, runEvery, loopIndexGenerator, retryWithSleep, processExit };
+export { logWithPrefix, firstCapital, varSubsDoubleBracket, queryObjToStr, CustomError, createCustomErrorClass, urlCompose, urlDecompose, indexOfNthMatch, colors, colorMessage, colorMessageByStatus, colorByStatus, findDeepKey, deepFreeze, getAt, setAt, sorterByPaths, filterFlatMap, arraySorter, isPromise, sleep, sleepWithValue, sleepWithFunction, notTo, arrayToObject, arrayOfObjectsToObject, removeDuplicates, traverse, traverseVertically, project, copyPropsWithValue, copyPropsWithValueUsingRules, EnumMap, Enum, transition, pushUniqueKey, pushUniqueKeyOrChange, pushAt, memoize, fillWith, isDate, isEmpty, isStringADate, formatDate, dateFormatter, YYYY_MM_DD_hh_mm_ss_ToUtcDate, dateToObj, diffInDaysYYYY_MM_DD, subtractDays, addDays, previousDayOfWeek, getSameDateOrPreviousFridayForWeekends, isDateMidnight, setDateToMidnight, replaceAll, cleanString, repeat, oneIn, loopIndexGenerator, retryWithSleep, processExit };

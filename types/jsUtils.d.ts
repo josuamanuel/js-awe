@@ -54,7 +54,7 @@ declare namespace jsUtils {
   export { replaceAll };
   export { cleanString };
   export { repeat };
-  export { runEvery };
+  export { oneIn };
   export { loopIndexGenerator };
   export { retryWithSleep };
   export { processExit };
@@ -309,7 +309,7 @@ export function repeat(numberOfTimes: any): {
   awaitTimes: (funToRepeat: any) => Promise<any[]>;
   value: (value: any) => any[];
 };
-export function runEvery(period: any): {
+export function oneIn(period: any): {
   calls: (runFunc: any) => {
     (...args: any[]): any;
     reset(): number;
