@@ -116,6 +116,9 @@ declare function innerRightJoinWith(
 
 export { innerRightJoinWith }
 
+
+type HashFunction<T> = (elem: T) => string;
+
 /**
 * Add input rows which hash is not present in the target
 * duplicates in the target will be deleted keeping the last row.
@@ -125,7 +128,14 @@ export { innerRightJoinWith }
 * @param hashMaster hash function for the target data
 * @param master target data
 */
-export function unionWithHashKeys(isAsc:boolean|undefined, hashAddNoDups:(el:any)=>string, any[], hashMaster:(el:any)=>string, master:any[])
+export function unionWithHashKeysUnc<T,P>(
+  isAsc: boolean|undefined,
+  hashAddNoDups: HashFunction<T>,
+  addNoDupsToTheEnd: T[],
+  hashMaster: HashFunction<P>,
+  master: P[]
+): (T|P)[];
+
 /**
 * Update target with input for rows with same hash
 * Add to target the new rows from input with new hash.

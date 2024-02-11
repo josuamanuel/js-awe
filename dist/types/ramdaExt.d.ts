@@ -118,8 +118,14 @@ export { innerRightJoinWith }
 
 /**
 * Add input rows which hash is not present in the target
+* duplicates in the target will be deleted keeping the last row.
+* @param isAsc undefined: does not order. true: return result in asc order. false: in desc order
+* @param hashAddNoDups hash function for the input data
+* @param addNoDupsToTheEnd input data
+* @param hashMaster hash function for the target data
+* @param master target data
 */
-export const unionWithHashKeys: any;
+export function unionWithHashKeys(isAsc:boolean|undefined, hashAddNoDups:(el:any)=>string, any[], hashMaster:(el:any)=>string, master:any[])
 /**
 * Update target with input for rows with same hash
 * Add to target the new rows from input with new hash.
