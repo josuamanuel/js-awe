@@ -495,15 +495,43 @@ declare function innerRightJoinWith(
 ):typeof injectLeftData
 
 
+
+type HashFunction<T> = (elem: T) => string;
+
 /**
 * Add input rows which hash is not present in the target
+* duplicates in the target will be deleted keeping the last row.
+* @param isAsc undefined: does not order. true: return result in asc order. false: in desc order
+* @param hashAddNoDups hash function for the input data
+* @param addNoDupsToTheEnd input data
+* @param hashMaster hash function for the target data
+* @param master target data
 */
-declare const unionWithHashKeys: any;
+declare function unionWithHashKeysUnc<T,P>(
+  isAsc: boolean|undefined,
+  hashAddNoDups: HashFunction<T>,
+  addNoDupsToTheEnd: T[],
+  hashMaster: HashFunction<P>,
+  master: P[]
+): (T|P)[];
+
+
 /**
-* Update target with input for rows with same hash
-* Add to target the new rows from input with new hash.
+* Add input rows which hash is not present in the target
+* duplicates in the target will be deleted keeping the last row.
+* @param isAsc undefined: does not order. true: return result in asc order. false: in desc order
+* @param hashAddNoDups hash function for the input data
+* @param addNoDupsToTheEnd input data
+* @param hashMaster hash function for the target data
+* @param master target data
 */
-declare const updateWithHashKeys: any;
+declare function unionWithHashKeys<T,P>(
+  isAsc: boolean|undefined,
+  hashAddNoDups: HashFunction<T>,
+  addNoDupsToTheEnd: T[],
+  hashMaster: HashFunction<P>,
+):(master: P[]) => (T|P)[];
+
 declare const between: any;
 declare const matchByPropId: any;
 declare const splitCond: any;
@@ -667,4 +695,4 @@ declare function Timeline(): {
     };
 };
 
-export { Chrono, CustomError, Enum, EnumMap, RE, RLog, Table, Text, Timeline, YYYY_MM_DD_hh_mm_ss_ToUtcDate, addDays, anonymize, arrayOfObjectsToObject, arraySorter, arrayToObject, bearerSanitizer, between, cleanString, cloneCopy, colorByStatus, colorMessage, colorMessageByStatus, colors, copyPropsWithValue, copyPropsWithValueUsingRules, createCustomErrorClass, dateFormatter, dateToObj, deepFreeze, diffInDaysYYYY_MM_DD, exclude, fetchImproved, ffletchMaker, fillWith, filterFlatMap, filterMap, findDeepKey, findSolution, firstCapital, fletch, formatDate, getAt, getSameDateOrPreviousFridayForWeekends, groupByWithCalc, indexOfNthMatch, innerRightJoinWith, isDate, isDateMidnight, isEmpty, isPromise, isStringADate, lengthSanitizer, log, logWithPrefix, loopIndexGenerator, mapWithNext, mapWithPrevious, matchByPropId, memoize, mergeArrayOfObjectsRenamingProps, notTo, oneIn, parallel, partialAtPos, pickPaths, pipe, pipeWhile, pipeWithChain, plan, previousDayOfWeek, processExit, project, promiseAll, promiseFunToFutureFun, pushAt, pushUniqueKey, pushUniqueKeyOrChange, queryObjToStr, removeDuplicates, repeat, replaceAll, retryWithSleep, runFunctionsSyncOrParallel, runFutureFunctionsInParallel, sanitize, setAt, setDateToMidnight, sleep, sleepWithFunction, sleepWithValue, something, sorterByPaths, splitCond, subtractDays, transition, traverse, traverseVertically, uncurry, unionWithHashKeys, updateWithHashKeys, urlCompose, urlDecompose, varSubsDoubleBracket, wildcardToRegExp };
+export { Chrono, CustomError, Enum, EnumMap, RE, RLog, Table, Text, Timeline, YYYY_MM_DD_hh_mm_ss_ToUtcDate, addDays, anonymize, arrayOfObjectsToObject, arraySorter, arrayToObject, bearerSanitizer, between, cleanString, cloneCopy, colorByStatus, colorMessage, colorMessageByStatus, colors, copyPropsWithValue, copyPropsWithValueUsingRules, createCustomErrorClass, dateFormatter, dateToObj, deepFreeze, diffInDaysYYYY_MM_DD, exclude, fetchImproved, ffletchMaker, fillWith, filterFlatMap, filterMap, findDeepKey, findSolution, firstCapital, fletch, formatDate, getAt, getSameDateOrPreviousFridayForWeekends, groupByWithCalc, indexOfNthMatch, innerRightJoinWith, isDate, isDateMidnight, isEmpty, isPromise, isStringADate, lengthSanitizer, log, logWithPrefix, loopIndexGenerator, mapWithNext, mapWithPrevious, matchByPropId, memoize, mergeArrayOfObjectsRenamingProps, notTo, oneIn, parallel, partialAtPos, pickPaths, pipe, pipeWhile, pipeWithChain, plan, previousDayOfWeek, processExit, project, promiseAll, promiseFunToFutureFun, pushAt, pushUniqueKey, pushUniqueKeyOrChange, queryObjToStr, removeDuplicates, repeat, replaceAll, retryWithSleep, runFunctionsSyncOrParallel, runFutureFunctionsInParallel, sanitize, setAt, setDateToMidnight, sleep, sleepWithFunction, sleepWithValue, something, sorterByPaths, splitCond, subtractDays, transition, traverse, traverseVertically, uncurry, unionWithHashKeys, unionWithHashKeysUnc, urlCompose, urlDecompose, varSubsDoubleBracket, wildcardToRegExp };

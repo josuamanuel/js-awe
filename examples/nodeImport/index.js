@@ -1,6 +1,4 @@
-import { Chrono, sleepWithFunction, unionWithHashKeys } from 'js-awe'
-
-unionWithHashKeys(true, el=> el.id, el=> el.id, )
+import { Chrono, sleepWithFunction } from 'js-awe'
 
 let chrono = Chrono()
 

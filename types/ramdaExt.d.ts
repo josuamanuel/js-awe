@@ -116,9 +116,6 @@ declare function innerRightJoinWith(
 
 export { innerRightJoinWith }
 
-
-type HashFunction<T> = (elem: T) => string;
-
 /**
 * Add input rows which hash is not present in the target
 * duplicates in the target will be deleted keeping the last row.
@@ -130,17 +127,29 @@ type HashFunction<T> = (elem: T) => string;
 */
 export function unionWithHashKeysUnc<T,P>(
   isAsc: boolean|undefined,
-  hashAddNoDups: HashFunction<T>,
+  hashAddNoDups: (elem: T) => string,
   addNoDupsToTheEnd: T[],
-  hashMaster: HashFunction<P>,
+  hashMaster: (elem: P) => string,
   master: P[]
 ): (T|P)[];
 
+
 /**
-* Update target with input for rows with same hash
-* Add to target the new rows from input with new hash.
+* Add input rows which hash is not present in the target
+* duplicates in the target will be deleted keeping the last row.
+* @param isAsc undefined: does not order. true: return result in asc order. false: in desc order
+* @param hashAddNoDups hash function for the input data
+* @param addNoDupsToTheEnd input data
+* @param hashMaster hash function for the target data
+* @return a function ready to receive the target data
 */
-export const updateWithHashKeys: any;
+export function unionWithHashKeys<T,P>(
+  isAsc: boolean|undefined,
+  hashAddNoDups: (elem: T) => string,
+  addNoDupsToTheEnd: T[],
+  hashMaster: (elem: T) => string,
+):(master: P[]) => (T|P)[];
+
 export const between: any;
 export const matchByPropId: any;
 export const splitCond: any;
