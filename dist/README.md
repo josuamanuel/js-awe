@@ -25,14 +25,9 @@ fun1 --|                 |-> fun5
 
 ```javascript
 const { plan } = require("js-awe")
-
-const fun1 = val1 => Promise.resolve(val1 * 2)    // fun1: 3*2 = 6
-const fun2A = val2 => val2 + 1                    // fun2A: 6 + 1 = 7
-const fun3 = val3 => Promise.resolve(val3 + 3)    // fun3: 7 + 3 = 10
-const fun2B = val2 => Promise.resolve(val2 - 1)   // fun2B: 6 - 1 = 5;
-const fun4 = val4 => val4 + 2                     // fun4: 5 + 2 = 7
-const fun5 = ([val4, val5]) => val4 + val5        // fun5: 10 + 7 = 17; Promise.resolve(17)
-
+ 
+let { fun1, fun2A, fun3, fun2B, fun4, fun5 } = exportDemoFunctions()
+ 
 const myCalc = plan().build([
   fun1,                      
   [fun2A, fun3],
@@ -41,6 +36,18 @@ const myCalc = plan().build([
 ])
 
 myCalc(3).then(result => console.log(result)) //=> 17
+
+// Just some simple functions to demonstrate the plan functionality
+function exportDemoFunctions() {
+  return { 
+    fun1: val1 => Promise.resolve(val1 * 2),    // fun1: 3*2 = 6
+    fun2A: val2 => val2 + 1,                    // fun2A: 6 + 1 = 7
+    fun3: val3 => Promise.resolve(val3 + 3),    // fun3: 7 + 3 = 10
+    fun2B: val2 => Promise.resolve(val2 - 1),   // fun2B: 6 - 1 = 5;
+    fun4: val4 => val4 + 2,                     // fun4: 5 + 2 = 7
+    fun5: ([val4, val5]) => val4 + val5,        // fun5: 10 + 7 = 17; Promise.resolve(17)
+  }
+}
 ```
 
 ### New functional async style. Avoid await contamination

@@ -495,9 +495,6 @@ declare function innerRightJoinWith(
 ):typeof injectLeftData
 
 
-
-type HashFunction<T> = (elem: T) => string;
-
 /**
 * Add input rows which hash is not present in the target
 * duplicates in the target will be deleted keeping the last row.
@@ -509,9 +506,9 @@ type HashFunction<T> = (elem: T) => string;
 */
 declare function unionWithHashKeysUnc<T,P>(
   isAsc: boolean|undefined,
-  hashAddNoDups: HashFunction<T>,
+  hashAddNoDups: (elem: T) => string,
   addNoDupsToTheEnd: T[],
-  hashMaster: HashFunction<P>,
+  hashMaster: (elem: P) => string,
   master: P[]
 ): (T|P)[];
 
@@ -523,13 +520,13 @@ declare function unionWithHashKeysUnc<T,P>(
 * @param hashAddNoDups hash function for the input data
 * @param addNoDupsToTheEnd input data
 * @param hashMaster hash function for the target data
-* @param master target data
+* @return a function ready to receive the target data
 */
 declare function unionWithHashKeys<T,P>(
   isAsc: boolean|undefined,
-  hashAddNoDups: HashFunction<T>,
+  hashAddNoDups: (elem: T) => string,
   addNoDupsToTheEnd: T[],
-  hashMaster: HashFunction<P>,
+  hashMaster: (elem: T) => string,
 ):(master: P[]) => (T|P)[];
 
 declare const between: any;
