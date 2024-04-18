@@ -1458,6 +1458,22 @@ function processExit(error) {
         console.log(e);
     }
 }
+function _(scope, fn) {
+    return (...params) => {
+        let result;
+        try {
+            globalThis.$ = scope;
+            result = fn(...params);
+        }
+        catch (e) {
+            throw e;
+        }
+        finally {
+            globalThis.$ = undefined;
+        }
+        return result;
+    };
+}
 const jsUtils = {
     logWithPrefix,
     firstCapital,
@@ -1519,7 +1535,8 @@ const jsUtils = {
     oneIn,
     loopIndexGenerator,
     retryWithSleep,
-    processExit
+    processExit,
+    _
 };
 export default jsUtils;
-export { logWithPrefix, firstCapital, varSubsDoubleBracket, queryObjToStr, CustomError, createCustomErrorClass, urlCompose, urlDecompose, indexOfNthMatch, colors, colorMessage, colorMessageByStatus, colorByStatus, findDeepKey, deepFreeze, getAt, setAt, sorterByPaths, filterFlatMap, arraySorter, isPromise, sleep, sleepWithValue, sleepWithFunction, notTo, arrayToObject, arrayOfObjectsToObject, removeDuplicates, traverse, traverseVertically, project, copyPropsWithValue, copyPropsWithValueUsingRules, EnumMap, Enum, transition, pushUniqueKey, pushUniqueKeyOrChange, pushAt, memoize, fillWith, isDate, isEmpty, isStringADate, formatDate, dateFormatter, YYYY_MM_DD_hh_mm_ss_ToUtcDate, dateToObj, diffInDaysYYYY_MM_DD, subtractDays, addDays, previousDayOfWeek, getSameDateOrPreviousFridayForWeekends, isDateMidnight, setDateToMidnight, replaceAll, cleanString, repeat, oneIn, loopIndexGenerator, retryWithSleep, processExit };
+export { logWithPrefix, firstCapital, varSubsDoubleBracket, queryObjToStr, CustomError, createCustomErrorClass, urlCompose, urlDecompose, indexOfNthMatch, colors, colorMessage, colorMessageByStatus, colorByStatus, findDeepKey, deepFreeze, getAt, setAt, sorterByPaths, filterFlatMap, arraySorter, isPromise, sleep, sleepWithValue, sleepWithFunction, notTo, arrayToObject, arrayOfObjectsToObject, removeDuplicates, traverse, traverseVertically, project, copyPropsWithValue, copyPropsWithValueUsingRules, EnumMap, Enum, transition, pushUniqueKey, pushUniqueKeyOrChange, pushAt, memoize, fillWith, isDate, isEmpty, isStringADate, formatDate, dateFormatter, YYYY_MM_DD_hh_mm_ss_ToUtcDate, dateToObj, diffInDaysYYYY_MM_DD, subtractDays, addDays, previousDayOfWeek, getSameDateOrPreviousFridayForWeekends, isDateMidnight, setDateToMidnight, replaceAll, cleanString, repeat, oneIn, loopIndexGenerator, retryWithSleep, processExit, _ };

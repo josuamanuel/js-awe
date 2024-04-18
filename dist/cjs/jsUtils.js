@@ -13,7 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.subtractDays = exports.diffInDaysYYYY_MM_DD = exports.dateToObj = exports.YYYY_MM_DD_hh_mm_ss_ToUtcDate = exports.dateFormatter = exports.formatDate = exports.isStringADate = exports.isEmpty = exports.isDate = exports.fillWith = exports.memoize = exports.pushAt = exports.pushUniqueKeyOrChange = exports.pushUniqueKey = exports.transition = exports.Enum = exports.EnumMap = exports.copyPropsWithValueUsingRules = exports.copyPropsWithValue = exports.project = exports.traverseVertically = exports.traverse = exports.removeDuplicates = exports.arrayOfObjectsToObject = exports.arrayToObject = exports.notTo = exports.sleepWithFunction = exports.sleepWithValue = exports.sleep = exports.isPromise = exports.arraySorter = exports.filterFlatMap = exports.sorterByPaths = exports.setAt = exports.getAt = exports.deepFreeze = exports.findDeepKey = exports.colorByStatus = exports.colorMessageByStatus = exports.colorMessage = exports.colors = exports.indexOfNthMatch = exports.urlDecompose = exports.urlCompose = exports.createCustomErrorClass = exports.CustomError = exports.queryObjToStr = exports.varSubsDoubleBracket = exports.firstCapital = exports.logWithPrefix = void 0;
-exports.processExit = exports.retryWithSleep = exports.loopIndexGenerator = exports.oneIn = exports.repeat = exports.cleanString = exports.replaceAll = exports.setDateToMidnight = exports.isDateMidnight = exports.getSameDateOrPreviousFridayForWeekends = exports.previousDayOfWeek = exports.addDays = void 0;
+exports._ = exports.processExit = exports.retryWithSleep = exports.loopIndexGenerator = exports.oneIn = exports.repeat = exports.cleanString = exports.replaceAll = exports.setDateToMidnight = exports.isDateMidnight = exports.getSameDateOrPreviousFridayForWeekends = exports.previousDayOfWeek = exports.addDays = void 0;
 const just_clone_1 = __importDefault(require("just-clone"));
 const jsonpath_plus_1 = require("jsonpath-plus");
 const logWithPrefix = (title, displayFunc) => (message) => {
@@ -1542,6 +1542,23 @@ function processExit(error) {
     }
 }
 exports.processExit = processExit;
+function _(scope, fn) {
+    return (...params) => {
+        let result;
+        try {
+            globalThis.$ = scope;
+            result = fn(...params);
+        }
+        catch (e) {
+            throw e;
+        }
+        finally {
+            globalThis.$ = undefined;
+        }
+        return result;
+    };
+}
+exports._ = _;
 const jsUtils = {
     logWithPrefix,
     firstCapital,
@@ -1603,6 +1620,7 @@ const jsUtils = {
     oneIn,
     loopIndexGenerator,
     retryWithSleep,
-    processExit
+    processExit,
+    _
 };
 exports.default = jsUtils;

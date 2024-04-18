@@ -1784,6 +1784,22 @@ function processExit(error) {
   }
 }
 
+function _(scope, fn) {
+  return (...params) => {
+    let result;
+    try {
+      globalThis.$ = scope;
+      result = fn(...params);
+    }catch(e)
+    {
+      throw e;
+    } finally {
+      globalThis.$ = undefined;
+    }
+    return result
+  }
+}
+
 const jsUtils = {
   logWithPrefix,
   firstCapital,
@@ -1845,7 +1861,8 @@ const jsUtils = {
   oneIn,
   loopIndexGenerator,
   retryWithSleep,
-  processExit
+  processExit,
+  _
 }
 
 export default jsUtils
@@ -1911,5 +1928,6 @@ export {
   oneIn,
   loopIndexGenerator,
   retryWithSleep,
-  processExit
+  processExit,
+  _
 }
