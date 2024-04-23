@@ -1463,8 +1463,8 @@ function _(scope, fn) {
         let result;
         try {
             globalThis.stack ??= [{}];
-            globalThis.stack.push({ ...globalThis.stack[-1], ...scope });
-            globalThis.$ = globalThis.stack[-1];
+            globalThis.stack.push({ ...globalThis.stack.at(-1), ...scope });
+            globalThis.$ = globalThis.stack.at(-1);
             result = fn(...params);
         }
         catch (e) {

@@ -1548,8 +1548,8 @@ function _(scope, fn) {
         let result;
         try {
             (_a = globalThis.stack) !== null && _a !== void 0 ? _a : (globalThis.stack = [{}]);
-            globalThis.stack.push(Object.assign(Object.assign({}, globalThis.stack[-1]), scope));
-            globalThis.$ = globalThis.stack[-1];
+            globalThis.stack.push(Object.assign(Object.assign({}, globalThis.stack.at(-1)), scope));
+            globalThis.$ = globalThis.stack.at(-1);
             result = fn(...params);
         }
         catch (e) {
