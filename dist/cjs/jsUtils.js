@@ -1547,9 +1547,9 @@ function _(scope, fn) {
         var _a;
         let result;
         try {
-            globalThis.$ = scope;
             (_a = globalThis.stack) !== null && _a !== void 0 ? _a : (globalThis.stack = [{}]);
-            globalThis.stack.push(scope);
+            globalThis.stack.push(Object.assign(Object.assign({}, globalThis.stack[-1]), scope));
+            globalThis.$ = globalThis.stack[-1];
             result = fn(...params);
             globalThis.stack.pop();
         }
