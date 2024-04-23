@@ -2782,9 +2782,10 @@ function _(scope, fn) {
   return (...params) => {
     let result;
     try {
-      globalThis.$ = scope;
       globalThis.stack ??= [{}];
-      globalThis.stack.push(scope);
+      globalThis.stack.push({...globalThis.stack[-1], ...scope});
+      globalThis.$ = globalThis.stack[-1];
+      
       result = fn(...params);
       globalThis.stack.pop();
     }catch(e)

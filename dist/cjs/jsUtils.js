@@ -1551,13 +1551,12 @@ function _(scope, fn) {
             globalThis.stack.push(Object.assign(Object.assign({}, globalThis.stack[-1]), scope));
             globalThis.$ = globalThis.stack[-1];
             result = fn(...params);
-            globalThis.stack.pop();
         }
         catch (e) {
             throw e;
         }
         finally {
-            globalThis.$ = globalThis.stack.at(-1);
+            globalThis.$ = globalThis.stack.pop();
         }
         return result;
     };
