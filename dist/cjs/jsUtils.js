@@ -1245,7 +1245,8 @@ function sleepWithValue(ms, value) {
 }
 exports.sleepWithValue = sleepWithValue;
 function sleepWithFunction(ms, func, ...params) {
-    return new Promise(resolve => setTimeout(() => resolve(func(...params)), ms));
+    const clonedParams = (0, just_clone_1.default)(params);
+    return new Promise(resolve => setTimeout(() => resolve(func(...clonedParams)), ms));
 }
 exports.sleepWithFunction = sleepWithFunction;
 function retryWithSleep(times, updateSleepTimeFun, funToRun, funToRunParams, shouldStopRetrying) {

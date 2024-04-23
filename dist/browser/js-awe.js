@@ -2427,8 +2427,9 @@ function sleepWithValue(ms, value) {
 }
 
 function sleepWithFunction(ms, func, ...params) {
+  const clonedParams = collectionClone(params);
   return new Promise(resolve =>
-    setTimeout(() => resolve(func(...params)), ms)
+    setTimeout(() => resolve(func(...clonedParams)), ms)
   )
 }
 

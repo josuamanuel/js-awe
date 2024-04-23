@@ -2420,8 +2420,9 @@ function sleep(ms) {
 }
 
 function sleepWithValue(ms, value) {
+  const clonedValue = collectionClone(value);
   return new Promise(resolve =>
-    setTimeout(() => resolve(value), ms)
+    setTimeout(() => resolve(clonedValue), ms)
   )
 }
 
