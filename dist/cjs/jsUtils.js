@@ -1556,7 +1556,8 @@ function _(scope, fn) {
             throw e;
         }
         finally {
-            globalThis.$ = globalThis.stack.pop();
+            globalThis.stack.pop();
+            globalThis.$ = globalThis.stack.at(-1);
         }
         return result;
     };
