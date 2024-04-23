@@ -1240,7 +1240,8 @@ function sleep(ms) {
 }
 exports.sleep = sleep;
 function sleepWithValue(ms, value) {
-    return new Promise(resolve => setTimeout(() => resolve(value), ms));
+    const clonedValue = (0, just_clone_1.default)(value);
+    return new Promise(resolve => setTimeout(() => resolve(clonedValue), ms));
 }
 exports.sleepWithValue = sleepWithValue;
 function sleepWithFunction(ms, func, ...params) {

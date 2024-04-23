@@ -1176,7 +1176,8 @@ function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 function sleepWithValue(ms, value) {
-    return new Promise(resolve => setTimeout(() => resolve(value), ms));
+    const clonedValue = clone(value);
+    return new Promise(resolve => setTimeout(() => resolve(clonedValue), ms));
 }
 function sleepWithFunction(ms, func, ...params) {
     return new Promise(resolve => setTimeout(() => resolve(func(...params)), ms));
