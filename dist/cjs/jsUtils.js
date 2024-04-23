@@ -1544,16 +1544,20 @@ function processExit(error) {
 exports.processExit = processExit;
 function _(scope, fn) {
     return (...params) => {
+        var _a;
         let result;
         try {
             globalThis.$ = scope;
+            (_a = globalThis.stack) !== null && _a !== void 0 ? _a : (globalThis.stack = [{}]);
+            globalThis.stack.push(scope);
             result = fn(...params);
+            globalThis.stack.pop();
         }
         catch (e) {
             throw e;
         }
         finally {
-            globalThis.$ = undefined;
+            globalThis.$ = globalThis.stack.at(-1);
         }
         return result;
     };
