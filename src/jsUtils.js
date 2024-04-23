@@ -1793,12 +1793,11 @@ function _(scope, fn) {
       globalThis.$ = globalThis.stack[-1];
       
       result = fn(...params);
-      globalThis.stack.pop()
     }catch(e)
     {
       throw e;
     } finally {
-      globalThis.$ = globalThis.stack.at(-1);
+      globalThis.$ =globalThis.stack.pop();
     }
     return result
   }
