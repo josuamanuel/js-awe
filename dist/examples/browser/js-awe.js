@@ -2778,6 +2778,22 @@ function processExit(error) {
   }
 }
 
+function _(scope, fn) {
+  return (...params) => {
+    let result;
+    try {
+      globalThis.$ = scope;
+      result = fn(...params);
+    }catch(e)
+    {
+      throw e;
+    } finally {
+      globalThis.$ = undefined;
+    }
+    return result
+  }
+}
+
 const jsUtils = {
   logWithPrefix,
   firstCapital,
@@ -2839,7 +2855,8 @@ const jsUtils = {
   oneIn,
   loopIndexGenerator,
   retryWithSleep,
-  processExit
+  processExit,
+  _
 };
 
 function cloneCopy(to, from, firstCleanTo, shallow) {
@@ -20367,4 +20384,4 @@ function sanitize(obj, sanitizers = ['ibmApis'], noSanitzedUptoLogLevel) {
 
 }
 
-export { Chrono, CustomError, Enum, EnumMap, F, Index, index as R, RE, RLog, Table, Text, Timeline, YYYY_MM_DD_hh_mm_ss_ToUtcDate, addDays, anonymize, arrayOfObjectsToObject, arraySorter, arrayToObject, bearerSanitizer, between, cleanString, cloneCopy, colorByStatus, colorMessage, colorMessageByStatus, colors, consoleTable, consoleTableExtended, copyPropsWithValue, copyPropsWithValueUsingRules, createCustomErrorClass, dateFormatter, dateToObj, deepFreeze, diffInDaysYYYY_MM_DD, exclude, fetchImproved, ffletchMaker, fillWith, filterFlatMap, filterMap, findDeepKey, findSolution, firstCapital, fletch, formatDate, getAt, getSameDateOrPreviousFridayForWeekends, groupByWithCalc, indexOfNthMatch, innerRightJoinWith, isDate, isDateMidnight, isEmpty$2 as isEmpty, isPromise, isStringADate, lengthSanitizer, log, logWithPrefix, loopIndexGenerator, mapWithNext, mapWithPrevious, matchByPropId, memoize, mergeArrayOfObjectsRenamingProps, notTo, oneIn, parallel, partialAtPos, pickPaths, pipe, pipeWhile, pipeWithChain, plan, previousDayOfWeek, processExit, project$2 as project, promiseAll, promiseFunToFutureFun, pushAt, pushUniqueKey, pushUniqueKeyOrChange, queryObjToStr, removeDuplicates, repeat$2 as repeat, replaceAll, retryWithSleep, runFunctionsSyncOrParallel, runFutureFunctionsInParallel, sanitize, setAt, setDateToMidnight, sleep, sleepWithFunction, sleepWithValue, something, sorterByPaths, splitCond, subtractDays, transition, traverse$2 as traverse, traverseVertically, uncurry, unionWithHashKeys, updateWithHashKeys, urlCompose, urlDecompose, varSubsDoubleBracket, wildcardToRegExp };
+export { Chrono, CustomError, Enum, EnumMap, F, Index, index as R, RE, RLog, Table, Text, Timeline, YYYY_MM_DD_hh_mm_ss_ToUtcDate, _, addDays, anonymize, arrayOfObjectsToObject, arraySorter, arrayToObject, bearerSanitizer, between, cleanString, cloneCopy, colorByStatus, colorMessage, colorMessageByStatus, colors, consoleTable, consoleTableExtended, copyPropsWithValue, copyPropsWithValueUsingRules, createCustomErrorClass, dateFormatter, dateToObj, deepFreeze, diffInDaysYYYY_MM_DD, exclude, fetchImproved, ffletchMaker, fillWith, filterFlatMap, filterMap, findDeepKey, findSolution, firstCapital, fletch, formatDate, getAt, getSameDateOrPreviousFridayForWeekends, groupByWithCalc, indexOfNthMatch, innerRightJoinWith, isDate, isDateMidnight, isEmpty$2 as isEmpty, isPromise, isStringADate, lengthSanitizer, log, logWithPrefix, loopIndexGenerator, mapWithNext, mapWithPrevious, matchByPropId, memoize, mergeArrayOfObjectsRenamingProps, notTo, oneIn, parallel, partialAtPos, pickPaths, pipe, pipeWhile, pipeWithChain, plan, previousDayOfWeek, processExit, project$2 as project, promiseAll, promiseFunToFutureFun, pushAt, pushUniqueKey, pushUniqueKeyOrChange, queryObjToStr, removeDuplicates, repeat$2 as repeat, replaceAll, retryWithSleep, runFunctionsSyncOrParallel, runFutureFunctionsInParallel, sanitize, setAt, setDateToMidnight, sleep, sleepWithFunction, sleepWithValue, something, sorterByPaths, splitCond, subtractDays, transition, traverse$2 as traverse, traverseVertically, uncurry, unionWithHashKeys, updateWithHashKeys, urlCompose, urlDecompose, varSubsDoubleBracket, wildcardToRegExp };

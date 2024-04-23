@@ -1463,13 +1463,16 @@ function _(scope, fn) {
         let result;
         try {
             globalThis.$ = scope;
+            globalThis.stack ??= [{}];
+            globalThis.stack.push(scope);
             result = fn(...params);
+            globalThis.stack.pop();
         }
         catch (e) {
             throw e;
         }
         finally {
-            globalThis.$ = undefined;
+            globalThis.$ = globalThis.stack.at(-1);
         }
         return result;
     };
