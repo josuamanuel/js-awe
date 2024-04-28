@@ -679,7 +679,7 @@ function copyPropsWithValue(objDest, shouldUpdateOnlyEmptyFields = false) {
 
       if (isALeaf(nodeValue) === false) return
 
-      if (nodeValue === undefined || nodeValue === null) return
+      if (nodeValue === undefined || nodeValue === null || currentPath.length === 1) return
 
       const destPath = currentPath.slice(1 - currentPath.length)
 
