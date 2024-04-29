@@ -408,3 +408,9 @@ N.B.: vscode does not support IntelliSense inside html script tag, at least at c
 </body>
 ...
 ```
+
+## TO-DO
+
+* Take Ramda, fluture and JSONPath (project function) to another library so we can have a minimalist light library. Only dependencies allowed: just-*
+* Take logLevelExtension to another library.
+* Taking fluture means we remove flutures from plan()
