@@ -1786,26 +1786,6 @@ function processExit(error) {
   }
 }
 
-function _(scope, fn) {
-  return (...params) => {
-    let result;
-    try {
-      globalThis.stack ??= [{}]
-      globalThis.stack.push({...globalThis.stack.at(-1), ...scope})
-      globalThis.$ = globalThis.stack.at(-1);
-      
-      result = fn(...params);
-    }catch(e)
-    {
-      throw e;
-    } finally {
-      globalThis.stack.pop()
-      globalThis.$ = globalThis.stack.at(-1);
-    }
-    return result
-  }
-}
-
 const jsUtils = {
   logWithPrefix,
   firstCapital,
@@ -1867,8 +1847,7 @@ const jsUtils = {
   oneIn,
   loopIndexGenerator,
   retryWithSleep,
-  processExit,
-  _
+  processExit
 }
 
 export default jsUtils
@@ -1934,6 +1913,5 @@ export {
   oneIn,
   loopIndexGenerator,
   retryWithSleep,
-  processExit,
-  _
+  processExit
 }
