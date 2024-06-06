@@ -50,11 +50,13 @@ function exportDemoFunctions() {
 }
 ```
 
-### New functional async style. Avoid await contamination
+### New Functional Asynchronous Style: Preventing Await Complexity
 
-* using **plan**, it pipes functions and forget if a function returns a promise or a real value. Next function always receives the real value.
-* Automatic control of error. Any return of type "Error" or "Promise.reject" will stop the execution of the pipe and return the error. There is no need to circuit break each function.
-* Define sequencial or concurrent execution through the use of array nesting. Pure javascript, no artifical syntax.
+* By using ***plan***, it seamlessly connects functions, eliminating the need to worry about whether a function returns a promise or a direct value. The next function in the pipeline always receives the resolved value.
+* Automatic error handling is provided. If any function returns an "Error" object or a rejected Promise, the rest of the pipeline is skipped, and the error is propagated without the need for explicit error handling in each individual function.
+* Sequential or concurrent execution can be defined through nested arrays, allowing for a clean and intuitive syntax without the need for artificial constructs. The code remains pure JavaScript.
+
+In essence, this new functional asynchronous style introduced by ***plan*** simplifies asynchronous programming by abstracting away the complexities of dealing with promises and await statements. It provides a streamlined approach to composing asynchronous functions, automatically handling errors, and organizing the execution flow through a declarative syntax, all while maintaining the familiarity of JavaScript.
 
 ***The libary handles the mixing of sync and async functions seamlessly***
 
@@ -104,9 +106,9 @@ Async await has done a lot to improve the readability of code when compared with
 
 How many times you have experienced the problem of expecting real values and what you receive is a promise. How many times you solve this problem with an await making the code non performant as we end-up programming secuencially.
 
-Every-time we use await, the execution flow split in two. If you spread await in different part of your code then it will create an execution flow in the shape of a tree. This means that you need to keep in your head and in sync a mental model for the data flow and a mental model of the execution flow. This makes the code difficult to reason about.
+Whenever we use await, the execution flow branches into two separate paths. Employing await statements across different parts of your code creates an execution flow that resembles a tree-like structure. This complicates code readability, as you need to maintain and synchronize two mental models concurrently: one for the data flow and another for the execution flow. Juggling this dual cognitive load makes the code more challenging to comprehend and reason about effectively.
 
-“plan” tries to solve this problem by declaring this tree explicitly in one place and in a simple elegant way. It uses array nesting to define this tree. It does not use weird DSL. “plan” is an execution planner that pipes functions to run in sequence and functions to run concurrently. It handles for you the promise chaining and data passing **so you can write pure functions free of async await**.
+“plan” tries to solve this problem by declaring the asynchoricity explicitly in one place and in a simple elegant way. It uses array nesting to define this tree. It does not use weird DSL. “plan” is an execution planner that pipes functions to run in sequence and functions to run concurrently. It handles for you the promise chaining and data passing **so you can write pure functions free of async await**.
 
 The construct to run in sequence:
 
