@@ -52,7 +52,7 @@ function exportDemoFunctions() {
 
 ### New Functional Asynchronous Style: Preventing Await Complexity
 
-* By using ***plan***, it seamlessly pipe functions, eliminating the need to worry about whether a function returns a promise or a resolved value. The next function in the pipeline always receives the resolved value.
+* By using ***plan***, it seamlessly pipe functions. Values are passed automatically between functions. In case of the value being a promise, it will extract the resolve value before being passed to the next function.
 * Automatic error handling is provided. If any function returns an "Error" object or a rejected Promise, the rest of the pipeline is skipped, and the error is propagated without the need for explicit error handling in each individual function.
 * Sequential or concurrent execution can be defined through nested arrays, allowing for a clean and intuitive syntax without the need for artificial constructs. The code remains pure JavaScript.
 
