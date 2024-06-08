@@ -40,7 +40,7 @@ function areRelativeFrom(ancestorInCommon) {
     return familyMember1 => familyMember2 => (0, just_compare_1.default)(ancestorInCommon, familyMember1 === null || familyMember1 === void 0 ? void 0 : familyMember1.slice(0, ancestorInCommon.length)) &&
         (0, just_compare_1.default)(ancestorInCommon, familyMember2 === null || familyMember2 === void 0 ? void 0 : familyMember2.slice(0, ancestorInCommon.length));
 }
-areRelativeFrom([0, 0])([0, 0, 0, 0])([0, 0]); //?
+// areRelativeFrom([0,0])([0,0,0,0])([0,0]) //?
 const stackSiblingsReducer = (acum, el, index) => {
     var _a;
     if (isSiblingOf((_a = ramdaExt_js_1.R.last(acum)) === null || _a === void 0 ? void 0 : _a.path)(el.path)) {

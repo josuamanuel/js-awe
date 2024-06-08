@@ -34,7 +34,7 @@ function areRelativeFrom(ancestorInCommon) {
     return familyMember1 => familyMember2 => compare(ancestorInCommon, familyMember1?.slice(0, ancestorInCommon.length)) &&
         compare(ancestorInCommon, familyMember2?.slice(0, ancestorInCommon.length));
 }
-areRelativeFrom([0, 0])([0, 0, 0, 0])([0, 0]); //?
+// areRelativeFrom([0,0])([0,0,0,0])([0,0]) //?
 const stackSiblingsReducer = (acum, el, index) => {
     if (isSiblingOf(R.last(acum)?.path)(el.path)) {
         acum[acum.length - 1].value = pipe(R.last(acum).value, el.value);

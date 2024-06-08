@@ -1705,7 +1705,7 @@ function copyPropsWithValue(objDest, shouldUpdateOnlyEmptyFields = false) {
 
       if (isALeaf(nodeValue) === false) return
 
-      if (nodeValue === undefined || nodeValue === null) return
+      if (nodeValue === undefined || nodeValue === null || currentPath.length === 1) return
 
       const destPath = currentPath.slice(1 - currentPath.length);
 
@@ -2780,26 +2780,6 @@ function processExit(error) {
   }
 }
 
-function _(scope, fn) {
-  return (...params) => {
-    let result;
-    try {
-      globalThis.stack ??= [{}];
-      globalThis.stack.push({...globalThis.stack.at(-1), ...scope});
-      globalThis.$ = globalThis.stack.at(-1);
-      
-      result = fn(...params);
-    }catch(e)
-    {
-      throw e;
-    } finally {
-      globalThis.stack.pop();
-      globalThis.$ = globalThis.stack.at(-1);
-    }
-    return result
-  }
-}
-
 const jsUtils = {
   logWithPrefix,
   firstCapital,
@@ -2861,8 +2841,7 @@ const jsUtils = {
   oneIn,
   loopIndexGenerator,
   retryWithSleep,
-  processExit,
-  _
+  processExit
 };
 
 function cloneCopy(to, from, firstCleanTo, shallow) {
@@ -19954,16 +19933,7 @@ function getDescendants(stack)
     )
 }
 
-function areRelativeFrom(ancestorInCommon)
-{
-  if(ancestorInCommon === undefined || ancestorInCommon.length === 0) return false
-
-  return familyMember1 => familyMember2 => 
-    collectionCompare(ancestorInCommon, familyMember1?.slice(0, ancestorInCommon.length)) &&
-    collectionCompare(ancestorInCommon, familyMember2?.slice(0, ancestorInCommon.length))
-}
-
-areRelativeFrom([0,0])([0,0,0,0])([0,0]); //?
+// areRelativeFrom([0,0])([0,0,0,0])([0,0]) //?
 
 const stackSiblingsReducer = 
   (acum, el, index$1) => {
@@ -20390,4 +20360,4 @@ function sanitize(obj, sanitizers = ['ibmApis'], noSanitzedUptoLogLevel) {
 
 }
 
-export { Chrono, CustomError, Enum, EnumMap, F, Index, index as R, RE, RLog, Table, Text, Timeline, YYYY_MM_DD_hh_mm_ss_ToUtcDate, _, addDays, anonymize, arrayOfObjectsToObject, arraySorter, arrayToObject, bearerSanitizer, between, cleanString, cloneCopy, colorByStatus, colorMessage, colorMessageByStatus, colors, consoleTable, consoleTableExtended, copyPropsWithValue, copyPropsWithValueUsingRules, createCustomErrorClass, dateFormatter, dateToObj, deepFreeze, diffInDaysYYYY_MM_DD, exclude, fetchImproved, ffletchMaker, fillWith, filterFlatMap, filterMap, findDeepKey, findSolution, firstCapital, fletch, formatDate, getAt, getSameDateOrPreviousFridayForWeekends, groupByWithCalc, indexOfNthMatch, innerRightJoinWith, isDate, isDateMidnight, isEmpty$2 as isEmpty, isPromise, isStringADate, lengthSanitizer, log, logWithPrefix, loopIndexGenerator, mapWithNext, mapWithPrevious, matchByPropId, memoize, mergeArrayOfObjectsRenamingProps, notTo, oneIn, parallel, partialAtPos, pickPaths, pipe, pipeWhile, pipeWithChain, plan, previousDayOfWeek, processExit, project$2 as project, promiseAll, promiseFunToFutureFun, pushAt, pushUniqueKey, pushUniqueKeyOrChange, queryObjToStr, removeDuplicates, repeat$2 as repeat, replaceAll, retryWithSleep, runFunctionsSyncOrParallel, runFutureFunctionsInParallel, sanitize, setAt, setDateToMidnight, sleep, sleepWithFunction, sleepWithValue, something, sorterByPaths, splitCond, subtractDays, transition, traverse$2 as traverse, traverseVertically, uncurry, unionWithHashKeys, updateWithHashKeys, urlCompose, urlDecompose, varSubsDoubleBracket, wildcardToRegExp };
+export { Chrono, CustomError, Enum, EnumMap, F, Index, index as R, RE, RLog, Table, Text, Timeline, YYYY_MM_DD_hh_mm_ss_ToUtcDate, addDays, anonymize, arrayOfObjectsToObject, arraySorter, arrayToObject, bearerSanitizer, between, cleanString, cloneCopy, colorByStatus, colorMessage, colorMessageByStatus, colors, consoleTable, consoleTableExtended, copyPropsWithValue, copyPropsWithValueUsingRules, createCustomErrorClass, dateFormatter, dateToObj, deepFreeze, diffInDaysYYYY_MM_DD, exclude, fetchImproved, ffletchMaker, fillWith, filterFlatMap, filterMap, findDeepKey, findSolution, firstCapital, fletch, formatDate, getAt, getSameDateOrPreviousFridayForWeekends, groupByWithCalc, indexOfNthMatch, innerRightJoinWith, isDate, isDateMidnight, isEmpty$2 as isEmpty, isPromise, isStringADate, lengthSanitizer, log, logWithPrefix, loopIndexGenerator, mapWithNext, mapWithPrevious, matchByPropId, memoize, mergeArrayOfObjectsRenamingProps, notTo, oneIn, parallel, partialAtPos, pickPaths, pipe, pipeWhile, pipeWithChain, plan, previousDayOfWeek, processExit, project$2 as project, promiseAll, promiseFunToFutureFun, pushAt, pushUniqueKey, pushUniqueKeyOrChange, queryObjToStr, removeDuplicates, repeat$2 as repeat, replaceAll, retryWithSleep, runFunctionsSyncOrParallel, runFutureFunctionsInParallel, sanitize, setAt, setDateToMidnight, sleep, sleepWithFunction, sleepWithValue, something, sorterByPaths, splitCond, subtractDays, transition, traverse$2 as traverse, traverseVertically, uncurry, unionWithHashKeys, updateWithHashKeys, urlCompose, urlDecompose, varSubsDoubleBracket, wildcardToRegExp };
