@@ -1,0 +1,16 @@
+{
+    "name": "nodeimport",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "type":"module",
+    "scripts": {
+      "test": "echo \"Error: no test specified\" && exit 1",
+      "run": "node index.js"
+    },
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+      "js-awe": "^1.0.44"
+    }
+  }
