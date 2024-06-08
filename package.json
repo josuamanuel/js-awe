@@ -40,8 +40,8 @@
     "genAndCopyTypes": "npm run buildTypes && npm run copyMapsAndTypes",
     "buildLib": "rm -rf ./dist && mkdir ./dist && tsc -p tsconfig.json && tsc -p tsconfig-cjs.json && ./fixup",
     "buildWeb": "rollup -c && ./awkChangenNodePerf.sh && rollup -c rollup.config.min.js && rollup -c rollup.config.dts.js && cp -r ./dist/browser ./examples",
-    "testBuildRequire": "cd  examples/nodeRequire && rm -rf ./node_modules && rm -f package-lock.json && npm install --omit=dev  && rm -rf ./node_modules/js-awe/* && cp -rf ../../dist ./node_modules/js-awe/ && cp ../../package.json ./node_modules/js-awe && node index.js",
-    "testBuildImport": "cd  examples/nodeImport  && rm -rf ./node_modules && rm -f package-lock.json && npm install --omit=dev  && rm -rf ./node_modules/js-awe/* && cp -rf ../../dist ./node_modules/js-awe/ && cp ../../package.json ./node_modules/js-awe && node index.js",
+    "testBuildRequire": "cd  examples/nodeRequire && rm -rf ./node_modules/* && rm -f package-lock.json && npm install --omit=dev  && rm -rf ./node_modules/js-awe/* && cp -rf ../../dist ./node_modules/js-awe/ && cp ../../package.json ./node_modules/js-awe && node index.js",
+    "testBuildImport": "cd  examples/nodeImport  && rm -rf ./node_modules/* && rm -f package-lock.json && npm install --omit=dev  && rm -rf ./node_modules/js-awe/* && cp -rf ../../dist ./node_modules/js-awe/ && cp ../../package.json ./node_modules/js-awe && node index.js",
     "build": "npm test && npm run genAndCopyTypes && npm run buildLib && npm run buildWeb && npm run testBuildRequire && npm run testBuildImport"
   },
   "license": "MIT",
