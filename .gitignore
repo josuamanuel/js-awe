@@ -109,5 +109,7 @@ genTypes
 
 examples/nodeImport/node_modules
 examples/nodeImport/package-lock.json
+examples/nodeImport/package.json
 examples/nodeRequire/node_modules
 examples/nodeRequire/package-lock.json
+examples/nodeRequire/package.json
