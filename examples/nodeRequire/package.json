@@ -1,0 +1,17 @@
+{
+  "name": "noderequire",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type":"commonjs",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "run": "node index.js"
+  },
+  "dependencies": {
+    "js-awe": "^1.0.44"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
