@@ -106,6 +106,3 @@ typings/
 
 genTypes
 
-examples/nodeImport/node_modules
-examples/nodeImport/package-lock.json
-examples/nodeImport/package.json
