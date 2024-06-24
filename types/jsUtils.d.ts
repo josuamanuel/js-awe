@@ -529,11 +529,8 @@ type StringDate = `${number}${Separator}${Month}${Separator}${Day}${string}`;
 
 export function isDate(d: any): boolean;
 
-
-type Empty = undefined | null | 0 | 0n | '' | never[] | [] | readonly []  | Record<string, never> | {};
-
 /**
- * Checks if a value is empty: undefined, null, '', 0, NaN, [], {}
+ * Checks if a value is empty: undefined, null, '', 0, 0n, NaN, [], {}
  * Empty differs from falsy as we have added: [] and {} that are truthy And removed: false 
  * @param value - The value to check.
  * @returns Returns `true` if the value is empty, `false` otherwise.
