@@ -7,75 +7,100 @@ export declare interface Chrono {
 
   /**
    * Create event/s and start the timer.
-   * @param eventNames name of the event or array with events
+   * @param eventNames Name of the event or array with event names.
+   * @example
+   * // Single event
+   * chrono.time('step1');
+   * 
+   * // Multiple events
+   * chrono.time(['step1', 'step2']);
    */
-  time(eventNames: string | string[]): void
+  time(eventNames: string | string[]): void;
 
   /**
-   * Stop the timer for the envent/s.
-   * @param eventNames name of the event or array with events
+   * Stop the timer for the event/s.
+   * @param eventNames Name of the event or array with event names.
+   * @example
+   * // Single event
+   * chrono.timeEnd('step1');
+   * 
+   * // Multiple events
+   * chrono.timeEnd(['step1', 'step2']);
    */
   timeEnd(eventNames: string | string[]): void
 
   /**
-   * console.log the following report below:
-   * ```
-   * chronoCreation :  2023-11-05T11:50:54.798Z
-   * report :  2023-11-05T11:50:56.119Z
-   * 
-   * Timeline of events:
-   * ┌────────┬───────────────────────────────────────────────────────────────────────────────────────┐
-   * │ Events │ ms 0                                     656                             1198  1300   │
-   * ├────────┼───────────────────────────────────────────────────────────────────────────────────────┤
-   * │ step1  │    |--------------------------------------|                                        || │
-   * │ step2  │                                             |------------------------------------|    │
-   * │ step3  │                                              |-----------------------------|          │
-   * └────────┴───────────────────────────────────────────────────────────────────────────────────────┘
-   * 
-   * Total elapse Time of each event: 
-   * ┌───────┬────────┬────────────┐
-   * │ name  │ elapse │ percentage │
-   * ├───────┼────────┼────────────┤
-   * │ step1 │ 655    │ 36.85      │
-   * │ step2 │ 620    │ 34.86      │
-   * │ step3 │ 503    │ 28.29      │
-   * └───────┴────────┴────────────┘
-   * 
-   * Coinciding Events timeline: 
-   * ┌───────────────┬──────────┬────────────┐
-   * │ runningEvents │ elapseMs │ percentage │
-   * ├───────────────┼──────────┼────────────┤
-   * │ step1         │ 655      │ 51.39      │
-   * │ step2         │ 116      │ 9.16       │
-   * │ step2,step3   │ 503      │ 39.45      │
-   * └───────────────┴──────────┴────────────┘
-   * ```
+   * Print the report of the events in the console.
    */
   report(): void
 
   /**
-   * This is an implementation of Chrono().time() to use in pipeline of functions. Prepaire the time event function that will be
-   * triggered in the execution of the pipeline. As this is for logging purposes data is passed to the next function. This function
+   * This is an implementation of Chrono().time() to use in a pipeline of functions. Prepare the time event function that will be
+   * triggered in the execution of the pipeline. As this is for logging purposes, data is passed to the next function. This function
    * takes the input and passes it to the next function without modifications.
+   * @param event Name of the event or array with event names.
+   * @returns A function that takes the input data and passes it to the next function without modifications.
+   * @example
+   * const pipeline = [
+   *   chrono.setTime('step1'),
+   *   // other functions in the pipeline
+   * ];
+   * 
+   * const result = pipeline.reduce((data, fn) => fn(data), inputData);
    */
   setTime: (event: string | string[]) => <T>(data: T) => T;
 
   /**
-   * This is an implementation of Chrono().timeEnd() to use in pipeline of functions. Prepaire the timeEnd event function that will be
-   * triggered in the execution of the pipeline. As this is for logging purposes data is passed to the next function. This function
+   * This is an implementation of Chrono().timeEnd() to use in a pipeline of functions. Prepare the timeEnd event function that will be
+   * triggered in the execution of the pipeline. As this is for logging purposes, data is passed to the next function. This function
    * takes the input and passes it to the next function without modifications.
+   * @param event Name of the event or array with event names.
+   * @returns A function that takes the input data and passes it to the next function without modifications.
+   * @example
+   * const pipeline = [
+   *   // other functions in the pipeline
+   *   chrono.setTimeEnd('step1'),
+   * ];
+   * 
+   * const result = pipeline.reduce((data, fn) => fn(data), inputData);
    */
   setTimeEnd: (event: string | string[]) => <T>(data: T) => T;
 
   /**
-   * This is an implementation of Chrono().report() to use in pipeline of functions. Its execution will log the event reports as in
+   * This is an implementation of Chrono().report() to use in a pipeline of functions. Its execution will log the event reports as in
    * Chrono().report() and returns the same data received as input.
+   * @returns A function that takes the input data, logs the event reports, and returns the same data.
+   * @example
+   * const pipeline = [
+   *   // other functions in the pipeline
+   *   chrono.logReport,
+   * ];
+   * 
+   * const result = pipeline.reduce((data, fn) => fn(data), inputData);
    */
   logReport: <T>(data: T) => T;
 
+  /**
+   * Get the current state of the Chrono timer.
+   * @returns The current state of the Chrono timer.
+   */
   getChronoState: () => {};
+
+  /**
+   * Set the Chrono timer state using the Performance API format.
+   * @param performanceGetEntriesByTypeOjb The Performance API object returned by `performance.getEntriesByType('measure')`.
+   */
   setChronoStateUsingPerformanceAPIFormat: (performanceGetEntriesByTypeOjb: any) => void;
+
+  /**
+   * Get the Chrono timer state using the Performance API format.
+   * @returns The Chrono timer state in the Performance API format.
+   */
   getChronoStateUsingPerformanceAPIFormat: () => any[];
+
+  /**
+   * Calculate the average time for each event.
+   */
   average: () => void;
 }
 export declare function Chrono(): Chrono

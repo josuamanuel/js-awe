@@ -1681,13 +1681,13 @@ function copyPropsWithValueUsingRules(objDest, copyRules, shouldUpdateOnlyEmptyF
 }
 // {
 //   let objTo = {a:{b:2},c:3}
-//   let objFrom = {a:{b:4},c:8,d:{e:{f:12}}}
+//   let objFrom = {a:{b:4},c:8,d:{e:{f:12}},l:5}
 //   copyPropsWithValueUsingRules(objTo, [{from:'a.b', to:'c'}, {from:'d.e.f', to:'d'}])(objFrom)
 //   objTo
 // }
 // {
 //   let objTo = {a:{b:2},c:3}
-//   let objFrom = {a:{b:4},c:8,d:{e:{f:12}}}
+//   let objFrom = {a:{b:4},c:8,d:{e:{f:12}}, l:5}
 //   copyPropsWithValueUsingRules(objTo, 
 //     [
 //       {from:'a.b', to:'c'},
@@ -1700,8 +1700,8 @@ function copyPropsWithValueUsingRules(objDest, copyRules, shouldUpdateOnlyEmptyF
 // }
 
 function copyPropsWithValue(objDest, shouldUpdateOnlyEmptyFields = false) {
-  return function (input) {
-    traverse$2(input, (nodeValue, currentPath) => {
+  return function (inputObj) {
+    traverse$2(inputObj, (nodeValue, currentPath) => {
 
       if (isALeaf(nodeValue) === false) return
 
