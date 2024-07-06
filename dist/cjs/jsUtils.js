@@ -616,6 +616,7 @@ function isEmpty(value) {
         value === null ||
         value === '' ||
         value === 0 ||
+        value === 0n ||
         value !== value ||
         (Array.isArray(value) && (value === null || value === void 0 ? void 0 : value.length) === 0) ||
         (typeof value === 'object' && Object.keys(value).length === 0))

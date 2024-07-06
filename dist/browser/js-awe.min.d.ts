@@ -673,10 +673,9 @@ type StringDate = `${number}${Separator}${Month}${Separator}${Day}${string}`;
 
 declare function isDate(d: any): boolean;
 
-
 /**
- * Checks if a value is empty: undefined, null, '', 0, NaN, [], {}
- * empty is bigger than falsy as we have added [] and {} that are truthy
+ * Checks if a value is empty: undefined, null, '', 0, 0n, NaN, [], {}
+ * Empty differs from falsy as we have added: [] and {} that are truthy And removed: false 
  * @param value - The value to check.
  * @returns Returns `true` if the value is empty, `false` otherwise.
  */
@@ -778,24 +777,24 @@ declare function isDateMidnight(date: Date):boolean | undefined;
 declare function setDateToMidnight(date: Date | StringDate): Date;
 
 /**
- * Gets the date of the previous month.
- * @param date - The date to get the previous month.
- * @returns The date of the previous month.
- */
-declare function replaceAll(str: any, ...fromTo: any[]): any;
-
-/**
  * Replaces all occurrences of a substring in a string.
  * @param str - The string to replace the substring in.
  * @param fromTo - The substring to replace and the new substring.
  * @returns The string with the replaced substring.
  */
-declare function cleanString(str: any): any;
+declare function replaceAll(str: any, ...fromTo: any[]): any;
 
 /**
  * Cleans a string by removing all non-alphanumeric characters.
  * @param str - The string to clean.
  * @returns The cleaned string.
+ */
+declare function cleanString(str: any): any;
+
+/**
+ * Repeats a function a specified number of times.
+ * @param numberOfTimes - The number of times to repeat the function.
+ * @returns An object with functions to repeat the function.
  */
 declare function repeat(numberOfTimes: any): {
   times: (funToRepeat: any) => any[];
@@ -804,9 +803,9 @@ declare function repeat(numberOfTimes: any): {
 };
 
 /**
- * Repeats a function a specified number of times.
- * @param numberOfTimes - The number of times to repeat the function.
- * @returns An object with functions to repeat the function.
+ * Calls a function one in a specified period.
+ * @param period - The period to call the function.
+ * @returns An object with functions to call the function.
  */
 declare function oneIn(period: any): {
   calls: (runFunc: any) => {
@@ -815,11 +814,7 @@ declare function oneIn(period: any): {
   };
 };
 
-/**
- * Calls a function one in a specified period.
- * @param period - The period to call the function.
- * @returns An object with functions to call the function.
- */
+
 declare function loopIndexGenerator(initValue: any, iterations: any): Generator<any, void, unknown>;
 
 /**
