@@ -1,6 +1,8 @@
 'use strict';
 import clone from 'just-clone';
 import { JSONPath } from 'jsonpath-plus';
+import { value } from 'fluture';
+import { parse } from 'path';
 const logWithPrefix = (title, displayFunc) => (message) => {
     let finalMessage = message;
     if (typeof displayFunc === 'function') {
@@ -509,6 +511,9 @@ function copyPropsWithValueUsingRules(objDest, copyRules, shouldUpdateOnlyEmptyF
                 to = rule;
             }
             let valueToCopy = getAt(inputObj, from);
+            if (typeof rule.transform === 'function') {
+                valueToCopy = rule.transform(valueToCopy);
+            }
             if (valueToCopy === undefined || valueToCopy === null)
                 return;
             if (shouldUpdateOnlyEmptyFields === true && isEmpty(getAt(objDest, to)))
@@ -531,6 +536,19 @@ function copyPropsWithValueUsingRules(objDest, copyRules, shouldUpdateOnlyEmptyF
 //   copyPropsWithValueUsingRules(objTo, 
 //     [
 //       {from:'a.b', to:'c'},
+//       {from:'d.e.f', to:'d.f'},
+//       {from:'d.e.g', to:'d.g'}
+//     ],
+//     true
+//   )(objFrom)
+//   objTo
+// }
+// {
+//   let objTo = {a:{b:2},c:12}
+//   let objFrom = {a:{b:4},g:"2228",d:{e:{f:12}}, l:5}
+//   copyPropsWithValueUsingRules(objTo, 
+//     [
+//       {from:'g', to:'e', transform: parseInt},
 //       {from:'d.e.f', to:'d.f'},
 //       {from:'d.e.g', to:'d.g'}
 //     ],
