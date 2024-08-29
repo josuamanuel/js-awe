@@ -84,29 +84,6 @@ RE.unionWithHashKeys = unionWithHashKeys;
 // )(
 //   [{date:'2020-01-01'},{date:'2020-01-02',a:1}]
 // )//?
-// function updateWithHashKeysUnc(isAsc, hashAddNoDups, addNoDupsToTheEnd, hashMaster, master) {
-//   const union = new Map()
-//   for (let elem of master) {
-//     union.set(hashMaster(elem), elem)
-//   }
-//   for (let elem of addNoDupsToTheEnd) {
-//     union.set(hashAddNoDups(elem), elem)
-//   }
-//   if(isAsc === true || isAsc === false) {
-//     return Array.from(union.entries()).sort(sorterByPaths('0',isAsc)).map(elem => elem[1]) 
-//   }
-//   return Array.from(union.values())
-// }
-// const updateWithHashKeys = R.curryN(5, updateWithHashKeysUnc)
-// RE.updateWithHashKeys = updateWithHashKeys
-// RE.updateWithHashKeys(
-//   true,
-//   elem=>elem.date,
-//   [{date:'2020-01-08'},{date:'2020-01-03'},{date:'2020-01-02',a:2},{date:'2020-01-05',a:1}],
-//   elem=>elem.date
-// )(
-//   [{date:'2020-01-08',a:4},{date:'2020-01-01',a:1},{date:'2020-01-05',a:5}]
-// )//?
 function isOldLessThanNew(hashOldRecords, hashNewRecords) {
     if (hashOldRecords === hashNewRecords)
         return false;

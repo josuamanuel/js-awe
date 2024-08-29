@@ -1,8 +1,6 @@
 'use strict';
 import clone from 'just-clone';
 import { JSONPath } from 'jsonpath-plus';
-import { value } from 'fluture';
-import { parse } from 'path';
 const logWithPrefix = (title, displayFunc) => (message) => {
     let finalMessage = message;
     if (typeof displayFunc === 'function') {

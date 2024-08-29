@@ -808,7 +808,7 @@ declare function repeat(numberOfTimes: any): {
  * @returns An object with functions to call the function.
  */
 declare function oneIn(period: any): {
-  calls: (runFunc: any) => {
+  call: (runFunc: any) => {
     (...args: any[]): any;
     reset(): number;
   };
@@ -922,7 +922,7 @@ declare function injectLeftData(leftData:any[]):typeof injectRightDataD
 /**
 * Right join using condition and merge function by keys.
 * Response will be for each record in the right will be match with 1..N records in the left.
-* Left record that dont mat will not be present in the response.
+* Left record that dont match will not be present in the response.
 * Each record will be composed of the sum of fields from right and left.
 * If there are coincident field names. the update function will be called to resolve the value.
 * If update is not present, the default behaviour will be to choose the value from right.
@@ -987,6 +987,24 @@ declare function unionWithHashKeys<T,P>(
   addNoDupsToTheEnd: T[],
   hashMaster: (elem: T) => string,
 ):(master: P[]) => (T|P)[];
+
+/**
+* Given the input records will replace the target matched records. To match the records
+* specific hash functions for each data set are provided and executed. 
+* @param isAsc undefined: does not order. true: return result in asc order. false: in desc order
+* @param getHashNewRecords hash function for the input data
+* @param newRecords input data
+* @param getHashOldRecords hash function for the target data
+* @return a function ready to receive the target data
+*/
+declare function updateWithHashKeys<T, U, V, W, X>(
+  isAsc: boolean | undefined,
+  getHashNewRecords: (elem: T) => U,
+  newRecords: T[],
+  getHashOldRecords: (elem: W) => V
+  
+): (oldRecords: W[]) => X[]
+
 
 declare const between: any;
 declare const matchByPropId: any;
@@ -1151,4 +1169,4 @@ declare function Timeline(): {
     };
 };
 
-export { Chrono, CustomError, Enum, EnumMap, RE, RLog, Table, Text, Timeline, YYYY_MM_DD_hh_mm_ss_ToUtcDate, _delete, addDays, anonymize, arrayOfObjectsToObject, arraySorter, arrayToObject, bearerSanitizer, between, cleanString, cloneCopy, colorByStatus, colorMessage, colorMessageByStatus, colors, copyPropsWithValue, copyPropsWithValueUsingRules, createCustomErrorClass, dateFormatter, dateToObj, deepFreeze, diffInDaysYYYY_MM_DD, exclude, fetchImproved, ffletchMaker, fillWith, filterFlatMap, filterMap, findDeepKey, findSolution, firstCapital, fletch, formatDate, getAt, getSameDateOrPreviousFridayForWeekends, groupByWithCalc, indexOfNthMatch, innerRightJoinWith, isDate, isDateMidnight, isEmpty, isPromise, isStringADate, lengthSanitizer, log, logWithPrefix, loopIndexGenerator, mapWithNext, mapWithPrevious, matchByPropId, memoize, mergeArrayOfObjectsRenamingProps, notTo, oneIn, parallel, partialAtPos, pickPaths, pipe, pipeWhile, pipeWithChain, plan, previousDayOfWeek, processExit, project, promiseAll, promiseFunToFutureFun, pushAt, pushUniqueKey, pushUniqueKeyOrChange, queryObjToStr, removeDuplicates, repeat, replaceAll, retryWithSleep, runFunctionsSyncOrParallel, runFutureFunctionsInParallel, sanitize, setAt, setDateToMidnight, skip, sleep, sleepWithFunction, sleepWithValue, something, sorterByPaths, splitCond, stop, subtractDays, transition, traverse, traverseVertically, uncurry, unionWithHashKeys, unionWithHashKeysUnc, urlCompose, urlDecompose, varSubsDoubleBracket, wildcardToRegExp };
+export { Chrono, CustomError, Enum, EnumMap, RE, RLog, Table, Text, Timeline, YYYY_MM_DD_hh_mm_ss_ToUtcDate, _delete, addDays, anonymize, arrayOfObjectsToObject, arraySorter, arrayToObject, bearerSanitizer, between, cleanString, cloneCopy, colorByStatus, colorMessage, colorMessageByStatus, colors, copyPropsWithValue, copyPropsWithValueUsingRules, createCustomErrorClass, dateFormatter, dateToObj, deepFreeze, diffInDaysYYYY_MM_DD, exclude, fetchImproved, ffletchMaker, fillWith, filterFlatMap, filterMap, findDeepKey, findSolution, firstCapital, fletch, formatDate, getAt, getSameDateOrPreviousFridayForWeekends, groupByWithCalc, indexOfNthMatch, innerRightJoinWith, isDate, isDateMidnight, isEmpty, isPromise, isStringADate, lengthSanitizer, log, logWithPrefix, loopIndexGenerator, mapWithNext, mapWithPrevious, matchByPropId, memoize, mergeArrayOfObjectsRenamingProps, notTo, oneIn, parallel, partialAtPos, pickPaths, pipe, pipeWhile, pipeWithChain, plan, previousDayOfWeek, processExit, project, promiseAll, promiseFunToFutureFun, pushAt, pushUniqueKey, pushUniqueKeyOrChange, queryObjToStr, removeDuplicates, repeat, replaceAll, retryWithSleep, runFunctionsSyncOrParallel, runFutureFunctionsInParallel, sanitize, setAt, setDateToMidnight, skip, sleep, sleepWithFunction, sleepWithValue, something, sorterByPaths, splitCond, stop, subtractDays, transition, traverse, traverseVertically, uncurry, unionWithHashKeys, unionWithHashKeysUnc, updateWithHashKeys, urlCompose, urlDecompose, varSubsDoubleBracket, wildcardToRegExp };
