@@ -664,7 +664,7 @@ export function repeat(numberOfTimes: any): {
  * @returns An object with functions to call the function.
  */
 export function oneIn(period: any): {
-  calls: (runFunc: any) => {
+  call: (runFunc: any) => {
     (...args: any[]): any;
     reset(): number;
   };

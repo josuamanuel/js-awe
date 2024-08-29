@@ -83,7 +83,7 @@ declare function injectLeftData(leftData:any[]):typeof injectRightDataD
 /**
 * Right join using condition and merge function by keys.
 * Response will be for each record in the right will be match with 1..N records in the left.
-* Left record that dont mat will not be present in the response.
+* Left record that dont match will not be present in the response.
 * Each record will be composed of the sum of fields from right and left.
 * If there are coincident field names. the update function will be called to resolve the value.
 * If update is not present, the default behaviour will be to choose the value from right.
@@ -149,6 +149,24 @@ export function unionWithHashKeys<T,P>(
   addNoDupsToTheEnd: T[],
   hashMaster: (elem: T) => string,
 ):(master: P[]) => (T|P)[];
+
+/**
+* Given the input records will replace the target matched records. To match the records
+* specific hash functions for each data set are provided and executed. 
+* @param isAsc undefined: does not order. true: return result in asc order. false: in desc order
+* @param getHashNewRecords hash function for the input data
+* @param newRecords input data
+* @param getHashOldRecords hash function for the target data
+* @return a function ready to receive the target data
+*/
+export function updateWithHashKeys<T, U, V, W, X>(
+  isAsc: boolean | undefined,
+  getHashNewRecords: (elem: T) => U,
+  newRecords: T[],
+  getHashOldRecords: (elem: W) => V
+  
+): (oldRecords: W[]) => X[]
+
 
 export const between: any;
 export const matchByPropId: any;
