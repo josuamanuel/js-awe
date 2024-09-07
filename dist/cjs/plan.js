@@ -16,7 +16,7 @@ const convertPathToStackPath = path => path.map((el, index) => {
 function generateStack(plan) {
     let stack = [];
     const reviver = (nodeRef, currentPath, parent) => {
-        if (typeof nodeRef === 'function')
+        if (typeof nodeRef === 'function' && isNaN(parseInt(currentPath.at(-1), 10)) === false)
             stack.push({ value: nodeRef, path: convertPathToStackPath(currentPath) });
         return undefined;
     };

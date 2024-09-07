@@ -19876,13 +19876,12 @@ function generateStack(plan)
 {
   let stack = [];
 
-  const reviver = 
-    (nodeRef, currentPath, parent) => {
-     if(typeof nodeRef === 'function')
-        stack.push({value: nodeRef, path:  convertPathToStackPath(currentPath)});
-    
-      return undefined
-    };
+  const reviver = (nodeRef, currentPath, parent) => {
+    if(typeof nodeRef === 'function' && isNaN(parseInt(currentPath.at(-1),10)) === false)
+      stack.push({value: nodeRef, path:  convertPathToStackPath(currentPath)});
+  
+    return undefined
+  };
 
   traverse$2(
     plan,
@@ -20114,24 +20113,24 @@ function plan({numberOfThreads=Infinity, mockupsObj={}} = {numberOfThreads: Infi
   function build(planDef)
   {
     const toExec = pipe(
-        generateStack,
-        changeFunWithMockupsObj(mockupsObj),
-        pipeWhile(stack => stack.length > 1)(
-          pipeWhile(...lengthStackPrevLessThanCurr())
-          (
-            acumSiblings,
-            acumParallel(numberOfThreads),
-          ),
-          reduceNesting,
+      generateStack,
+      changeFunWithMockupsObj(mockupsObj),
+      pipeWhile(stack => stack.length > 1)(
+        pipeWhile(...lengthStackPrevLessThanCurr())
+        (
+          acumSiblings,
+          acumParallel(numberOfThreads),
         ),
-        extractFinalValue,
-      )(planDef);
+        reduceNesting,
+      ),
+      extractFinalValue,
+    )(planDef);
 
       toExec.rebuild = (options) => {
         setOptions(options);
         return build(planDef)
       };
-      return toExec
+    return toExec
   }
 
   function setOptions(options) {
