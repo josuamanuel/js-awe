@@ -723,7 +723,9 @@ function indexOfNthMatch(string, toMatch, nth) {
 }
 function toDate(date) {
     return date
-        ? new Date(date)
+        ? date instanceof Date
+            ? date
+            : new Date(date)
         : new Date();
 }
 function isDate(d) {
@@ -847,6 +849,18 @@ function addDays(daysToAdd, date) {
 // addDays(3, "2023-03-24").toISOString() //?
 // addDays(9, "2023-03-24").toISOString() //?
 function previousDayOfWeek(dayOfWeek, date) {
+    let dateToProcess = toDate(date);
+    if (isDate(dateToProcess) === false)
+        return dateToProcess;
+    let diffInDaysOfWeek = dateToProcess.getDay() - dayOfWeek;
+    let toSubtract = diffInDaysOfWeek >= 0
+        ? diffInDaysOfWeek
+        : 7 + diffInDaysOfWeek;
+    return subtractDays(toSubtract, dateToProcess);
+}
+//previousDayOfWeek(6,new Date('2021-05-07')) //?
+//previousDayOfWeek(1,new Date('2021-03-25')) //?
+function currentDayOfWeek(dayOfWeek, date) {
     let dateToProcess = toDate(date);
     if (isDate(dateToProcess) === false)
         return dateToProcess;

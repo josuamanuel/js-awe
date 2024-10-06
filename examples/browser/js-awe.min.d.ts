@@ -749,9 +749,10 @@ declare function addDays(daysToSubtract: number, date: Date | StringDate): Date;
 declare function subtractDays(daysToSubtract: number, date: Date | StringDate): Date;
 
 /**
- * Gets the day of the week.
- * @param date - The date to get the day of the week.
- * @returns The day of the week.
+ * Calculates the previous or current date at a specific previous day: 0:monday to 6:Sunday.
+ * @param dayOfWeek - The day of the week. 0: Sunday, 1: Monday, 2: Tuesday, 3: Wednesday, 4: Thursday, 5: Friday, 6: Saturday.
+ * @param date - The date subject to calculation. If the date requested correspond to the dayOfWeek, the same input date is returned.
+ * @returns The calculated date.
  */
 declare function previousDayOfWeek(dayOfWeek: 0 | 1 | 2 | 3 | 4 | 5 | 6, date: Date | StringDate): Date;
 

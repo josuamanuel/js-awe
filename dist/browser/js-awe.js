@@ -1909,7 +1909,9 @@ function indexOfNthMatch(string, toMatch, nth) {
 function toDate(date)
 {
   return date
-      ? new Date(date)
+      ? date instanceof Date
+        ? date
+        : new Date(date)
       : new Date()
 }
 
