@@ -1006,11 +1006,10 @@ declare function updateWithHashKeys<T, U, V, W, X>(
   
 ): (oldRecords: W[]) => X[]
 
-
 declare const between: any;
 declare const matchByPropId: any;
 declare const splitCond: any;
-declare function filterMap<T>(filterFun:(el:T, index?:number, data?:T[])=>boolean, mapFun:(el:T,index?:number, data?:T[])=>T, data:T[]): T[];
+declare function filterMap<T,U>(filterFun:(el:T, index:number, data:T[])=>unknown, mapFun:(el:T,index:number, data:T[])=>U, data:T[]): U[];
 declare const mapWithNext: any;
 declare const mapWithPrevious: any;
 /**

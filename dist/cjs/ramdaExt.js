@@ -217,9 +217,12 @@ function splitCondUnc(condFun, array) {
 const splitCond = R.curryN(2, splitCondUnc);
 exports.splitCond = splitCond;
 RE.splitCond = splitCond;
-const filterMap = R.curry((filter, map, data) => data.reduce((acum, current, index, data) => filter(current, index, data)
-    ? R.append(map(current, index, data), acum)
-    : acum, []));
+const filterMap = R.curry((filter, map, data) => data.reduce((acum, current, index, data) => {
+    if (filter(current, index, data)) {
+        acum.push(map(current, index, data));
+    }
+    return acum;
+}, []));
 exports.filterMap = filterMap;
 RE.filterMap = filterMap;
 const mapWithNext = R.curry((mapper, endValue, array) => array.map((elem, index) => {

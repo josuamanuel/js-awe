@@ -216,14 +216,17 @@ const splitCond = R.curryN(2, splitCondUnc)
 RE.splitCond = splitCond
 
 const filterMap = R.curry(
-  (filter, map, data) => data.reduce(
-    (acum, current, index, data) => 
-      filter(current, index, data)
-        ? R.append(map(current, index, data), acum)
-        : acum,
-    []
-  )
-);
+  (filter, map, data) => 
+    data.reduce(
+      (acum, current, index, data) => {
+        if (filter(current, index, data)) {
+          acum.push(map(current, index, data))
+        }
+        return acum
+      }, 
+      []
+    )
+)
 RE.filterMap = filterMap
 
 const mapWithNext = R.curry(

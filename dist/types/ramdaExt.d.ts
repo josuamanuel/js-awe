@@ -167,11 +167,10 @@ export function updateWithHashKeys<T, U, V, W, X>(
   
 ): (oldRecords: W[]) => X[]
 
-
 export const between: any;
 export const matchByPropId: any;
 export const splitCond: any;
-export function filterMap<T>(filterFun:(el:T, index?:number, data?:T[])=>boolean, mapFun:(el:T,index?:number, data?:T[])=>T, data:T[]): T[];
+export function filterMap<T,U>(filterFun:(el:T, index:number, data:T[])=>unknown, mapFun:(el:T,index:number, data:T[])=>U, data:T[]): U[];
 export const mapWithNext: any;
 export const mapWithPrevious: any;
 /**

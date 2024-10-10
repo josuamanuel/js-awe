@@ -1,5 +1,5 @@
 
-import { sleepWithValue, Chrono} from 'js-awe'
+import { sleepWithValue, Chrono, filterMap} from 'js-awe'
 
 const myChrono = Chrono()
 
@@ -13,6 +13,8 @@ sleepWithValue(100, 5)
     myChrono.average()
     myChrono.report()
   })
+
+filterMap((el, index)=> el > index, (el,index)=> el*index, [0,1,7,3,4,5,9]) //?
 
 
 /*

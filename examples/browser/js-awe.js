@@ -17007,13 +17007,16 @@ const splitCond = curryN(2, splitCondUnc);
 RE.splitCond = splitCond;
 
 const filterMap = curry(
-  (filter, map, data) => data.reduce(
-    (acum, current, index$1, data) => 
-      filter(current, index$1, data)
-        ? append(map(current, index$1, data), acum)
-        : acum,
-    []
-  )
+  (filter, map, data) => 
+    data.reduce(
+      (acum, current, index, data) => {
+        if (filter(current, index, data)) {
+          acum.push(map(current, index, data));
+        }
+        return acum
+      }, 
+      []
+    )
 );
 RE.filterMap = filterMap;
 
