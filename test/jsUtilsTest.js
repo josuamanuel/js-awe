@@ -452,7 +452,7 @@ describe('jsUtils', () => {
     assert.strictEqual(diffInDaysYYYY_MM_DD('2023-02-27', '2023-03-02'), 3)
   })
 
-  it('previousDayOfWeek', () => {
+  it('previousDayOfWeek requested Saturday being on Sunday, return yestarday', () => {
     assert.strictEqual(
       previousDayOfWeek(6, new Date('2023-03-19')).toISOString(),
       new Date('2023-03-18').toISOString()
@@ -473,7 +473,7 @@ describe('jsUtils', () => {
     )
   })
 
-  it('previousDayOfWeek', () => {
+  it('previousDayOfWeek requested Thursday being on Sunday, return previous Thursday', () => {
     assert.strictEqual(
       previousDayOfWeek(4, new Date('2023-03-19')).toISOString(),
       new Date('2023-03-16').toISOString()
