@@ -480,12 +480,20 @@ describe('jsUtils', () => {
     )
   })
 
+  it('previousDayOfWeek. requested Wednesday being on Monday, it returns the requested day of the previous week', () => {
+    assert.strictEqual(
+      previousDayOfWeek(3, '2023-03-20').toISOString(),
+      new Date('2023-03-15').toISOString()
+    )
+  })
+
   it('previousDayOfWeek. You can use string date format', () => {
     assert.strictEqual(
       previousDayOfWeek(4, '2023-03-19').toISOString(),
       new Date('2023-03-16').toISOString()
     )
   })
+
 
   const findDeepKeyObjSubject = {
     house: {
