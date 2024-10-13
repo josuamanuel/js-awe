@@ -1,6 +1,6 @@
 {
   "name": "js-awe",
-  "version": "1.0.77",
+  "version": "1.0.78",
   "homepage": "https://github.com/josuamanuel/js-awe",
   "author": "josuamanuel@hotmail.com",
   "repository": "github:josuamanuel/js-awe",
@@ -52,7 +52,6 @@
     "@rollup/plugin-typescript": "^11.1.2",
     "@types/node": "^20.4.1",
     "mocha": "^10.4.0",
-    "rollup": "^4.22.4",
     "rollup-plugin-dts": "^6.0.1",
     "rollup-plugin-node-polyfills": "^0.2.1"
   },
@@ -63,6 +62,7 @@
     "just-compare": "^2.2.2",
     "just-deep-map-values": "^1.1.1",
     "loglevel": "^1.8.0",
-    "ramda": "^0.28.0"
+    "ramda": "^0.28.0",
+    "rollup": "^4.22.4"
   }
 }
