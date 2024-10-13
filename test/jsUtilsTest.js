@@ -2,6 +2,7 @@ import { strict as assert } from 'assert'
 import {
   EnumMap,
   Enum,
+  sorterByPaths,
   formatDate,
   addDays,
   subtractDays,
@@ -415,6 +416,34 @@ describe('jsUtils', () => {
     }
 
     assert.strictEqual(ex.name, 'ENUM_TRANSITION_NOT_ALLOWED')
+  })
+
+  it('sorterByPaths ASC by default', () => {
+    assert.deepEqual(
+      [{a:{b:3}}, {a:{b:2}}, {a:{b:5}}, {a:{b:4}}].sort(sorterByPaths('a.b')),
+      [{a:{b:2}}, {a:{b:3}}, {a:{b:4}}, {a:{b:5}}]
+    )
+  })
+
+  it('sorterByPaths with DESC', () => {
+    assert.deepEqual(
+      [{a:{b:3}}, {a:{b:2}}, {a:{b:5}}, {a:{b:4}}].sort(sorterByPaths(['a.b'], false)),
+      [{a:{b:5}}, {a:{b:4}}, {a:{b:3}}, {a:{b:2}}]
+    )
+  })
+
+  it('sorterByPaths multiple paths', () => {
+    assert.deepEqual(
+      [{a:{b:5}}, {a:{b:3,c:2}}, {a:{b:3,c:1}}, {a:{b:4}}].sort(sorterByPaths(['a.b','a.c'])),
+      [{a:{b:3,c:1}}, {a:{b:3,c:2}}, {a:{b:4}}, {a:{b:5}}]
+    )
+  })
+
+  it('sorterByPaths with undefined', () => {
+    assert.deepEqual(
+      [{a:3},{a:4},{a:undefined},{a:2},{a:1},{a:undefined},{a:0},{a:undefined}].sort(sorterByPaths('a')),
+      [{a:undefined},{a:undefined},{a:undefined},{a:0},{a:1},{a:2},{a:3},{a:4}]
+    )
   })
 
   it('formatDate YYYY-MM-DD...', () => {

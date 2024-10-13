@@ -1386,8 +1386,8 @@ const sorterByPaths = (paths, isAsc = true) => {
   return (objA, objB) => {
 
     for (let currentPath of pathArr) {
-      if (getAt(objA, currentPath) > getAt(objB, currentPath)) return great
-      else if (getAt(objA, currentPath) < getAt(objB, currentPath)) return less
+      if ( (getAt(objA, currentPath)??-Infinity) > (getAt(objB, currentPath)??-Infinity) ) return great
+      else if( (getAt(objA, currentPath)??-Infinity) < (getAt(objB, currentPath)??-Infinity) ) return less
     }
 
     return 0
@@ -1400,6 +1400,7 @@ const sorterByPaths = (paths, isAsc = true) => {
 //   [{a:{b:3}}, {a:{b:2}}, {a:{b:5}}, {a:{b:4}}].sort(sorterByPaths('a.b', false)),
 //   [{a:{b:3}}, {a:{b:2}}, {a:{b:5}}, {a:{b:4}}].sort(sorterByPaths(['a.b'], false)),
 //   [{a:{b:3,c:2}}, {a:{b:3,c:1}}, {a:{b:5}}, {a:{b:4}}].sort(sorterByPaths(['a.b','a.c'], true)),
+//   [{a:3},{a:4},{a:undefined},{a:2},{a:1},{a:undefined},{a:0},{a:undefined}].sort(sorterByPaths(['a']))
 // )
 
 function filterFlatMap(mapWithUndefinedFilterFun, data) {

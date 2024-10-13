@@ -1196,10 +1196,11 @@ const sorterByPaths = (paths, isAsc = true) => {
     else
         pathArr = [...paths];
     return (objA, objB) => {
+        var _a, _b, _c, _d;
         for (let currentPath of pathArr) {
-            if (getAt(objA, currentPath) > getAt(objB, currentPath))
+            if (((_a = getAt(objA, currentPath)) !== null && _a !== void 0 ? _a : -Infinity) > ((_b = getAt(objB, currentPath)) !== null && _b !== void 0 ? _b : -Infinity))
                 return great;
-            else if (getAt(objA, currentPath) < getAt(objB, currentPath))
+            else if (((_c = getAt(objA, currentPath)) !== null && _c !== void 0 ? _c : -Infinity) < ((_d = getAt(objB, currentPath)) !== null && _d !== void 0 ? _d : -Infinity))
                 return less;
         }
         return 0;
@@ -1212,6 +1213,7 @@ exports.sorterByPaths = sorterByPaths;
 //   [{a:{b:3}}, {a:{b:2}}, {a:{b:5}}, {a:{b:4}}].sort(sorterByPaths('a.b', false)),
 //   [{a:{b:3}}, {a:{b:2}}, {a:{b:5}}, {a:{b:4}}].sort(sorterByPaths(['a.b'], false)),
 //   [{a:{b:3,c:2}}, {a:{b:3,c:1}}, {a:{b:5}}, {a:{b:4}}].sort(sorterByPaths(['a.b','a.c'], true)),
+//   [{a:3},{a:4},{a:undefined},{a:2},{a:1},{a:undefined},{a:0},{a:undefined}].sort(sorterByPaths(['a']))
 // )
 function filterFlatMap(mapWithUndefinedFilterFun, data) {
     let result = [];

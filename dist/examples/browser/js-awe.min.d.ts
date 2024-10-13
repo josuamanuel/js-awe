@@ -349,11 +349,11 @@ declare function setAt(obj: any, valuePath: any, value: any): string;
 /**
  * Creates a sorter function to use as a parameter in array.prototype.sort(sorter).
  * It can order by several fields. If fields are equal, it will uneven using subsequent fields.
- * @param {any} paths - List of paths to sort by. One path for each field to order by. Route path is of the shape 'person.details.age'. If it is only one field, it can be a string.
+ * @param {string | string[]} paths - List of paths to sort by. One path for each field to order by. Route path is of the shape 'person.details.age'. If it is only one field, it can be a string.
  * @param {boolean} [isAsc=true] - Optional. Default: true. true: to order ascending. false: to order descending.
  * @returns {Function} - A sorter function to include in array.prototype.sort(sorter).
  */
-declare function sorterByPaths(paths: any, isAsc?: boolean): (objA: any, objB: any) => number;
+declare function sorterByPaths(paths: string[]|string, isAsc?: boolean): (objA: unknown, objB: unknown) => number;
 
 /**
  * Filters and maps an array.
