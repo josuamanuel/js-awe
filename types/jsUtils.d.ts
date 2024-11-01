@@ -526,7 +526,11 @@ type Day = '01' | '02' | '03' | '04' | '05' | '06' | '07' | '08' | '09' | '10' |
 type Separator = '/' | '-'
 type StringDate = `${number}${Separator}${Month}${Separator}${Day}${string}`;
 
-
+/**
+ * Checks if a value is a valid Date: instance of Date and not NaN.
+ * @param value - The value to check.
+ * @returns Returns `true` if it is valid date, `false` otherwise.
+ */
 export function isDate(d: any): boolean;
 
 /**
