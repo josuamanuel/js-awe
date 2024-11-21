@@ -9,7 +9,7 @@
       "run": "node index.js"
     },
     "dependencies": {
-      "js-awe": "^1.0.44"
+      "js-awe": "^1.0.79"
     },
     "keywords": [],
     "author": "",
