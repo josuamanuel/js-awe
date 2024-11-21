@@ -34,14 +34,14 @@ function cloneCopy(to, from, firstCleanTo, shallow) {
   return to
 }
 
-function wildcardToRegExp(pathSearch, flagsString, separator = '.') {
+function wildcardToRegExp(pathSearch, flagsString, separator = '.',matchFromStart = true, matchToEnd = true) {
 
   let escSeparator = escapeRegExp(separator)
 
   let result = pathSearch.split(separator).join(`${escSeparator}`)
   result = result.split('*').join(`[^${escSeparator}]*`)
   result = result.split(`[^${escSeparator}]*[^${escSeparator}]*`).join('.*')
-  result = '^' + result + '$'
+  result = `${matchFromStart?'^':''}${result}${matchToEnd?'$':''}`
   let regExToReturn = new RegExp(result, flagsString)
 
   return regExToReturn
