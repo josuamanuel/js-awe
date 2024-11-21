@@ -16,7 +16,17 @@ export { ramda as R };
  declare function anonymize(toAnonymise: string): string
 
 declare function cloneCopy(to: any, from: any, firstCleanTo: any, shallow: any): any;
-declare function wildcardToRegExp(pathSearch: any, flagsString: any, separator?: string): RegExp;
+
+/**
+ * 
+ * @param pathSearch - The search query containing wildcards: account.**.name any that starts with account and ends with name.
+ * @param flagString - The flag strings to add to regex: i (case insensitive), g (global), m (multiline), s (dot matches all), u (unicode), y (sticky).
+ * @param separator - The separator characted used in pathSearch to separate different words. account.name -> .
+ * @param matchFromStart - If true, the regex will match from the start of the string.
+ * @param matchToEnd - If true, the regex will match to the end of the string.
+ * @returns The regex equivalent to pathSearch.
+ */
+declare function wildcardToRegExp(pathSearch: string, flagsString: string, separator?: string, matchFromStart?: boolean, matchToEnd?: boolean): RegExp;
 declare function promiseAll(obj: any): any;
 
 /**
@@ -670,7 +680,11 @@ type Day = '01' | '02' | '03' | '04' | '05' | '06' | '07' | '08' | '09' | '10' |
 type Separator = '/' | '-'
 type StringDate = `${number}${Separator}${Month}${Separator}${Day}${string}`;
 
-
+/**
+ * Checks if a value is a valid Date: instance of Date and not NaN.
+ * @param value - The value to check.
+ * @returns Returns `true` if it is valid date, `false` otherwise.
+ */
 declare function isDate(d: any): boolean;
 
 /**
