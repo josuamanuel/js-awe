@@ -400,7 +400,7 @@ class Plugins {
   }
 }
 
-//     JavaScript Expression Parser (JSEP) 1.3.9
+//     JavaScript Expression Parser (JSEP) 1.4.0
 
 class Jsep {
   /**
@@ -408,7 +408,7 @@ class Jsep {
    */
   static get version() {
     // To be filled in by the template
-    return '1.3.9';
+    return '1.4.0';
   }
 
   /**
@@ -1284,6 +1284,7 @@ Object.assign(Jsep, {
   // see [Order of operations](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Operator_Precedence)
   binary_ops: {
     '||': 1,
+    '??': 1,
     '&&': 2,
     '|': 3,
     '^': 4,
@@ -1303,10 +1304,11 @@ Object.assign(Jsep, {
     '-': 9,
     '*': 10,
     '/': 10,
-    '%': 10
+    '%': 10,
+    '**': 11
   },
   // sets specific binary_ops as right-associative
-  right_associative: new Set(),
+  right_associative: new Set(['**']),
   // Additional valid identifier chars, apart from a-z, A-Z and 0-9 (except on the starting char)
   additional_identifier_chars: new Set(['$', '_']),
   // Literals
@@ -1441,7 +1443,7 @@ const MINUS_CODE = 45; // -
 
 const plugin = {
   name: 'assignment',
-  assignmentOperators: new Set(['=', '*=', '**=', '/=', '%=', '+=', '-=', '<<=', '>>=', '>>>=', '&=', '^=', '|=']),
+  assignmentOperators: new Set(['=', '*=', '**=', '/=', '%=', '+=', '-=', '<<=', '>>=', '>>>=', '&=', '^=', '|=', '||=', '&&=', '??=']),
   updateOperators: [PLUS_CODE, MINUS_CODE],
   assignmentPrecedence: 0.9,
   init(jsep) {
@@ -1503,10 +1505,14 @@ const plugin = {
   }
 };
 
-/* eslint-disable no-bitwise */
+/* eslint-disable no-bitwise -- Convenient */
 
 // register plugins
 jsep.plugins.register(index$1, plugin);
+jsep.addUnaryOp('typeof');
+jsep.addLiteral('null', null);
+jsep.addLiteral('undefined', undefined);
+const BLOCKED_PROTO_PROPERTIES = new Set(['constructor', '__proto__', '__defineGetter__', '__defineSetter__']);
 const SafeEval = {
   /**
    * @param {jsep.Expression} ast
@@ -1546,9 +1552,9 @@ const SafeEval = {
       '|': (a, b) => a | b(),
       '^': (a, b) => a ^ b(),
       '&': (a, b) => a & b(),
-      // eslint-disable-next-line eqeqeq
+      // eslint-disable-next-line eqeqeq -- API
       '==': (a, b) => a == b(),
-      // eslint-disable-next-line eqeqeq
+      // eslint-disable-next-line eqeqeq -- API
       '!=': (a, b) => a != b(),
       '===': (a, b) => a === b(),
       '!==': (a, b) => a !== b(),
@@ -1589,7 +1595,7 @@ const SafeEval = {
     return SafeEval.evalAst(ast.alternate, subs);
   },
   evalIdentifier(ast, subs) {
-    if (ast.name in subs) {
+    if (Object.hasOwn(subs, ast.name)) {
       return subs[ast.name];
     }
     throw ReferenceError(`${ast.name} is not defined`);
@@ -1601,6 +1607,12 @@ const SafeEval = {
     const prop = ast.computed ? SafeEval.evalAst(ast.property) // `object[property]`
     : ast.property.name; // `object.property` property is Identifier
     const obj = SafeEval.evalAst(ast.object, subs);
+    if (obj === undefined || obj === null) {
+      throw TypeError(`Cannot read properties of ${obj} (reading '${prop}')`);
+    }
+    if (!Object.hasOwn(obj, prop) && BLOCKED_PROTO_PROPERTIES.has(prop)) {
+      throw TypeError(`Cannot read properties of ${obj} (reading '${prop}')`);
+    }
     const result = obj[prop];
     if (typeof result === 'function') {
       return result.bind(obj); // arrow functions aren't affected by bind.
@@ -1612,8 +1624,9 @@ const SafeEval = {
       '-': a => -SafeEval.evalAst(a, subs),
       '!': a => !SafeEval.evalAst(a, subs),
       '~': a => ~SafeEval.evalAst(a, subs),
-      // eslint-disable-next-line no-implicit-coercion
-      '+': a => +SafeEval.evalAst(a, subs)
+      // eslint-disable-next-line no-implicit-coercion -- API
+      '+': a => +SafeEval.evalAst(a, subs),
+      typeof: a => typeof SafeEval.evalAst(a, subs)
     }[ast.operator](ast.argument);
     return result;
   },
@@ -1623,6 +1636,9 @@ const SafeEval = {
   evalCallExpression(ast, subs) {
     const args = ast.arguments.map(arg => SafeEval.evalAst(arg, subs));
     const func = SafeEval.evalAst(ast.callee, subs);
+    // if (func === Function) {
+    //     throw new Error('Function constructor is disabled');
+    // }
     return func(...args);
   },
   evalAssignmentExpression(ast, subs) {
@@ -1654,15 +1670,13 @@ class SafeScript {
    * @returns {EvaluatedResult} Result of evaluated code
    */
   runInNewContext(context) {
-    const keyMap = {
-      ...context
-    };
+    // `Object.create(null)` creates a prototypeless object
+    const keyMap = Object.assign(Object.create(null), context);
     return SafeEval.evalAst(this.ast, keyMap);
   }
 }
 
-/* eslint-disable camelcase, unicorn/prefer-string-replace-all,
-  unicorn/prefer-at */
+/* eslint-disable camelcase -- Convenient for escaping */
 
 
 /**
@@ -1795,7 +1809,7 @@ class NewError extends Error {
  * @class
  */
 function JSONPath(opts, expr, obj, callback, otherTypeCallback) {
-  // eslint-disable-next-line no-restricted-syntax
+  // eslint-disable-next-line no-restricted-syntax -- Allow for pseudo-class
   if (!(this instanceof JSONPath)) {
     try {
       return new JSONPath(opts, expr, obj, callback, otherTypeCallback);
@@ -1943,7 +1957,7 @@ JSONPath.prototype._handleCallback = function (fullRetObj, callback, type) {
   if (callback) {
     const preferredOutput = this._getPreferredOutput(fullRetObj);
     fullRetObj.path = typeof fullRetObj.path === 'string' ? fullRetObj.path : JSONPath.toPathString(fullRetObj.path);
-    // eslint-disable-next-line n/callback-return
+    // eslint-disable-next-line n/callback-return -- No need to return
     callback(preferredOutput, type, fullRetObj);
   }
 };
@@ -2080,7 +2094,7 @@ JSONPath.prototype._trace = function (expr, val, path, parent, parentPropName, c
     // As this will resolve to a property name (but we don't know it
     //  yet), property and parent information is relative to the
     //  parent of the property to which this expression will resolve
-    addRet(this._trace(unshift(this._eval(loc, val, path[path.length - 1], path.slice(0, -1), parent, parentPropName), x), val, path, parent, parentPropName, callback, hasArrExpr));
+    addRet(this._trace(unshift(this._eval(loc, val, path.at(-1), path.slice(0, -1), parent, parentPropName), x), val, path, parent, parentPropName, callback, hasArrExpr));
   } else if (loc[0] === '@') {
     // value type: @boolean(), etc.
     let addType = false;
@@ -2235,9 +2249,9 @@ JSONPath.prototype._eval = function (code, _v, _vname, path, parent, parentPropN
   }
   const scriptCacheKey = this.currEval + 'Script:' + code;
   if (!JSONPath.cache[scriptCacheKey]) {
-    let script = code.replace(/@parentProperty/gu, '_$_parentProperty').replace(/@parent/gu, '_$_parent').replace(/@property/gu, '_$_property').replace(/@root/gu, '_$_root').replace(/@([.\s)[])/gu, '_$_v$1');
+    let script = code.replaceAll('@parentProperty', '_$_parentProperty').replaceAll('@parent', '_$_parent').replaceAll('@property', '_$_property').replaceAll('@root', '_$_root').replaceAll(/@([.\s)[])/gu, '_$_v$1');
     if (containsPath) {
-      script = script.replace(/@path/gu, '_$_path');
+      script = script.replaceAll('@path', '_$_path');
     }
     if (this.currEval === 'safe' || this.currEval === true || this.currEval === undefined) {
       JSONPath.cache[scriptCacheKey] = new this.safeVm.Script(script);
@@ -2295,7 +2309,7 @@ JSONPath.toPointer = function (pointer) {
   let p = '';
   for (let i = 1; i < n; i++) {
     if (!/^(~|\^|@.*?\(\))$/u.test(x[i])) {
-      p += '/' + x[i].toString().replace(/~/gu, '~0').replace(/\//gu, '~1');
+      p += '/' + x[i].toString().replaceAll('~', '~0').replaceAll('/', '~1');
     }
   }
   return p;
@@ -2315,32 +2329,32 @@ JSONPath.toPathArray = function (expr) {
   const subx = [];
   const normalized = expr
   // Properties
-  .replace(/@(?:null|boolean|number|string|integer|undefined|nonFinite|scalar|array|object|function|other)\(\)/gu, ';$&;')
+  .replaceAll(/@(?:null|boolean|number|string|integer|undefined|nonFinite|scalar|array|object|function|other)\(\)/gu, ';$&;')
   // Parenthetical evaluations (filtering and otherwise), directly
   //   within brackets or single quotes
-  .replace(/[['](\??\(.*?\))[\]'](?!.\])/gu, function ($0, $1) {
+  .replaceAll(/[['](\??\(.*?\))[\]'](?!.\])/gu, function ($0, $1) {
     return '[#' + (subx.push($1) - 1) + ']';
   })
   // Escape periods and tildes within properties
-  .replace(/\[['"]([^'\]]*)['"]\]/gu, function ($0, prop) {
-    return "['" + prop.replace(/\./gu, '%@%').replace(/~/gu, '%%@@%%') + "']";
+  .replaceAll(/\[['"]([^'\]]*)['"]\]/gu, function ($0, prop) {
+    return "['" + prop.replaceAll('.', '%@%').replaceAll('~', '%%@@%%') + "']";
   })
   // Properties operator
-  .replace(/~/gu, ';~;')
+  .replaceAll('~', ';~;')
   // Split by property boundaries
-  .replace(/['"]?\.['"]?(?![^[]*\])|\[['"]?/gu, ';')
+  .replaceAll(/['"]?\.['"]?(?![^[]*\])|\[['"]?/gu, ';')
   // Reinsert periods within properties
-  .replace(/%@%/gu, '.')
+  .replaceAll('%@%', '.')
   // Reinsert tildes within properties
-  .replace(/%%@@%%/gu, '~')
+  .replaceAll('%%@@%%', '~')
   // Parent
-  .replace(/(?:;)?(\^+)(?:;)?/gu, function ($0, ups) {
+  .replaceAll(/(?:;)?(\^+)(?:;)?/gu, function ($0, ups) {
     return ';' + ups.split('').join(';') + ';';
   })
   // Descendents
-  .replace(/;;;|;;/gu, ';..;')
+  .replaceAll(/;;;|;;/gu, ';..;')
   // Remove trailing
-  .replace(/;$|'?\]|'$/gu, '');
+  .replaceAll(/;$|'?\]|'$/gu, '');
   const exprList = normalized.split(';').map(function (exp) {
     const match = exp.match(/#(\d+)/u);
     return !match || !match[1] ? exp : subx[match[1]];

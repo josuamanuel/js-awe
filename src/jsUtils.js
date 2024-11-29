@@ -1711,7 +1711,13 @@ function fillWith(mapper, lenOrWhileTruthFun) {
 //   ) //?
 // )
 
+function numberToFixedString(num, intLength, decLength) {
+  return num.toFixed(decLength).padStart(intLength + decLength + 1, '0')
 
+}
+// console.log(
+//   numberToFixedString(12.345, 5, 2) //?
+// )
 
 // can be called with list of parameters or with array.
 //console.log(replaceAll('I like red cars and red houses', {from:'red',to:'yellow'},{from:'e',to:'E'}))
@@ -1864,6 +1870,7 @@ const jsUtils = {
   pushAt,
   memoize,
   fillWith,
+  numberToFixedString,
   isDate,
   isEmpty,
   isStringADate,
@@ -1930,6 +1937,7 @@ export {
   pushAt,
   memoize,
   fillWith,
+  numberToFixedString,
   isDate,
   isEmpty,
   isStringADate,

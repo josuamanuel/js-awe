@@ -521,6 +521,22 @@ export function memoize(): {
  */
 export function fillWith(mapper: any, lenOrWhileTruthFun: any): any[];
 
+/**
+  * Number to string with fixed integer and decimals
+  * @param num - The number to convert.
+  * @param intLength - The length of the integer part.
+  * @param decLength - The length of the decimal part.
+  * @returns The number as a string with fixed integer and decimal parts.
+  * @example
+  * ```
+  * numberToFixedString(123.456, 5, 2) //?
+  * ```
+  * This will produce
+  * ```
+  * '00123.46'
+ */
+export function numberToFixedString(num:number, intLength:number, decLength:number): string;
+
 type Month = '01' | '02' | '03' | '04' | '05' | '06' | '07' | '08' | '09' | '10' | '11' | '12';
 type Day = '01' | '02' | '03' | '04' | '05' | '06' | '07' | '08' | '09' | '10' | '11' | '12' | '13' | '14' | '15' | '16' | '17' | '18' | '19' | '20' | '21' | '22' | '23' | '24' | '25' | '26' | '27' | '28' | '29' | '30' | '31';
 type Separator = '/' | '-'
