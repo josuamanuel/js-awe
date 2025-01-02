@@ -212,6 +212,22 @@ export function setAt(obj: any, valuePath: any, value: any): string;
 export function sorterByPaths(paths: string[]|string, isAsc?: boolean): (objA: unknown, objB: unknown) => number;
 
 /**
+ * Creates a sorter function to use as a parameter in array.prototype.sort(sorter).
+ * It can order by several fields and specifying an order by each field.
+ * @param {string | string[]} paths - List of paths to sort by. One path for each field to order by. Route path is of the shape 'person.details.age'. If it is only one field, it can be a string.
+ * @param {boolean | array} [isAsc=true] - Optional. Default: true. true: to order ascending. false: to order descending. You can specify an array [true, false] to order by each field.  
+ * @returns {Function} - A sorter function to include in array.prototype.sort(sorter).
+ */
+export function sorterByFields(paths: string[]|string, isAsc?: boolean): (objA: unknown, objB: unknown) => number;
+
+/**
+ * Returns the value if it is not undefined, null or NaN. Otherwise, it returns the default value.
+ * @param value   The value to check.
+ * @param defaultValue  The default value to return if the value is undefined, null or NaN.
+ */
+export function defaultValue(value: any, defaultValue: any): any;
+
+/**
  * Filters and maps an array.
  * @param {any} mapWithUndefinedFilterFun - The array to filter and map.
  * @param {any} data - The data to filter and map.

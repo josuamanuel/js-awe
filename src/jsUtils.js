@@ -1370,13 +1370,21 @@ function setAt(obj, valuePath, value) {
   // obj6 //?
 }
 
+const defaultValue = (value, defaultVal) => {
+  if(value === undefined || value === null || isNaN(value)) return defaultVal
+
+  return value
+}
+
 const sorterByPaths = (paths, isAsc = true) => {
   let great = 1
   let less = -1
+  let  nullishValues = Infinity // In ascending we put nullish values at the end
 
   if (isAsc === false) {
     great = -1
     less = 1
+    nullishValues = -Infinity // In descending we put nullish values at the beginning
   }
 
   let pathArr
@@ -1386,8 +1394,8 @@ const sorterByPaths = (paths, isAsc = true) => {
   return (objA, objB) => {
 
     for (let currentPath of pathArr) {
-      if ( (getAt(objA, currentPath)??-Infinity) > (getAt(objB, currentPath)??-Infinity) ) return great
-      else if( (getAt(objA, currentPath)??-Infinity) < (getAt(objB, currentPath)??-Infinity) ) return less
+      if ( defaultValue(getAt(objA, currentPath), nullishValues) > defaultValue(getAt(objB, currentPath), nullishValues) ) return great
+      if ( defaultValue(getAt(objA, currentPath), nullishValues) < defaultValue(getAt(objB, currentPath), nullishValues) ) return less
     }
 
     return 0
@@ -1402,6 +1410,56 @@ const sorterByPaths = (paths, isAsc = true) => {
 //   [{a:{b:3,c:2}}, {a:{b:3,c:1}}, {a:{b:5}}, {a:{b:4}}].sort(sorterByPaths(['a.b','a.c'], true)),
 //   [{a:3},{a:4},{a:undefined},{a:2},{a:1},{a:undefined},{a:0},{a:undefined}].sort(sorterByPaths(['a']))
 // )
+
+
+const sorterByFields = (paths, isAsc = true) => {
+  if(Array.isArray(isAsc) === false) {
+    isAsc = Array(paths.length).fill(isAsc)
+  }
+
+  let pathArr
+  if (typeof paths === 'string') pathArr = [paths]
+  else pathArr = [...paths]
+
+  return (objA, objB) => {
+
+    let great, less, nullishValues, currentPath
+    for(let index =0; index < pathArr.length; index++) {
+      currentPath = pathArr[index]
+      great = 1
+      less = -1
+      nullishValues = Infinity // In ascending we put nullish values at the end
+    
+      if (isAsc[index] === false) {
+        great = -1
+        less = 1
+        nullishValues = -Infinity // In descending we put nullish values at the beginning
+      }
+    
+      if ( defaultValue(getAt(objA, currentPath), nullishValues) > defaultValue(getAt(objB, currentPath), nullishValues) ) return great
+      if ( defaultValue(getAt(objA, currentPath), nullishValues) < defaultValue(getAt(objB, currentPath), nullishValues) ) return less
+    }
+    return 0
+  }
+}
+// console.log(
+//   [{a:{b:3}}, {a:{b:2}}, {a:{b:5}}, {a:{b:4}}].sort(sorterByFields('a.b')),
+//   [{a:{b:3}}, {a:{b:2}}, {a:{b:5}}, {a:{b:4}}].sort(sorterByFields('a.b', true)),
+//   [{a:{b:3}}, {a:{b:2}}, {a:{b:5}}, {a:{b:4}}].sort(sorterByFields('a.b', false)),
+//   [{a:{b:3}}, {a:{b:2}}, {a:{b:5}}, {a:{b:4}}].sort(sorterByFields(['a.b'], false)),
+//   [{a:{b:3,c:2}}, {a:{b:3,c:1}}, {a:{b:5}}, {a:{b:4}}].sort(sorterByFields(['a.b','a.c'], true)),
+//   [{a:3},{a:4},{a:undefined},{a:2},{a:1},{a:undefined},{a:0},{a:undefined}].sort(sorterByFields(['a']))
+// )
+
+// [
+//   {a:3,b:2},
+//   {a:4,b:1},
+//   {a:undefined,b:3},
+//   {a:2,b:NaN},
+//   {a:3,b:NaN},
+//   {a:undefined,b:6},
+//   {a:0,b:7},
+//   {a:undefined,b:null}].sort(sorterByFields(['a','b'],[true,false])) //?
 
 function filterFlatMap(mapWithUndefinedFilterFun, data) {
   let result = []
@@ -1847,6 +1905,8 @@ const jsUtils = {
   getAt,
   setAt,
   sorterByPaths,
+  sorterByFields,
+  defaultValue,
   filterFlatMap,
   arraySorter,
   isPromise,
@@ -1914,6 +1974,8 @@ export {
   getAt,
   setAt,
   sorterByPaths,
+  sorterByFields,
+  defaultValue,
   filterFlatMap,
   arraySorter,
   isPromise,

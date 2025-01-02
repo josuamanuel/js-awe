@@ -442,7 +442,7 @@ describe('jsUtils', () => {
   it('sorterByPaths with undefined', () => {
     assert.deepEqual(
       [{a:3},{a:4},{a:undefined},{a:2},{a:1},{a:undefined},{a:0},{a:undefined}].sort(sorterByPaths('a')),
-      [{a:undefined},{a:undefined},{a:undefined},{a:0},{a:1},{a:2},{a:3},{a:4}]
+      [{a:0},{a:1},{a:2},{a:3},{a:4},{a:undefined},{a:undefined},{a:undefined}]
     )
   })
 

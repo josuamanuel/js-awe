@@ -12,8 +12,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.diffInDaysYYYY_MM_DD = exports.dateToObj = exports.YYYY_MM_DD_hh_mm_ss_ToUtcDate = exports.dateFormatter = exports.formatDate = exports.isStringADate = exports.isEmpty = exports.isDate = exports.numberToFixedString = exports.fillWith = exports.memoize = exports.pushAt = exports.pushUniqueKeyOrChange = exports.pushUniqueKey = exports.transition = exports.Enum = exports.EnumMap = exports.copyPropsWithValueUsingRules = exports.copyPropsWithValue = exports.project = exports.traverseVertically = exports.traverse = exports.removeDuplicates = exports.arrayOfObjectsToObject = exports.arrayToObject = exports.notTo = exports.sleepWithFunction = exports.sleepWithValue = exports.sleep = exports.isPromise = exports.arraySorter = exports.filterFlatMap = exports.sorterByPaths = exports.setAt = exports.getAt = exports.deepFreeze = exports.findDeepKey = exports.colorByStatus = exports.colorMessageByStatus = exports.colorMessage = exports.colors = exports.indexOfNthMatch = exports.urlDecompose = exports.urlCompose = exports.createCustomErrorClass = exports.CustomError = exports.queryObjToStr = exports.varSubsDoubleBracket = exports.firstCapital = exports.logWithPrefix = void 0;
-exports.processExit = exports.retryWithSleep = exports.loopIndexGenerator = exports.oneIn = exports.repeat = exports.cleanString = exports.replaceAll = exports.setDateToMidnight = exports.isDateMidnight = exports.getSameDateOrPreviousFridayForWeekends = exports.previousDayOfWeek = exports.addDays = exports.subtractDays = void 0;
+exports.YYYY_MM_DD_hh_mm_ss_ToUtcDate = exports.dateFormatter = exports.formatDate = exports.isStringADate = exports.isEmpty = exports.isDate = exports.numberToFixedString = exports.fillWith = exports.memoize = exports.pushAt = exports.pushUniqueKeyOrChange = exports.pushUniqueKey = exports.transition = exports.Enum = exports.EnumMap = exports.copyPropsWithValueUsingRules = exports.copyPropsWithValue = exports.project = exports.traverseVertically = exports.traverse = exports.removeDuplicates = exports.arrayOfObjectsToObject = exports.arrayToObject = exports.notTo = exports.sleepWithFunction = exports.sleepWithValue = exports.sleep = exports.isPromise = exports.arraySorter = exports.filterFlatMap = exports.defaultValue = exports.sorterByFields = exports.sorterByPaths = exports.setAt = exports.getAt = exports.deepFreeze = exports.findDeepKey = exports.colorByStatus = exports.colorMessageByStatus = exports.colorMessage = exports.colors = exports.indexOfNthMatch = exports.urlDecompose = exports.urlCompose = exports.createCustomErrorClass = exports.CustomError = exports.queryObjToStr = exports.varSubsDoubleBracket = exports.firstCapital = exports.logWithPrefix = void 0;
+exports.processExit = exports.retryWithSleep = exports.loopIndexGenerator = exports.oneIn = exports.repeat = exports.cleanString = exports.replaceAll = exports.setDateToMidnight = exports.isDateMidnight = exports.getSameDateOrPreviousFridayForWeekends = exports.previousDayOfWeek = exports.addDays = exports.subtractDays = exports.diffInDaysYYYY_MM_DD = exports.dateToObj = void 0;
 const just_clone_1 = __importDefault(require("just-clone"));
 const jsonpath_plus_1 = require("jsonpath-plus");
 const logWithPrefix = (title, displayFunc) => (message) => {
@@ -1183,12 +1183,20 @@ exports.setAt = setAt;
     // setAt(obj6,'items.$last.ar.$push',8) //?
     // obj6 //?
 }
+const defaultValue = (value, defaultVal) => {
+    if (value === undefined || value === null || isNaN(value))
+        return defaultVal;
+    return value;
+};
+exports.defaultValue = defaultValue;
 const sorterByPaths = (paths, isAsc = true) => {
     let great = 1;
     let less = -1;
+    let nullishValues = Infinity; // In ascending we put nullish values at the end
     if (isAsc === false) {
         great = -1;
         less = 1;
+        nullishValues = -Infinity; // In descending we put nullish values at the beginning
     }
     let pathArr;
     if (typeof paths === 'string')
@@ -1196,11 +1204,10 @@ const sorterByPaths = (paths, isAsc = true) => {
     else
         pathArr = [...paths];
     return (objA, objB) => {
-        var _a, _b, _c, _d;
         for (let currentPath of pathArr) {
-            if (((_a = getAt(objA, currentPath)) !== null && _a !== void 0 ? _a : -Infinity) > ((_b = getAt(objB, currentPath)) !== null && _b !== void 0 ? _b : -Infinity))
+            if (defaultValue(getAt(objA, currentPath), nullishValues) > defaultValue(getAt(objB, currentPath), nullishValues))
                 return great;
-            else if (((_c = getAt(objA, currentPath)) !== null && _c !== void 0 ? _c : -Infinity) < ((_d = getAt(objB, currentPath)) !== null && _d !== void 0 ? _d : -Infinity))
+            if (defaultValue(getAt(objA, currentPath), nullishValues) < defaultValue(getAt(objB, currentPath), nullishValues))
                 return less;
         }
         return 0;
@@ -1215,6 +1222,53 @@ exports.sorterByPaths = sorterByPaths;
 //   [{a:{b:3,c:2}}, {a:{b:3,c:1}}, {a:{b:5}}, {a:{b:4}}].sort(sorterByPaths(['a.b','a.c'], true)),
 //   [{a:3},{a:4},{a:undefined},{a:2},{a:1},{a:undefined},{a:0},{a:undefined}].sort(sorterByPaths(['a']))
 // )
+const sorterByFields = (paths, isAsc = true) => {
+    if (Array.isArray(isAsc) === false) {
+        isAsc = Array(paths.length).fill(isAsc);
+    }
+    let pathArr;
+    if (typeof paths === 'string')
+        pathArr = [paths];
+    else
+        pathArr = [...paths];
+    return (objA, objB) => {
+        let great, less, nullishValues, currentPath;
+        for (let index = 0; index < pathArr.length; index++) {
+            currentPath = pathArr[index];
+            great = 1;
+            less = -1;
+            nullishValues = Infinity; // In ascending we put nullish values at the end
+            if (isAsc[index] === false) {
+                great = -1;
+                less = 1;
+                nullishValues = -Infinity; // In descending we put nullish values at the beginning
+            }
+            if (defaultValue(getAt(objA, currentPath), nullishValues) > defaultValue(getAt(objB, currentPath), nullishValues))
+                return great;
+            if (defaultValue(getAt(objA, currentPath), nullishValues) < defaultValue(getAt(objB, currentPath), nullishValues))
+                return less;
+        }
+        return 0;
+    };
+};
+exports.sorterByFields = sorterByFields;
+// console.log(
+//   [{a:{b:3}}, {a:{b:2}}, {a:{b:5}}, {a:{b:4}}].sort(sorterByFields('a.b')),
+//   [{a:{b:3}}, {a:{b:2}}, {a:{b:5}}, {a:{b:4}}].sort(sorterByFields('a.b', true)),
+//   [{a:{b:3}}, {a:{b:2}}, {a:{b:5}}, {a:{b:4}}].sort(sorterByFields('a.b', false)),
+//   [{a:{b:3}}, {a:{b:2}}, {a:{b:5}}, {a:{b:4}}].sort(sorterByFields(['a.b'], false)),
+//   [{a:{b:3,c:2}}, {a:{b:3,c:1}}, {a:{b:5}}, {a:{b:4}}].sort(sorterByFields(['a.b','a.c'], true)),
+//   [{a:3},{a:4},{a:undefined},{a:2},{a:1},{a:undefined},{a:0},{a:undefined}].sort(sorterByFields(['a']))
+// )
+// [
+//   {a:3,b:2},
+//   {a:4,b:1},
+//   {a:undefined,b:3},
+//   {a:2,b:NaN},
+//   {a:3,b:NaN},
+//   {a:undefined,b:6},
+//   {a:0,b:7},
+//   {a:undefined,b:null}].sort(sorterByFields(['a','b'],[true,false])) //?
 function filterFlatMap(mapWithUndefinedFilterFun, data) {
     let result = [];
     let resultSize = 0;
@@ -1602,6 +1656,8 @@ const jsUtils = {
     getAt,
     setAt,
     sorterByPaths,
+    sorterByFields,
+    defaultValue,
     filterFlatMap,
     arraySorter,
     isPromise,
