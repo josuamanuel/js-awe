@@ -218,7 +218,7 @@ export function sorterByPaths(paths: string[]|string, isAsc?: boolean): (objA: u
  * @param {boolean | array} [isAsc=true] - Optional. Default: true. true: to order ascending. false: to order descending. You can specify an array [true, false] to order by each field.  
  * @returns {Function} - A sorter function to include in array.prototype.sort(sorter).
  */
-export function sorterByFields(paths: string[]|string, isAsc?: boolean): (objA: unknown, objB: unknown) => number;
+export function sorterByFields(paths: string[]|string, isAsc?: boolean | boolean[]): (objA: unknown, objB: unknown) => number;
 
 /**
  * Returns the value if it is not undefined, null or NaN. Otherwise, it returns the default value.
