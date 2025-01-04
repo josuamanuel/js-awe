@@ -16,6 +16,7 @@ exports.YYYY_MM_DD_hh_mm_ss_ToUtcDate = exports.dateFormatter = exports.formatDa
 exports.processExit = exports.retryWithSleep = exports.loopIndexGenerator = exports.oneIn = exports.repeat = exports.cleanString = exports.replaceAll = exports.setDateToMidnight = exports.isDateMidnight = exports.getSameDateOrPreviousFridayForWeekends = exports.previousDayOfWeek = exports.addDays = exports.subtractDays = exports.diffInDaysYYYY_MM_DD = exports.dateToObj = void 0;
 const just_clone_1 = __importDefault(require("just-clone"));
 const jsonpath_plus_1 = require("jsonpath-plus");
+const console_1 = require("console");
 const logWithPrefix = (title, displayFunc) => (message) => {
     let finalMessage = message;
     if (typeof displayFunc === 'function') {
@@ -1336,7 +1337,7 @@ function sleepWithFunction(ms, func, ...params) {
     return new Promise(resolve => setTimeout(() => resolve(func(...clonedParams)), ms));
 }
 exports.sleepWithFunction = sleepWithFunction;
-function retryWithSleep(times, updateSleepTimeFun, funToRun, funToRunParams, shouldStopRetrying) {
+function retryWithSleep(times, updateSleepTimeFun, funToRun, funToRunParams, shouldStopRetrying, logString) {
     var _a, _b, _c, _d, _e;
     return __awaiter(this, void 0, void 0, function* () {
         let result;
@@ -1361,16 +1362,19 @@ function retryWithSleep(times, updateSleepTimeFun, funToRun, funToRunParams, sho
             }
             catch (e) {
                 console.log('Called to shouldStopFun failed with params: ', { currentSleepTime, index });
+                console.log('Log from caller to retryFunction: ', logString);
                 console.log('Throwing exception...');
                 throw e;
             }
             const extractError = (_e = (_d = (_c = (_b = (_a = result === null || result === void 0 ? void 0 : result.message) !== null && _a !== void 0 ? _a : result === null || result === void 0 ? void 0 : result.error) !== null && _b !== void 0 ? _b : result === null || result === void 0 ? void 0 : result.code) !== null && _c !== void 0 ? _c : result === null || result === void 0 ? void 0 : result.status) !== null && _d !== void 0 ? _d : result === null || result === void 0 ? void 0 : result.status) !== null && _e !== void 0 ? _e : result === null || result === void 0 ? void 0 : result.name;
             console.log(`Iteration: ${index + 1} sleepTime: ${currentSleepTime} Error: ${extractError}`);
+            console.log('Log from caller to retryFunction: ', logString);
             try {
                 currentSleepTime = updateSleepTimeFun(currentSleepTime, index);
             }
             catch (e) {
                 console.log('Calling updateSleepTimeFun failed with params: ', { currentSleepTime, index });
+                console.log('Log from caller to retryFunction: ', logString);
                 throw e;
             }
         }

@@ -1,6 +1,7 @@
 'use strict'
 import clone from 'just-clone'
 import { JSONPath } from 'jsonpath-plus'
+import { log } from 'console'
 
 const logWithPrefix = (title, displayFunc) => (message) => {
 
@@ -1534,7 +1535,7 @@ function sleepWithFunction(ms, func, ...params) {
   )
 }
 
-async function retryWithSleep(times, updateSleepTimeFun, funToRun, funToRunParams, shouldStopRetrying) {
+async function retryWithSleep(times, updateSleepTimeFun, funToRun, funToRunParams, shouldStopRetrying, logString) {
   let result
   let currentSleepTime = 0
 
@@ -1556,17 +1557,20 @@ async function retryWithSleep(times, updateSleepTimeFun, funToRun, funToRunParam
       if (shouldStopRetrying?.(result) === true) return result
     } catch (e) {
       console.log('Called to shouldStopFun failed with params: ', { currentSleepTime, index })
+      console.log('Log from caller to retryFunction: ', logString)
       console.log('Throwing exception...')
       throw e
     }
 
     const extractError = result?.message ?? result?.error ?? result?.code ?? result?.status ?? result?.status ?? result?.name
     console.log(`Iteration: ${index + 1} sleepTime: ${currentSleepTime} Error: ${extractError}`)
+    console.log('Log from caller to retryFunction: ', logString)
 
     try {
       currentSleepTime = updateSleepTimeFun(currentSleepTime, index)
     } catch (e) {
       console.log('Calling updateSleepTimeFun failed with params: ', { currentSleepTime, index })
+      console.log('Log from caller to retryFunction: ', logString)
       throw e
     }
 

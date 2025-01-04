@@ -1,6 +1,7 @@
 'use strict';
 import clone from 'just-clone';
 import { JSONPath } from 'jsonpath-plus';
+import { log } from 'console';
 const logWithPrefix = (title, displayFunc) => (message) => {
     let finalMessage = message;
     if (typeof displayFunc === 'function') {
@@ -1268,7 +1269,7 @@ function sleepWithFunction(ms, func, ...params) {
     const clonedParams = clone(params);
     return new Promise(resolve => setTimeout(() => resolve(func(...clonedParams)), ms));
 }
-async function retryWithSleep(times, updateSleepTimeFun, funToRun, funToRunParams, shouldStopRetrying) {
+async function retryWithSleep(times, updateSleepTimeFun, funToRun, funToRunParams, shouldStopRetrying, logString) {
     let result;
     let currentSleepTime = 0;
     for (let index = 0; index < times; index++) {
@@ -1291,16 +1292,19 @@ async function retryWithSleep(times, updateSleepTimeFun, funToRun, funToRunParam
         }
         catch (e) {
             console.log('Called to shouldStopFun failed with params: ', { currentSleepTime, index });
+            console.log('Log from caller to retryFunction: ', logString);
             console.log('Throwing exception...');
             throw e;
         }
         const extractError = result?.message ?? result?.error ?? result?.code ?? result?.status ?? result?.status ?? result?.name;
         console.log(`Iteration: ${index + 1} sleepTime: ${currentSleepTime} Error: ${extractError}`);
+        console.log('Log from caller to retryFunction: ', logString);
         try {
             currentSleepTime = updateSleepTimeFun(currentSleepTime, index);
         }
         catch (e) {
             console.log('Calling updateSleepTimeFun failed with params: ', { currentSleepTime, index });
+            console.log('Log from caller to retryFunction: ', logString);
             throw e;
         }
     }
