@@ -717,8 +717,8 @@ export function loopIndexGenerator(initValue: any, iterations: any): Generator<a
  * @param updateSleepTimeFun A function that updates the sleep time between retries.
  * @param funToRun The function to run.
  * @param funToRunParams The parameters for the function to run.
- * @param shouldStopRetrying A function that determines whether to stop retrying based on the result of the function.
- * @param logString The fields that the caller to retry wants the retry to Log to show traceability.
+ * @param {function} shouldStopRetrying The function that determines whether to stop retrying based on the result of the function.
+ * @param {string} logString The fields that the caller to retry wants the retry to Log to show traceability.
  * @returns A Promise that resolves with the result of the function.
  */
 export function retryWithSleep<T>(times: number, updateSleepTimeFun: (currentSleepTime?:number, index?:number)=>number, funToRun: (...params:T[])=>any, funToRunParams: T[]|undefined, shouldStopRetrying?: (result?:any)=>boolean, logString?:string): Promise<any>;
