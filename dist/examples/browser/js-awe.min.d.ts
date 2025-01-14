@@ -872,10 +872,10 @@ declare function loopIndexGenerator(initValue: any, iterations: any): Generator<
  * @param funToRun The function to run.
  * @param funToRunParams The parameters for the function to run.
  * @param shouldStopRetrying A function that determines whether to stop retrying based on the result of the function.
- * @param logFields The fields that the caller to retry wants the retry to Log to show traceability.
+ * @param logString The fields that the caller to retry wants the retry to Log to show traceability.
  * @returns A Promise that resolves with the result of the function.
  */
-declare function retryWithSleep<T>(times: number, updateSleepTimeFun: (currentSleepTime?:number, index?:number)=>number, funToRun: (...params:T[])=>any, funToRunParams: T[]|undefined, shouldStopRetrying?: (result?:any)=>boolean, logFields?:string): Promise<any>;
+declare function retryWithSleep<T>(times: number, updateSleepTimeFun: (currentSleepTime?:number, index?:number)=>number, funToRun: (...params:T[])=>any, funToRunParams: T[]|undefined, shouldStopRetrying?: (result?:any)=>boolean, logString?:string): Promise<any>;
 
 
 /**

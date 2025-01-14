@@ -695,17 +695,34 @@ export function repeat(numberOfTimes: any): {
   value: (value: any) => any[];
 };
 
+
 /**
- * Calls a function one in a specified period.
- * @param period - The period to call the function.
- * @returns An object with functions to call the function.
+ * Calls a function one in a specified period. It allows to .reset() the counter, .stop() the counter, or to .setCount(newCount) manually
+ * @param {number} period - The period in which the function can only be called once.
+ * @returns {{ call: (runFunc: Function) => { (...args: any[]): any; reset: () => void; stop: () => void; setCount: (newCount: number) => void; } }}
+ * 
+ * @example
+ * ```
+ * const myTraceLog = (logPrefix) => console.log(`${logPrefix} Called`);
+ * const callEvery1000 = oneIn(1000).call(myTraceLog);
+ * 
+ * callEvery1000('LOG: '); // Call the function
+ * callEvery1000.toReset(); // Reset the counter
+ * callEvery1000.toStop(); // Don't call any longer
+ * callEvery1000.setCount(5); // to Call one In 5 times
+ * ```
  */
-export function oneIn(period: any): {
-  call: (runFunc: any) => {
-    (...args: any[]): any;
-    reset(): number;
-  };
-};
+type RunFunction = (...args: any[]) => any;
+
+interface ToExecute extends RunFunction {
+  reset: (callAtTheBeggining:boolean) => void
+  stop: () => void
+}
+
+interface OneInReturn {
+  call: (runFunc: RunFunction) => ToExecute;
+}
+export function oneIn(period: number): OneInReturn;
 
 
 export function loopIndexGenerator(initValue: any, iterations: any): Generator<any, void, unknown>;

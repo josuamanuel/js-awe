@@ -1508,30 +1508,44 @@ function repeat(numberOfTimes) {
 //   console.log(index)
 // })
 // repeat(8).value(0) //?
-function oneIn(period) {
-    let count = 0;
+function oneIn(period, callAtTheBeggining = true) {
+    let countdown = callAtTheBeggining ? 0 : period - 1;
     function call(runFunc) {
         function toExecute(...args) {
-            if (count === 0) {
-                count = period - 1;
+            console.log('countdown:', countdown, callAtTheBeggining);
+            if (countdown === 0) {
+                countdown = period - 1;
                 return runFunc(...args);
             }
-            count--;
+            countdown--;
         }
-        toExecute.reset = () => count = 0;
+        toExecute.reset = (callAtTheBegginingParam = true) => {
+            callAtTheBeggining = callAtTheBegginingParam;
+            countdown = callAtTheBeggining ? 0 : period - 1;
+        };
+        toExecute.stop = () => countdown = Infinity;
         return toExecute;
     }
     return { call };
 }
-// let myRunEvery = oneIn(3).call((txt1, txt2, txt3)=>{console.log(txt1, txt2, txt3);return 3})
+// let myRunEvery = oneIn(3, false).call((txt1, txt2, txt3)=>{console.log(txt1, txt2, txt3);return 3})
 // myRunEvery('jose','is great', '...') //?
 // myRunEvery('jose','is great', '...') //?
 // myRunEvery('jose','is great', '...') //?
 // myRunEvery('jose','is great', '...') //?
 // myRunEvery('jose','is great', '...') //?
-// myRunEvery.reset()
 // myRunEvery('jose','is great', '...') //?
 // myRunEvery('jose','is great', '...') //?
+// myRunEvery.reset(true)
+// myRunEvery('jose','is great', '...') //?
+// myRunEvery('jose','is great', '...') //?
+// myRunEvery('jose','is great', '...') //?
+// myRunEvery('jose','is great', '...') //?
+// myRunEvery.stop()
+// myRunEvery('jose','is great', '...') //?
+// myRunEvery('jose','is great', '...') //?
+// myRunEvery('jose','is great', '...') //?
+// myRunEvery.reset(true)
 // myRunEvery('jose','is great', '...') //?
 function* loopIndexGenerator(initValue, iterations) {
     let count = 0;

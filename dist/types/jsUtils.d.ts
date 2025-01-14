@@ -695,17 +695,34 @@ export function repeat(numberOfTimes: any): {
   value: (value: any) => any[];
 };
 
+
 /**
- * Calls a function one in a specified period.
- * @param period - The period to call the function.
- * @returns An object with functions to call the function.
+ * Calls a function one in a specified period. It allows to .reset() the counter, .stop() the counter, or to .setCount(newCount) manually
+ * @param {number} period - The period in which the function can only be called once.
+ * @returns {{ call: (runFunc: Function) => { (...args: any[]): any; reset: () => void; stop: () => void; setCount: (newCount: number) => void; } }}
+ * 
+ * @example
+ * ```
+ * const myTraceLog = (logPrefix) => console.log(`${logPrefix} Called`);
+ * const callEvery1000 = oneIn(1000).call(myTraceLog);
+ * 
+ * callEvery1000('LOG: '); // Call the function
+ * callEvery1000.toReset(); // Reset the counter
+ * callEvery1000.toStop(); // Don't call any longer
+ * callEvery1000.setCount(5); // to Call one In 5 times
+ * ```
  */
-export function oneIn(period: any): {
-  call: (runFunc: any) => {
-    (...args: any[]): any;
-    reset(): number;
-  };
-};
+type RunFunction = (...args: any[]) => any;
+
+interface ToExecute extends RunFunction {
+  reset: (callAtTheBeggining:boolean) => void
+  stop: () => void
+}
+
+interface OneInReturn {
+  call: (runFunc: RunFunction) => ToExecute;
+}
+export function oneIn(period: number): OneInReturn;
 
 
 export function loopIndexGenerator(initValue: any, iterations: any): Generator<any, void, unknown>;
@@ -717,8 +734,8 @@ export function loopIndexGenerator(initValue: any, iterations: any): Generator<a
  * @param updateSleepTimeFun A function that updates the sleep time between retries.
  * @param funToRun The function to run.
  * @param funToRunParams The parameters for the function to run.
- * @param shouldStopRetrying A function that determines whether to stop retrying based on the result of the function.
- * @param logString The fields that the caller to retry wants the retry to Log to show traceability.
+ * @param {function} shouldStopRetrying The function that determines whether to stop retrying based on the result of the function.
+ * @param {string} logString The fields that the caller to retry wants the retry to Log to show traceability.
  * @returns A Promise that resolves with the result of the function.
  */
 export function retryWithSleep<T>(times: number, updateSleepTimeFun: (currentSleepTime?:number, index?:number)=>number, funToRun: (...params:T[])=>any, funToRunParams: T[]|undefined, shouldStopRetrying?: (result?:any)=>boolean, logString?:string): Promise<any>;
