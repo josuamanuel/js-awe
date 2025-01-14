@@ -1837,8 +1837,6 @@ function oneIn(period, callAtTheBeggining = true) {
   function call(runFunc) {
 
     function toExecute(...args) {
-
-      console.log('countdown:', countdown, callAtTheBeggining)
       if (countdown ===0 ) {
         countdown = period - 1
         return runFunc(...args)
