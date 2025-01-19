@@ -82,6 +82,13 @@ export function createCustomErrorClass(errorName: string): {
 };
 
 /**
+ * Checks if a type is a basic type primitive: string, number, boolean, symbol, bigint.
+ * @param {any} type - The type to check.
+ * @returns {boolean} - true if the type is a basic type primitive, false otherwise.
+ */
+export function isBasicType(type: any): boolean;
+
+/**
  * Composes a URL from the gateway URL, service name, and service path.
  * @param {any} gatewayUrl - The gateway URL.
  * @param {any} serviceName - The service name.
@@ -401,23 +408,30 @@ export function copyPropsWithValue(objDest: any, shouldUpdateOnlyEmptyFields?: b
  * // objTo is now {a:{b:2},c:3,d:{f:12}}
  */
 export function copyPropsWithValueUsingRules(objDest: any, copyRules: any, shouldUpdateOnlyEmptyFields?: boolean): (inputObj: any) => any;
+
+type BasicType = string | number | boolean | symbol | bigint 
 export class EnumMap {
   /**
-   * Creates an instance of EnumMap.
-   * @param {object} values - The values of the enum.
+   * Emulates Enums in JavaScript. 
+   * @param {string[] | [BasicType, any][] | {[key: BasicType]: any}[] | Map<BasicType, any>} values - The values to initialize the EnumMap with.
+   * @example
+   * ```
+   * const DAYS = new EnumMap(['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY']);
+   * DAYS.SUNDAY //? 0
+   * DAYS.SATURDAY //? 6
+   * const NUM_TO_DAY = DAYS.invert()
+   * NUM_TO_DAY[0] //? 'SUNDAY'
+   * ```
    */
-  constructor(values: any);
+  constructor(values: any | Map<any, any> | [string, any][] | {[key: string]: any}[]);
   /**
-   * A Proxy handler method for getting a property value.
-   */
-  get(target: any, prop: any): any;
-  /**
-   * A Proxy handler method for setting a property value.
-   */
-  set(_undefined: any, prop: any): void;
-  /**
-   * Gets the current active value of the enum.
-   * @returns {string} The active enum value.
+   * Inverts the EnumMap. values are the key, and the keys are the values.
+   * @returns {EnumMap} The active enum value.
+   * @example
+   * ```
+   * const DAYS = new EnumMap(['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY']);
+   * const NUM_TO_DAY = DAYS.invert()
+   * NUM_TO_DAY[0] //? 'SUNDAY'
    */
   invert(): EnumMap;
 }
@@ -594,6 +608,21 @@ export function formatDate(format: any, date?: Date | StringDate): string | unde
  * @returns A function that formats a date.
  */
 export function dateFormatter(format: string): (date: Date | StringDate) => string | undefined;
+
+/**
+ * Represents the days of the week.
+ * @type {EnumMap}
+ * @example
+ * ```
+ * DAYS.SUNDAY //? 0
+ * DAYS.SATURDAY //? 6
+ * DAYS.next(DAYS.SATURDAY) //? 0
+ * const NUM_TO_DAY = DAYS.invert()
+ * NUM_TO_DAY[0] //? 'SUNDAY'
+ * NUM_TO_DAY[6] //? 'SATURDAY'
+ * ```
+ */
+export const DAYS: EnumMap;
 
 /**
  * Converts a date string to a date object.

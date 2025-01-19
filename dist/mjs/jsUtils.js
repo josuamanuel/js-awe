@@ -1,7 +1,6 @@
 'use strict';
 import clone from 'just-clone';
 import { JSONPath } from 'jsonpath-plus';
-import { log } from 'console';
 const logWithPrefix = (title, displayFunc) => (message) => {
     let finalMessage = message;
     if (typeof displayFunc === 'function') {
@@ -53,6 +52,17 @@ function createCustomErrorClass(errorName) {
     };
     return errorClass;
 }
+function isBasicType(variableToCheck) {
+    const type = typeof variableToCheck;
+    return (type !== 'object' && type !== 'undefined' && type !== 'function');
+}
+// isBasicType(null) //?
+// isBasicType(undefined) //?
+// isBasicType(new Map()) //?
+// isBasicType({}) //?
+// isBasicType(Symbol()) //?
+// isBasicType('22') //?
+// isBasicType(Number(2)) //?
 class Enum {
     constructor(values, rules) {
         // activeObjectKey will be an object with keys from values array and only one current key active: {ON:false,OFF:true}
@@ -160,7 +170,51 @@ class Enum {
 // }
 class EnumMap {
     constructor(values) {
-        return new Proxy(clone(values), this);
+        const objLiteral = this.#validateAndTransform(clone(values));
+        return new Proxy(objLiteral, this);
+    }
+    #validateAndTransform(values) {
+        if (values === undefined || values === null)
+            throw new Error('Null or undefined is not permitted to construct a EnumMap instance.');
+        const valuesProtoName = Object.getPrototypeOf(values).constructor.name;
+        if (valuesProtoName === 'Map') {
+            return Object.fromEntries(values);
+        }
+        if (valuesProtoName === 'Object') {
+            return values;
+        }
+        let typeOfValue;
+        let objectResult = [];
+        if (valuesProtoName === 'Array') {
+            for (let i = 0; i < values.length; i++) {
+                // basicTypes: ['SUNDAY', 'MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY','SATURDAY']
+                if (isBasicType(values[i])) {
+                    objectResult[values[i]] = i;
+                    if (typeOfValue !== undefined && typeOfValue !== 'basicType')
+                        throw new CustomError('ENUMMAP_VALUES_NOT_VALID', 'EnumMap values should be consistent...');
+                    typeOfValue = 'basicType';
+                }
+                // elements are [key, value]: [['SUNDAY',1],['MONDAY',5], ['TUESDAY',2],['WEDNESDAY',3],['THURSDAY',9],['FRIDAY',6],['SATURDAY',4]]
+                if (Array.isArray(values[i]) && values[i].length === 2) {
+                    objectResult[values[i][0]] = values[i][1];
+                    if (typeOfValue !== undefined && typeOfValue !== 'array')
+                        throw new CustomError('ENUMMAP_VALUES_NOT_VALID', 'EnumMap values should be consistent...');
+                    typeOfValue = 'array';
+                }
+                // elements are object with {key:value} [{SUNDAY:1},{MONDAY:5}, {TUESDAY:2},{WEDNESDAY:3},{THURSDAY:9},{FRIDAY:6},{SATURDAY:4}]
+                if (values[i] !== null && typeof values[i] === 'object' && Object.keys(values[i]).length === 1) {
+                    let key = Object.keys(values[i])[0];
+                    objectResult[key] = values[i][key];
+                    if (typeOfValue !== undefined && typeOfValue !== 'object')
+                        throw new CustomError('ENUMMAP_VALUES_NOT_VALID', 'EnumMap values should be consistent...');
+                    typeOfValue = 'object';
+                }
+            }
+            if (typeOfValue === undefined) {
+                throw new CustomError('ENUM_VALUES_NOT_VALID', 'Values must be an array of strings, an array of arrays, an array of objects or an array of maps');
+            }
+        }
+        return objectResult;
     }
     get(target, prop) {
         if (target[prop] == null && this[prop] == null)
@@ -176,17 +230,10 @@ class EnumMap {
         let invertedValues = {};
         for (const elem in this) {
             if (this.hasOwnProperty(elem)) {
-                if (invertedValues[this[elem]] === undefined) {
-                    invertedValues[this[elem]] = [];
-                }
-                pushUniqueKey(elem, invertedValues[this[elem]]);
+                if (isBasicType(this[elem]) === false)
+                    throw new CustomError('INVERT_VALUES_NOT_BASIC_TYPE', 'EnumMap values should be basic types');
+                invertedValues[this[elem]] = elem;
             }
-        }
-        if (Object.keys(invertedValues).reduce((acum, current) => acum && invertedValues[current].length === 1, true)) {
-            invertedValues = Object.keys(invertedValues).reduce((acum, current) => {
-                acum[current] = invertedValues[current][0];
-                return acum;
-            }, {});
         }
         return new EnumMap(clone(invertedValues));
     }
@@ -809,6 +856,8 @@ function YYYY_MM_DD_hh_mm_ss_ToUtcDate(dateYYYY_MM_DD_hh_mm_ss) {
     const datess = parseInt(dateYYYY_MM_DD_hh_mm_ss.substring(17, 19));
     return Date.UTC(dateYYYY, dateMM, dateDD, datehh, datemm, datess);
 }
+const DAYS = new EnumMap(['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY']);
+const MONTHS = new EnumMap(['JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE', 'JULY', 'AUGUST', 'SEPTEMBER', 'OCTOBER', 'NOVEMBER', 'DECEMBER']);
 function dateToObj(date) {
     let dateToProcess = toDate(date);
     if (isDate(dateToProcess) === false)
@@ -1574,6 +1623,8 @@ const jsUtils = {
     varSubsDoubleBracket,
     queryObjToStr,
     CustomError,
+    createCustomErrorClass,
+    isBasicType,
     urlCompose,
     urlDecompose,
     indexOfNthMatch,
@@ -1616,6 +1667,8 @@ const jsUtils = {
     isEmpty,
     isStringADate,
     formatDate,
+    DAYS,
+    MONTHS,
     dateFormatter,
     YYYY_MM_DD_hh_mm_ss_ToUtcDate,
     dateToObj,
@@ -1635,4 +1688,4 @@ const jsUtils = {
     processExit
 };
 export default jsUtils;
-export { logWithPrefix, firstCapital, varSubsDoubleBracket, queryObjToStr, CustomError, createCustomErrorClass, urlCompose, urlDecompose, indexOfNthMatch, colors, colorMessage, colorMessageByStatus, colorByStatus, findDeepKey, deepFreeze, getAt, setAt, sorterByPaths, sorterByFields, defaultValue, filterFlatMap, arraySorter, isPromise, sleep, sleepWithValue, sleepWithFunction, notTo, arrayToObject, arrayOfObjectsToObject, removeDuplicates, traverse, traverseVertically, project, copyPropsWithValue, copyPropsWithValueUsingRules, EnumMap, Enum, transition, pushUniqueKey, pushUniqueKeyOrChange, pushAt, memoize, fillWith, numberToFixedString, isDate, isEmpty, isStringADate, formatDate, dateFormatter, YYYY_MM_DD_hh_mm_ss_ToUtcDate, dateToObj, diffInDaysYYYY_MM_DD, subtractDays, addDays, previousDayOfWeek, getSameDateOrPreviousFridayForWeekends, isDateMidnight, setDateToMidnight, replaceAll, cleanString, repeat, oneIn, loopIndexGenerator, retryWithSleep, processExit };
+export { logWithPrefix, firstCapital, varSubsDoubleBracket, queryObjToStr, CustomError, createCustomErrorClass, isBasicType, urlCompose, urlDecompose, indexOfNthMatch, colors, colorMessage, colorMessageByStatus, colorByStatus, findDeepKey, deepFreeze, getAt, setAt, sorterByPaths, sorterByFields, defaultValue, filterFlatMap, arraySorter, isPromise, sleep, sleepWithValue, sleepWithFunction, notTo, arrayToObject, arrayOfObjectsToObject, removeDuplicates, traverse, traverseVertically, project, copyPropsWithValue, copyPropsWithValueUsingRules, EnumMap, Enum, transition, pushUniqueKey, pushUniqueKeyOrChange, pushAt, memoize, fillWith, numberToFixedString, isDate, isEmpty, isStringADate, formatDate, DAYS, MONTHS, dateFormatter, YYYY_MM_DD_hh_mm_ss_ToUtcDate, dateToObj, diffInDaysYYYY_MM_DD, subtractDays, addDays, previousDayOfWeek, getSameDateOrPreviousFridayForWeekends, isDateMidnight, setDateToMidnight, replaceAll, cleanString, repeat, oneIn, loopIndexGenerator, retryWithSleep, processExit };

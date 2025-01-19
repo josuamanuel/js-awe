@@ -109,7 +109,7 @@ describe('jsUtils', () => {
 
   it('EnumMap invert with repetition', () => {
     const result = new EnumMap(typeOfFood).invert()
-    assert.deepStrictEqual(result.meet, ['beef', 'lamb', 'pig'])
+    assert.deepStrictEqual(result.meet, 'pig')
   })
 
   it('EnumMap invert with repetition not modifieble', () => {

@@ -2435,6 +2435,22 @@ function createCustomErrorClass(errorName) {
   return errorClass;
 }
 
+function isBasicType(variableToCheck)
+{
+  const type = typeof variableToCheck;
+  return (
+     type !== 'object' && type !== 'undefined' && type !== 'function'
+  );
+}
+
+// isBasicType(null) //?
+// isBasicType(undefined) //?
+// isBasicType(new Map()) //?
+// isBasicType({}) //?
+// isBasicType(Symbol()) //?
+// isBasicType('22') //?
+// isBasicType(Number(2)) //?
+
 
 class Enum {
 
@@ -2565,10 +2581,72 @@ class Enum {
 // }
 
 
+
 class EnumMap {
+
   constructor(values) {
 
-    return new Proxy(collectionClone(values), this)
+    const objLiteral = this.#validateAndTransform(collectionClone(values));
+    return new Proxy(objLiteral, this)
+  }
+
+  #validateAndTransform(values) {
+
+    if(values === undefined || values === null) throw new Error('Null or undefined is not permitted to construct a EnumMap instance.')
+
+    const valuesProtoName = Object.getPrototypeOf(values).constructor.name;
+
+    if (valuesProtoName === 'Map') {
+      return Object.fromEntries(values)
+    }
+
+    if(valuesProtoName === 'Object') {
+      return values
+    }
+
+    let typeOfValue;
+    let objectResult = [];
+
+    if(valuesProtoName === 'Array') {
+      for(let i = 0; i < values.length; i++) {
+        // basicTypes: ['SUNDAY', 'MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY','SATURDAY']
+        if(isBasicType(values[i])) {
+          objectResult[values[i]] = i;
+          if(typeOfValue !== undefined && typeOfValue !== 'basicType')  
+            throw new CustomError('ENUMMAP_VALUES_NOT_VALID', 'EnumMap values should be consistent...')
+
+          typeOfValue = 'basicType';
+        }
+
+        // elements are [key, value]: [['SUNDAY',1],['MONDAY',5], ['TUESDAY',2],['WEDNESDAY',3],['THURSDAY',9],['FRIDAY',6],['SATURDAY',4]]
+        if(Array.isArray(values[i]) && values[i].length === 2) {
+          objectResult[values[i][0]] = values[i][1];
+          if(typeOfValue !== undefined && typeOfValue !== 'array')  
+            throw new CustomError('ENUMMAP_VALUES_NOT_VALID', 'EnumMap values should be consistent...')
+
+          typeOfValue = 'array';
+        }
+
+        // elements are object with {key:value} [{SUNDAY:1},{MONDAY:5}, {TUESDAY:2},{WEDNESDAY:3},{THURSDAY:9},{FRIDAY:6},{SATURDAY:4}]
+        if(values[i] !== null && typeof values[i] === 'object' && Object.keys(values[i]).length === 1) {
+
+          let key = Object.keys(values[i])[0];
+
+          objectResult[key] = values[i][key];
+          if(typeOfValue !== undefined && typeOfValue !== 'object')
+            throw new CustomError('ENUMMAP_VALUES_NOT_VALID', 'EnumMap values should be consistent...')
+
+          typeOfValue = 'object';
+        }
+
+      }
+
+      if (typeOfValue === undefined) {
+        throw new CustomError('ENUM_VALUES_NOT_VALID', 'Values must be an array of strings, an array of arrays, an array of objects or an array of maps')
+      }
+    }
+
+    return objectResult
   }
 
   get(target, prop) {
@@ -2588,22 +2666,9 @@ class EnumMap {
 
     for (const elem in this) {
       if (this.hasOwnProperty(elem)) {
-        if (invertedValues[this[elem]] === undefined) {
-          invertedValues[this[elem]] = [];
-        }
-
-        pushUniqueKey(elem, invertedValues[this[elem]]);
+        if ( isBasicType(this[elem]) === false) throw new CustomError('INVERT_VALUES_NOT_BASIC_TYPE', 'EnumMap values should be basic types')
+        invertedValues[this[elem]] = elem;
       }
-    }
-
-    if (Object.keys(invertedValues).reduce((acum, current) => acum && invertedValues[current].length === 1, true)) {
-      invertedValues = Object.keys(invertedValues).reduce(
-        (acum, current) => {
-          acum[current] = invertedValues[current][0];
-          return acum
-        },
-        {}
-      );
     }
 
     return new EnumMap(collectionClone(invertedValues))
@@ -3345,6 +3410,9 @@ function YYYY_MM_DD_hh_mm_ss_ToUtcDate(dateYYYY_MM_DD_hh_mm_ss) {
 
   return Date.UTC(dateYYYY, dateMM, dateDD, datehh, datemm, datess)
 }
+
+const DAYS = new EnumMap(['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY']);
+const MONTHS = new EnumMap(['JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE', 'JULY', 'AUGUST', 'SEPTEMBER', 'OCTOBER', 'NOVEMBER', 'DECEMBER']);
 
 function dateToObj(date) {
   let dateToProcess = toDate(date);
@@ -4220,6 +4288,8 @@ const jsUtils = {
   varSubsDoubleBracket,
   queryObjToStr,
   CustomError,
+  createCustomErrorClass,
+  isBasicType,
   urlCompose,
   urlDecompose,
   indexOfNthMatch,
@@ -4262,6 +4332,8 @@ const jsUtils = {
   isEmpty: isEmpty$1,
   isStringADate,
   formatDate,
+  DAYS,
+  MONTHS,
   dateFormatter,
   YYYY_MM_DD_hh_mm_ss_ToUtcDate,
   dateToObj,
@@ -21276,4 +21348,4 @@ function sanitize(obj, sanitizers = ['ibmApis'], noSanitzedUptoLogLevel) {
 
 }
 
-export { Chrono, CustomError, Enum, EnumMap, F, Index, index as R, RE, RLog, Table, Text, Timeline, YYYY_MM_DD_hh_mm_ss_ToUtcDate, addDays, anonymize, arrayOfObjectsToObject, arraySorter, arrayToObject, bearerSanitizer, between, cleanString, cloneCopy, colorByStatus, colorMessage, colorMessageByStatus, colors, consoleTable, consoleTableExtended, copyPropsWithValue, copyPropsWithValueUsingRules, createCustomErrorClass, dateFormatter, dateToObj, deepFreeze, defaultValue, diffInDaysYYYY_MM_DD, exclude, fetchImproved, ffletchMaker, fillWith, filterFlatMap, filterMap, findDeepKey, findSolution, firstCapital, fletch, formatDate, getAt, getSameDateOrPreviousFridayForWeekends, groupByWithCalc, indexOfNthMatch, innerRightJoinWith, isDate, isDateMidnight, isEmpty$1 as isEmpty, isPromise, isStringADate, lengthSanitizer, log, logWithPrefix, loopIndexGenerator, mapWithNext, mapWithPrevious, matchByPropId, memoize, mergeArrayOfObjectsRenamingProps, notTo, numberToFixedString, oneIn, parallel, partialAtPos, pickPaths, pipe, pipeWhile, pipeWithChain, plan, previousDayOfWeek, processExit, project$1 as project, promiseAll, promiseFunToFutureFun, pushAt, pushUniqueKey, pushUniqueKeyOrChange, queryObjToStr, removeDuplicates, repeat$1 as repeat, replaceAll, retryWithSleep, runFunctionsSyncOrParallel, runFutureFunctionsInParallel, sanitize, setAt, setDateToMidnight, sleep, sleepWithFunction, sleepWithValue, something, sorterByFields, sorterByPaths, splitCond, subtractDays, transition, traverse$1 as traverse, traverseVertically, uncurry, unionWithHashKeys, updateWithHashKeys, urlCompose, urlDecompose, varSubsDoubleBracket, wildcardToRegExp };
+export { Chrono, CustomError, DAYS, Enum, EnumMap, F, Index, MONTHS, index as R, RE, RLog, Table, Text, Timeline, YYYY_MM_DD_hh_mm_ss_ToUtcDate, addDays, anonymize, arrayOfObjectsToObject, arraySorter, arrayToObject, bearerSanitizer, between, cleanString, cloneCopy, colorByStatus, colorMessage, colorMessageByStatus, colors, consoleTable, consoleTableExtended, copyPropsWithValue, copyPropsWithValueUsingRules, createCustomErrorClass, dateFormatter, dateToObj, deepFreeze, defaultValue, diffInDaysYYYY_MM_DD, exclude, fetchImproved, ffletchMaker, fillWith, filterFlatMap, filterMap, findDeepKey, findSolution, firstCapital, fletch, formatDate, getAt, getSameDateOrPreviousFridayForWeekends, groupByWithCalc, indexOfNthMatch, innerRightJoinWith, isBasicType, isDate, isDateMidnight, isEmpty$1 as isEmpty, isPromise, isStringADate, lengthSanitizer, log, logWithPrefix, loopIndexGenerator, mapWithNext, mapWithPrevious, matchByPropId, memoize, mergeArrayOfObjectsRenamingProps, notTo, numberToFixedString, oneIn, parallel, partialAtPos, pickPaths, pipe, pipeWhile, pipeWithChain, plan, previousDayOfWeek, processExit, project$1 as project, promiseAll, promiseFunToFutureFun, pushAt, pushUniqueKey, pushUniqueKeyOrChange, queryObjToStr, removeDuplicates, repeat$1 as repeat, replaceAll, retryWithSleep, runFunctionsSyncOrParallel, runFutureFunctionsInParallel, sanitize, setAt, setDateToMidnight, sleep, sleepWithFunction, sleepWithValue, something, sorterByFields, sorterByPaths, splitCond, subtractDays, transition, traverse$1 as traverse, traverseVertically, uncurry, unionWithHashKeys, updateWithHashKeys, urlCompose, urlDecompose, varSubsDoubleBracket, wildcardToRegExp };
