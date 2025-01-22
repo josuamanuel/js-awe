@@ -877,7 +877,7 @@ function formatDate(format, date) {
     const mil = dateIsoString.substring(20, 23);
     const mi = dateIsoString.substring(20, 22);
     const month = indexMonths[MM];
-    const dayOfWeek = indexDays[dateToProcess.getDay()];
+    const dayOfWeek = indexDays[dateToProcess.getUTCDay()];
     return format
         .replace(/\$YYYY/g, YYYY)
         .replace(/\$YY/g, YY)
@@ -958,7 +958,7 @@ function previousDayOfWeek(dayOfWeek, date) {
     let dateToProcess = toDate(date);
     if (isDate(dateToProcess) === false)
         return dateToProcess;
-    let diffInDaysOfWeek = dateToProcess.getDay() - dayOfWeek;
+    let diffInDaysOfWeek = dateToProcess.getUTCDay() - dayOfWeek;
     let toSubtract = diffInDaysOfWeek >= 0
         ? diffInDaysOfWeek
         : 7 + diffInDaysOfWeek;
@@ -971,7 +971,7 @@ function currentDayOfWeek(dayOfWeek, date) {
     let dateToProcess = toDate(date);
     if (isDate(dateToProcess) === false)
         return dateToProcess;
-    let diffInDaysOfWeek = dateToProcess.getDay() - dayOfWeek;
+    let diffInDaysOfWeek = dateToProcess.getUTCDay() - dayOfWeek;
     let toSubtract = diffInDaysOfWeek >= 0
         ? diffInDaysOfWeek
         : 7 + diffInDaysOfWeek;

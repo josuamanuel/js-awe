@@ -777,16 +777,16 @@ declare function dateFormatter(format: string): (date: Date | StringDate) => str
 declare const DAYS: EnumMap;
 
 /**
- * Converts a date string to a date object.
+ * Convert a string without timezone as UTC time returning the number representing the date in ms
  * @param date - The date string to convert.
- * @returns The date object.
+ * @returns a number representing the date in ms.
  */
 declare function YYYY_MM_DD_hh_mm_ss_ToUtcDate(dateYYYY_MM_DD_hh_mm_ss: string): number;
 
 /**
  * Converts a date object to an object.
  * @param date - The date object to convert.
- * @returns The date object.
+ * @returns An object literal with numeric properties representing the date.
  */
 declare function dateToObj(date: Date | StringDate): {
   YYYY: number;
@@ -799,9 +799,9 @@ declare function dateToObj(date: Date | StringDate): {
 } | undefined;
 
 /**
- * Converts a date object to a string.
+ * Day difference between to dates.
  * @param date - The date object to convert.
- * @returns The date string.
+ * @returns A number with the difference in days between endDate and iniDate.
  */
 declare function diffInDaysYYYY_MM_DD(iniDate: Date | StringDate, endDate: Date | StringDate): number;
 

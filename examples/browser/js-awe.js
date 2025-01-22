@@ -2435,11 +2435,10 @@ function createCustomErrorClass(errorName) {
   return errorClass;
 }
 
-function isBasicType(variableToCheck)
-{
+function isBasicType(variableToCheck) {
   const type = typeof variableToCheck;
   return (
-     type !== 'object' && type !== 'undefined' && type !== 'function'
+    type !== 'object' && type !== 'undefined' && type !== 'function'
   );
 }
 
@@ -2592,7 +2591,7 @@ class EnumMap {
 
   #validateAndTransform(values) {
 
-    if(values === undefined || values === null) throw new Error('Null or undefined is not permitted to construct a EnumMap instance.')
+    if (values === undefined || values === null) throw new Error('Null or undefined is not permitted to construct a EnumMap instance.')
 
     const valuesProtoName = Object.getPrototypeOf(values).constructor.name;
 
@@ -2600,40 +2599,40 @@ class EnumMap {
       return Object.fromEntries(values)
     }
 
-    if(valuesProtoName === 'Object') {
+    if (valuesProtoName === 'Object') {
       return values
     }
 
     let typeOfValue;
     let objectResult = [];
 
-    if(valuesProtoName === 'Array') {
-      for(let i = 0; i < values.length; i++) {
+    if (valuesProtoName === 'Array') {
+      for (let i = 0; i < values.length; i++) {
         // basicTypes: ['SUNDAY', 'MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY','SATURDAY']
-        if(isBasicType(values[i])) {
+        if (isBasicType(values[i])) {
           objectResult[values[i]] = i;
-          if(typeOfValue !== undefined && typeOfValue !== 'basicType')  
+          if (typeOfValue !== undefined && typeOfValue !== 'basicType')
             throw new CustomError('ENUMMAP_VALUES_NOT_VALID', 'EnumMap values should be consistent...')
 
           typeOfValue = 'basicType';
         }
 
         // elements are [key, value]: [['SUNDAY',1],['MONDAY',5], ['TUESDAY',2],['WEDNESDAY',3],['THURSDAY',9],['FRIDAY',6],['SATURDAY',4]]
-        if(Array.isArray(values[i]) && values[i].length === 2) {
+        if (Array.isArray(values[i]) && values[i].length === 2) {
           objectResult[values[i][0]] = values[i][1];
-          if(typeOfValue !== undefined && typeOfValue !== 'array')  
+          if (typeOfValue !== undefined && typeOfValue !== 'array')
             throw new CustomError('ENUMMAP_VALUES_NOT_VALID', 'EnumMap values should be consistent...')
 
           typeOfValue = 'array';
         }
 
         // elements are object with {key:value} [{SUNDAY:1},{MONDAY:5}, {TUESDAY:2},{WEDNESDAY:3},{THURSDAY:9},{FRIDAY:6},{SATURDAY:4}]
-        if(values[i] !== null && typeof values[i] === 'object' && Object.keys(values[i]).length === 1) {
+        if (values[i] !== null && typeof values[i] === 'object' && Object.keys(values[i]).length === 1) {
 
           let key = Object.keys(values[i])[0];
 
           objectResult[key] = values[i][key];
-          if(typeOfValue !== undefined && typeOfValue !== 'object')
+          if (typeOfValue !== undefined && typeOfValue !== 'object')
             throw new CustomError('ENUMMAP_VALUES_NOT_VALID', 'EnumMap values should be consistent...')
 
           typeOfValue = 'object';
@@ -2666,7 +2665,7 @@ class EnumMap {
 
     for (const elem in this) {
       if (this.hasOwnProperty(elem)) {
-        if ( isBasicType(this[elem]) === false) throw new CustomError('INVERT_VALUES_NOT_BASIC_TYPE', 'EnumMap values should be basic types')
+        if (isBasicType(this[elem]) === false) throw new CustomError('INVERT_VALUES_NOT_BASIC_TYPE', 'EnumMap values should be basic types')
         invertedValues[this[elem]] = elem;
       }
     }
@@ -2961,10 +2960,10 @@ function traverseVertically(functionToRun, verFields, toTraverse) {
 }
 
 
-function project$1(paths, json, removeWithDelete=true) {
+function project$1(paths, json, removeWithDelete = true) {
   const toDelete = Symbol();
   let copy;
-  if (json === null || json === undefined ) return json
+  if (json === null || json === undefined) return json
   if (Array.isArray(json)) copy = [];
   else if (Object.getPrototypeOf(json) === Object.prototype) copy = {};
   else if (Array.isArray(paths) === false) throw new Error('paths must be an array')
@@ -2980,33 +2979,33 @@ function project$1(paths, json, removeWithDelete=true) {
 
     const result = JSONPath({ resultType: 'all', path, json });
 
-    let pendingToFilter= new Map();
+    let pendingToFilter = new Map();
 
     result.forEach(({ pointer, value }, index) => {
       const setAtPath = pointer.substring(1).split('/');
 
-      if (setAtPath.length === 1 && setAtPath[0] === '') copy = isInclude ? collectionClone(value) : undefined; 
+      if (setAtPath.length === 1 && setAtPath[0] === '') copy = isInclude ? collectionClone(value) : undefined;
       else {
-        if(removeWithDelete === true && isInclude === false) {
-          const parentPath = setAtPath.slice(0,-1);
+        if (removeWithDelete === true && isInclude === false) {
+          const parentPath = setAtPath.slice(0, -1);
           const parent = getAt(copy, parentPath);
-        
-          if(Array.isArray(parent) === true) {
+
+          if (Array.isArray(parent) === true) {
             // Arrays are stored in a map to be reviewed later to filter out the items mark for deletion.
             pendingToFilter.set(parentPath.join('/'), parent);
             // mark element for deletion
             setAt(copy, setAtPath, toDelete);
-          }else {
-            const fieldToDelete = setAtPath[setAtPath.length -1];
+          } else {
+            const fieldToDelete = setAtPath[setAtPath.length - 1];
             delete parent[fieldToDelete];
             setAt(copy, parentPath, parent);
           }
 
-        }else
+        } else
           setAt(copy, setAtPath, isInclude ? collectionClone(value) : undefined);
       }
     });
-    
+
     pendingToFilter.forEach((parent, parentPath) => {
       const compactingDeleteItems = parent.filter(el => el !== toDelete);
       setAt(copy, parentPath.split('/'), compactingDeleteItems);
@@ -3065,7 +3064,7 @@ function copyPropsWithValueUsingRules(objDest, copyRules, shouldUpdateOnlyEmptyF
 
         let valueToCopy = getAt(inputObj, from);
 
-        if(typeof rule.transform === 'function') {
+        if (typeof rule.transform === 'function') {
           valueToCopy = rule.transform(valueToCopy);
         }
 
@@ -3306,13 +3305,12 @@ function indexOfNthMatch(string, toMatch, nth) {
 }
 
 
-function toDate(date)
-{
+function toDate(date) {
   return date
-      ? date instanceof Date
-        ? date
-        : new Date(date)
-      : new Date()
+    ? date instanceof Date
+      ? date
+      : new Date(date)
+    : new Date()
 }
 
 function isDate(d) {
@@ -3379,7 +3377,7 @@ function formatDate(format, date) {
   const mi = dateIsoString.substring(20, 22);
 
   const month = indexMonths[MM];
-  const dayOfWeek = indexDays[dateToProcess.getDay()];
+  const dayOfWeek = indexDays[dateToProcess.getUTCDay()];
 
   return format
     .replace(/\$YYYY/g, YYYY)
@@ -3449,7 +3447,7 @@ function subtractDays(daysToSubtract, date) {
 
   if (isDate(dateToProcess) === false) return dateToProcess
 
-  return new Date(dateToProcess.valueOf() - 864E5*daysToSubtract)
+  return new Date(dateToProcess.valueOf() - 864E5 * daysToSubtract)
 }
 // subtractDays(2, "2023-03-26").toISOString() //?
 // subtractDays(3, "2023-03-27").toISOString() //?
@@ -3460,7 +3458,7 @@ function addDays(daysToAdd, date) {
 
   if (isDate(dateToProcess) === false) return dateToProcess
 
-  return new Date(dateToProcess.valueOf()+864E5*daysToAdd)
+  return new Date(dateToProcess.valueOf() + 864E5 * daysToAdd)
 }
 // addDays(2, "2023-03-24").toISOString() //?
 // addDays(3, "2023-03-24").toISOString() //?
@@ -3472,7 +3470,7 @@ function previousDayOfWeek(dayOfWeek, date) {
 
   if (isDate(dateToProcess) === false) return dateToProcess
 
-  let diffInDaysOfWeek = dateToProcess.getDay() - dayOfWeek;
+  let diffInDaysOfWeek = dateToProcess.getUTCDay() - dayOfWeek;
 
   let toSubtract = diffInDaysOfWeek >= 0
     ? diffInDaysOfWeek
@@ -3510,19 +3508,19 @@ function isDateMidnight(date) {
 
 function setDateToMidnight(date) {
 
-  if(typeof date === 'string') return new Date(date.substring(0,10))
+  if (typeof date === 'string') return new Date(date.substring(0, 10))
 
-  let dateToProcess = date === undefined 
+  let dateToProcess = date === undefined
     ? new Date()
     : isDate(date)
       ? date
       : new Date(date);
 
-  if(isNaN(+dateToProcess)) return dateToProcess
+  if (isNaN(+dateToProcess)) return dateToProcess
 
-  if(isDateMidnight(dateToProcess)) return dateToProcess
+  if (isDateMidnight(dateToProcess)) return dateToProcess
 
-  return new Date(dateToProcess.toISOString().substring(0,10))
+  return new Date(dateToProcess.toISOString().substring(0, 10))
 }
 
 const {
@@ -3702,7 +3700,7 @@ function setAt(obj, valuePath, value) {
     for (let i = 0, j = valuePathArray.length; i < j; i++) {
 
       let field = nameToIndex(result, valuePathArray[i]);
-    
+
       if (i === (valuePathArray.length - 1)) {
         if (result?.[valuePathArray[i]] !== undefined) {
           if (valueReturn !== CREATED) valueReturn = MODIFIED;
@@ -3733,14 +3731,13 @@ function setAt(obj, valuePath, value) {
   }
   return valueReturn
 
-  function nameToIndex(obj, field)
-  {
+  function nameToIndex(obj, field) {
     if (Array.isArray(obj) && field === '$last') {
       return obj.length - 1
     }
 
     if (Array.isArray(obj) && field === '$push') {
-      return obj.length 
+      return obj.length
     }
 
     if (Array.isArray(obj) && parseInt(field) < 0) {
@@ -3752,7 +3749,7 @@ function setAt(obj, valuePath, value) {
 }
 
 const defaultValue = (value, defaultVal) => {
-  if(value === undefined || value === null || isNaN(value)) return defaultVal
+  if (value === undefined || value === null || isNaN(value)) return defaultVal
 
   return value
 };
@@ -3760,7 +3757,7 @@ const defaultValue = (value, defaultVal) => {
 const sorterByPaths = (paths, isAsc = true) => {
   let great = 1;
   let less = -1;
-  let  nullishValues = Infinity; // In ascending we put nullish values at the end
+  let nullishValues = Infinity; // In ascending we put nullish values at the end
 
   if (isAsc === false) {
     great = -1;
@@ -3775,8 +3772,8 @@ const sorterByPaths = (paths, isAsc = true) => {
   return (objA, objB) => {
 
     for (let currentPath of pathArr) {
-      if ( defaultValue(getAt(objA, currentPath), nullishValues) > defaultValue(getAt(objB, currentPath), nullishValues) ) return great
-      if ( defaultValue(getAt(objA, currentPath), nullishValues) < defaultValue(getAt(objB, currentPath), nullishValues) ) return less
+      if (defaultValue(getAt(objA, currentPath), nullishValues) > defaultValue(getAt(objB, currentPath), nullishValues)) return great
+      if (defaultValue(getAt(objA, currentPath), nullishValues) < defaultValue(getAt(objB, currentPath), nullishValues)) return less
     }
 
     return 0
@@ -3794,7 +3791,7 @@ const sorterByPaths = (paths, isAsc = true) => {
 
 
 const sorterByFields = (paths, isAsc = true) => {
-  if(Array.isArray(isAsc) === false) {
+  if (Array.isArray(isAsc) === false) {
     isAsc = Array(paths.length).fill(isAsc);
   }
 
@@ -3805,20 +3802,20 @@ const sorterByFields = (paths, isAsc = true) => {
   return (objA, objB) => {
 
     let great, less, nullishValues, currentPath;
-    for(let index =0; index < pathArr.length; index++) {
+    for (let index = 0; index < pathArr.length; index++) {
       currentPath = pathArr[index];
       great = 1;
       less = -1;
       nullishValues = Infinity; // In ascending we put nullish values at the end
-    
+
       if (isAsc[index] === false) {
         great = -1;
         less = 1;
         nullishValues = -Infinity; // In descending we put nullish values at the beginning
       }
-    
-      if ( defaultValue(getAt(objA, currentPath), nullishValues) > defaultValue(getAt(objB, currentPath), nullishValues) ) return great
-      if ( defaultValue(getAt(objA, currentPath), nullishValues) < defaultValue(getAt(objB, currentPath), nullishValues) ) return less
+
+      if (defaultValue(getAt(objA, currentPath), nullishValues) > defaultValue(getAt(objB, currentPath), nullishValues)) return great
+      if (defaultValue(getAt(objA, currentPath), nullishValues) < defaultValue(getAt(objB, currentPath), nullishValues)) return less
     }
     return 0
   }
@@ -4212,12 +4209,12 @@ function repeat$1(numberOfTimes) {
 
 function oneIn(period, callAtTheBeggining = true) {
 
-  let countdown = callAtTheBeggining? 0 : period -1;
+  let countdown = callAtTheBeggining ? 0 : period - 1;
 
   function call(runFunc) {
 
     function toExecute(...args) {
-      if (countdown ===0 ) {
+      if (countdown === 0) {
         countdown = period - 1;
         return runFunc(...args)
       }
@@ -4226,7 +4223,7 @@ function oneIn(period, callAtTheBeggining = true) {
 
     toExecute.reset = (callAtTheBegginingParam = true) => {
       callAtTheBeggining = callAtTheBegginingParam;
-      countdown = callAtTheBeggining? 0 : period -1;
+      countdown = callAtTheBeggining ? 0 : period - 1;
     };
     toExecute.stop = () => countdown = Infinity;
     return toExecute
