@@ -47,7 +47,15 @@ export function varSubsDoubleBracket(strToResolveVars: string, state: any, mode?
 export function queryObjToStr(query: any): string;
 
 /**
+ * Converts an Error object to a brief string with stacktrace.
+ * @param {Error} error - The Error instance to summarize.
+ * @returns {string} - A brief string summarizing the error.
+ */
+export function summarizeError(error:Error): string;
+
+/**
  * Custom error class that extends the Error class.
+ * @class CustomError
  * @extends Error
  */
 export class CustomError extends Error {
@@ -59,6 +67,7 @@ export class CustomError extends Error {
    */
   constructor(name?: string, message?: string, data?: { status: number });
   data: { status: number };
+  summarizeError(error:CustomError): string;
 }
 
 /**
@@ -90,9 +99,9 @@ export function isBasicType(type: any): boolean;
 
 /**
  * Composes a URL from the gateway URL, service name, and service path.
- * @param {any} gatewayUrl - The gateway URL.
- * @param {any} serviceName - The service name.
- * @param {any} servicePath - The service path.
+ * @param {string} gatewayUrl - The gateway URL.
+ * @param {string} serviceName - The service name.
+ * @param {string} servicePath - The service path.
  * @returns {object} - The composed URL object.
  */
 export function urlCompose(gatewayUrl: any, serviceName: any, servicePath: any): {
@@ -104,18 +113,19 @@ export function urlCompose(gatewayUrl: any, serviceName: any, servicePath: any):
 
 /**
  * Decomposes a URL into the gateway URL, service name, and service path.
- * @param {any} url - The URL to decompose.
- * @param {any} listOfServiceNames - The list of service names.
- * @returns {any} - The decomposed URL object.
+ * @param {string} url - The URL to decompose.
+ * @param {string} listOfServiceNames - The list of service names.
+ * @returns {object} - The decomposed URL object.
  */
 export function urlDecompose(url: any, listOfServiceNames: any): any;
 
 /**
- * Returns the index of the nth match of a substring in a string.
- * @param {any} string - The string to search in.
- * @param {any} toMatch - The substring to match.
- * @param {any} nth - The nth match to find.
- * @returns {any} - The index of the nth match.
+ * Returns the index of the nth match of a substring toMatch in the stringToInspect.
+ * Returns -1 if the nth match is not found.
+ * @param {string} stringToInspect - The string to inspect in.
+ * @param {string} toMatch - The substring to match.
+ * @param {number} nth - The nth number match to find.
+ * @returns {number} - The index of the nth match.
  */
 export function indexOfNthMatch(string: any, toMatch: any, nth: any): any;
 

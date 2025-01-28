@@ -159,13 +159,13 @@ export function unionWithHashKeys<T,P>(
 * @param getHashOldRecords hash function for the target data
 * @return a function ready to receive the target data
 */
-export function updateWithHashKeys<T, U, V, W, X>(
+export function updateWithHashKeys<NewRecord, HashKey, OldRecord, Result>(
   isAsc: boolean | undefined,
-  getHashNewRecords: (elem: T) => U,
-  newRecords: T[],
-  getHashOldRecords: (elem: W) => V
+  getHashNewRecords: (elem: NewRecord) => HashKey,
+  newRecords: NewRecord[],
+  getHashOldRecords: (elem: OldRecord) => HashKey
   
-): (oldRecords: W[]) => X[]
+): (oldRecords: OldRecord[]) => Result[]
 
 export const between: any;
 export const matchByPropId: any;

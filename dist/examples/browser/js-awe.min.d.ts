@@ -752,14 +752,14 @@ declare function isStringADate(stringDate: string): boolean;
  * @param date - The date to format.
  * @returns The formatted date.
  */
-declare function formatDate(format: any, date?: Date | StringDate): string | undefined;
+declare function formatDate(format: any, date?: Date | StringDate | number): string | undefined;
 
 /**
  * Formats a date.
  * @param format - The format of the date.
  * @returns A function that formats a date.
  */
-declare function dateFormatter(format: string): (date: Date | StringDate) => string | undefined;
+declare function dateFormatter(format: string): (date: Date | StringDate | number) => string | undefined;
 
 /**
  * Represents the days of the week.
@@ -788,7 +788,7 @@ declare function YYYY_MM_DD_hh_mm_ss_ToUtcDate(dateYYYY_MM_DD_hh_mm_ss: string):
  * @param date - The date object to convert.
  * @returns An object literal with numeric properties representing the date.
  */
-declare function dateToObj(date: Date | StringDate): {
+declare function dateToObj(date: Date | StringDate | number): {
   YYYY: number;
   MM: number;
   DD: number;
@@ -803,7 +803,7 @@ declare function dateToObj(date: Date | StringDate): {
  * @param date - The date object to convert.
  * @returns A number with the difference in days between endDate and iniDate.
  */
-declare function diffInDaysYYYY_MM_DD(iniDate: Date | StringDate, endDate: Date | StringDate): number;
+declare function diffInDaysYYYY_MM_DD(iniDate: Date | StringDate | number, endDate: Date | StringDate | number): number;
 
 /**
  * Adds days to a date.
@@ -811,7 +811,7 @@ declare function diffInDaysYYYY_MM_DD(iniDate: Date | StringDate, endDate: Date 
  * @param date - The date to add days to.
  * @returns The date with the added days.
  */
-declare function addDays(daysToSubtract: number, date: Date | StringDate): Date;
+declare function addDays(daysToSubtract: number, date: Date | StringDate | number): Date;
 
 /**
  * Subtracts days from a date.
@@ -819,7 +819,7 @@ declare function addDays(daysToSubtract: number, date: Date | StringDate): Date;
  * @param date - The date to subtract days from.
  * @returns The date with the subtracted days.
  */
-declare function subtractDays(daysToSubtract: number, date: Date | StringDate): Date;
+declare function subtractDays(daysToSubtract: number, date: Date | StringDate | number): Date;
 
 /**
  * Calculates the previous or current date at a specific previous day: 0:monday to 6:Sunday.
@@ -827,14 +827,14 @@ declare function subtractDays(daysToSubtract: number, date: Date | StringDate): 
  * @param date - The date subject to calculation. If the date requested correspond to the dayOfWeek, the same input date is returned.
  * @returns The calculated date.
  */
-declare function previousDayOfWeek(dayOfWeek: 0 | 1 | 2 | 3 | 4 | 5 | 6, date: Date | StringDate): Date;
+declare function previousDayOfWeek(dayOfWeek: 0 | 1 | 2 | 3 | 4 | 5 | 6, date: Date | StringDate | number): Date;
 
 /**
  * Gets the same date or the previous Friday for weekends.
  * @param date - The date to get the same date or the previous Friday.
  * @returns The same date or the previous Friday.
  */
-declare function getSameDateOrPreviousFridayForWeekends(date: Date | StringDate): Date;
+declare function getSameDateOrPreviousFridayForWeekends(date: Date | StringDate | number): Date;
 
 /**
  * Checks if a date is midnight.
@@ -848,7 +848,7 @@ declare function isDateMidnight(date: Date):boolean | undefined;
  * @param date - The date to set to midnight.
  * @returns The date set to midnight.
  */
-declare function setDateToMidnight(date: Date | StringDate): Date;
+declare function setDateToMidnight(date: Date | StringDate | number): Date;
 
 /**
  * Replaces all occurrences of a substring in a string.
