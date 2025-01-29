@@ -32,6 +32,7 @@ const logWithPrefix = (title, displayFunc) => (message) => {
 };
 exports.logWithPrefix = logWithPrefix;
 function summarizeError(error) {
+    var _a;
     if (error instanceof Error === false)
         return 'Not an error object';
     const maxStackTraces = 5;
@@ -59,7 +60,8 @@ function summarizeError(error) {
         condensedStackTrace.push(...filteredStackTrace);
     }
     const condensedStackTraceString = condensedStackTrace.join(' -> ');
-    return `${error.name}: ${error.message}\nStack Trace: ${condensedStackTraceString}`;
+    const ErrorString = `${error.name}: ${error.message} ${((_a = error.cause) === null || _a === void 0 ? void 0 : _a.message) ? `[cause]: ${error.cause.message}` : ''}`;
+    return `${ErrorString}\nStack Trace: ${condensedStackTraceString}`;
 }
 exports.summarizeError = summarizeError;
 class CustomError extends Error {

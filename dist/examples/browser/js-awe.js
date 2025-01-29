@@ -2382,6 +2382,40 @@ const logWithPrefix = (title, displayFunc) => (message) => {
   return message
 };
 
+function summarizeError(error) {
+
+  if(error instanceof Error === false) return 'Not an error object';
+
+  const maxStackTraces = 5;
+  const stackTraceLines = error.stack.split('\n');
+  const filteredStackTrace = stackTraceLines
+    .filter(line => !line.includes('node_modules') && !line.includes('node:internal'))
+    .map(line => line.trim())
+    .filter(line => line.startsWith('at'))
+    .map(line => {
+      const match = line.match(/at .* \((.*\/)?([^\/]+):(\d+):(\d+)\)/) || line.match(/at (.*\/)?([^\/]+):(\d+):(\d+)/);
+      if (match) {
+        const [, , file, line, column] = match;
+        return `${file}:${line}:${column}`;
+      }
+      return line;
+    });
+
+  const condensedStackTrace = [];
+  const totalTraces = filteredStackTrace.length;
+
+  if (totalTraces > maxStackTraces) {
+    condensedStackTrace.push(...filteredStackTrace.slice(0, maxStackTraces - 1));
+    condensedStackTrace.push('...skipped...');
+    condensedStackTrace.push(filteredStackTrace[totalTraces - 1]);
+  } else {
+    condensedStackTrace.push(...filteredStackTrace);
+  }
+
+  const condensedStackTraceString = condensedStackTrace.join(' -> ');
+
+  return `${error.name}: ${error.message}\nStack Trace: ${condensedStackTraceString}`;
+}
 
 class CustomError extends Error {
   constructor(name = 'GENERIC', message = name, data = { status: 500 }) {
@@ -2401,6 +2435,10 @@ class CustomError extends Error {
 
   chain(func) {
     return this
+  }
+
+  summarizeError(error) {
+    return summarizeError(error)
   }
 
   static of = CustomError
@@ -3300,9 +3338,23 @@ function urlDecompose(url, listOfServiceNames) {
     })
 }
 
-function indexOfNthMatch(string, toMatch, nth) {
-  return string.split(toMatch, nth).join(toMatch).length
+function indexOfNthMatch(stringToInspect, toMatch, nth) {
+  if (nth > 0 === false) return -1;
+  let index = -1;
+  for (let i = 0; i < nth; i++) {
+    index = stringToInspect.indexOf(toMatch, index + 1);
+  }
+  return index;
 }
+// indexOfNthMatch('', '£', 0) //?
+// indexOfNthMatch('£', '£', 3.12) //?
+// indexOfNthMatch('£', '£', 1) //?
+// indexOfNthMatch('It will not find', 'loop', 0) //?
+// indexOfNthMatch('It will not find', 'loop', 1) //?
+// indexOfNthMatch('a.b.c.d.e.f', '£', 3) //?
+// indexOfNthMatch('a.b.c.d.e.f', '.', 3) //?
+// indexOfNthMatch('a.b.c.d.e.f', '.', 2) //?
+// indexOfNthMatch('a.b.c.d.e.f', '.', 1) //?
 
 
 function toDate(date) {
@@ -4284,6 +4336,7 @@ const jsUtils = {
   firstCapital,
   varSubsDoubleBracket,
   queryObjToStr,
+  summarizeError,
   CustomError,
   createCustomErrorClass,
   isBasicType,
@@ -21345,4 +21398,4 @@ function sanitize(obj, sanitizers = ['ibmApis'], noSanitzedUptoLogLevel) {
 
 }
 
-export { Chrono, CustomError, DAYS, Enum, EnumMap, F, Index, MONTHS, index as R, RE, RLog, Table, Text, Timeline, YYYY_MM_DD_hh_mm_ss_ToUtcDate, addDays, anonymize, arrayOfObjectsToObject, arraySorter, arrayToObject, bearerSanitizer, between, cleanString, cloneCopy, colorByStatus, colorMessage, colorMessageByStatus, colors, consoleTable, consoleTableExtended, copyPropsWithValue, copyPropsWithValueUsingRules, createCustomErrorClass, dateFormatter, dateToObj, deepFreeze, defaultValue, diffInDaysYYYY_MM_DD, exclude, fetchImproved, ffletchMaker, fillWith, filterFlatMap, filterMap, findDeepKey, findSolution, firstCapital, fletch, formatDate, getAt, getSameDateOrPreviousFridayForWeekends, groupByWithCalc, indexOfNthMatch, innerRightJoinWith, isBasicType, isDate, isDateMidnight, isEmpty$1 as isEmpty, isPromise, isStringADate, lengthSanitizer, log, logWithPrefix, loopIndexGenerator, mapWithNext, mapWithPrevious, matchByPropId, memoize, mergeArrayOfObjectsRenamingProps, notTo, numberToFixedString, oneIn, parallel, partialAtPos, pickPaths, pipe, pipeWhile, pipeWithChain, plan, previousDayOfWeek, processExit, project$1 as project, promiseAll, promiseFunToFutureFun, pushAt, pushUniqueKey, pushUniqueKeyOrChange, queryObjToStr, removeDuplicates, repeat$1 as repeat, replaceAll, retryWithSleep, runFunctionsSyncOrParallel, runFutureFunctionsInParallel, sanitize, setAt, setDateToMidnight, sleep, sleepWithFunction, sleepWithValue, something, sorterByFields, sorterByPaths, splitCond, subtractDays, transition, traverse$1 as traverse, traverseVertically, uncurry, unionWithHashKeys, updateWithHashKeys, urlCompose, urlDecompose, varSubsDoubleBracket, wildcardToRegExp };
+export { Chrono, CustomError, DAYS, Enum, EnumMap, F, Index, MONTHS, index as R, RE, RLog, Table, Text, Timeline, YYYY_MM_DD_hh_mm_ss_ToUtcDate, addDays, anonymize, arrayOfObjectsToObject, arraySorter, arrayToObject, bearerSanitizer, between, cleanString, cloneCopy, colorByStatus, colorMessage, colorMessageByStatus, colors, consoleTable, consoleTableExtended, copyPropsWithValue, copyPropsWithValueUsingRules, createCustomErrorClass, dateFormatter, dateToObj, deepFreeze, defaultValue, diffInDaysYYYY_MM_DD, exclude, fetchImproved, ffletchMaker, fillWith, filterFlatMap, filterMap, findDeepKey, findSolution, firstCapital, fletch, formatDate, getAt, getSameDateOrPreviousFridayForWeekends, groupByWithCalc, indexOfNthMatch, innerRightJoinWith, isBasicType, isDate, isDateMidnight, isEmpty$1 as isEmpty, isPromise, isStringADate, lengthSanitizer, log, logWithPrefix, loopIndexGenerator, mapWithNext, mapWithPrevious, matchByPropId, memoize, mergeArrayOfObjectsRenamingProps, notTo, numberToFixedString, oneIn, parallel, partialAtPos, pickPaths, pipe, pipeWhile, pipeWithChain, plan, previousDayOfWeek, processExit, project$1 as project, promiseAll, promiseFunToFutureFun, pushAt, pushUniqueKey, pushUniqueKeyOrChange, queryObjToStr, removeDuplicates, repeat$1 as repeat, replaceAll, retryWithSleep, runFunctionsSyncOrParallel, runFutureFunctionsInParallel, sanitize, setAt, setDateToMidnight, sleep, sleepWithFunction, sleepWithValue, something, sorterByFields, sorterByPaths, splitCond, subtractDays, summarizeError, transition, traverse$1 as traverse, traverseVertically, uncurry, unionWithHashKeys, updateWithHashKeys, urlCompose, urlDecompose, varSubsDoubleBracket, wildcardToRegExp };

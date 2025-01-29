@@ -37,7 +37,8 @@ function summarizeError(error) {
         condensedStackTrace.push(...filteredStackTrace);
     }
     const condensedStackTraceString = condensedStackTrace.join(' -> ');
-    return `${error.name}: ${error.message}\nStack Trace: ${condensedStackTraceString}`;
+    const ErrorString = `${error.name}: ${error.message} ${error.cause?.message ? `[cause]: ${error.cause.message}` : ''}`;
+    return `${ErrorString}\nStack Trace: ${condensedStackTraceString}`;
 }
 class CustomError extends Error {
     constructor(name = 'GENERIC', message = name, data = { status: 500 }) {
