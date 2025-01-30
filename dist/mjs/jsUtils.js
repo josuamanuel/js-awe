@@ -1585,14 +1585,15 @@ function cleanString(str) {
 //  'Only letters, numbers 1,2,3 dot and comma. Text is trimmed' //?
 function repeat(numberOfTimes) {
     let toReturn = [];
+    let forceExit = false;
     function times(funToRepeat) {
-        for (let index = 0; index < numberOfTimes; index++) {
+        for (let index = 0; index < numberOfTimes && forceExit === false; index++) {
             toReturn[index] = funToRepeat(index);
         }
         return toReturn;
     }
     async function awaitTimes(funToRepeat) {
-        for (let index = 0; index < numberOfTimes; index++) {
+        for (let index = 0; index < numberOfTimes && forceExit === false; index++) {
             toReturn[index] = await funToRepeat(index);
         }
         return toReturn;
@@ -1600,9 +1601,14 @@ function repeat(numberOfTimes) {
     function value(value) {
         return Array(numberOfTimes).fill(value);
     }
-    return { times, awaitTimes, value };
+    function breakNextIteration() {
+        forceExit = true;
+    }
+    return { times, awaitTimes, value, breakNextIteration };
 }
-// repeat(8).times((index) => {
+// const {breakNextIteration, times } = repeat(8)
+// times((index) => {
+//   if(index === 3) breakNextIteration()
 //   console.log(index)
 // })
 // repeat(8).value(0) //?

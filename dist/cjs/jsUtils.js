@@ -1678,15 +1678,16 @@ exports.cleanString = cleanString;
 //  'Only letters, numbers 1,2,3 dot and comma. Text is trimmed' //?
 function repeat(numberOfTimes) {
     let toReturn = [];
+    let forceExit = false;
     function times(funToRepeat) {
-        for (let index = 0; index < numberOfTimes; index++) {
+        for (let index = 0; index < numberOfTimes && forceExit === false; index++) {
             toReturn[index] = funToRepeat(index);
         }
         return toReturn;
     }
     function awaitTimes(funToRepeat) {
         return __awaiter(this, void 0, void 0, function* () {
-            for (let index = 0; index < numberOfTimes; index++) {
+            for (let index = 0; index < numberOfTimes && forceExit === false; index++) {
                 toReturn[index] = yield funToRepeat(index);
             }
             return toReturn;
@@ -1695,10 +1696,15 @@ function repeat(numberOfTimes) {
     function value(value) {
         return Array(numberOfTimes).fill(value);
     }
-    return { times, awaitTimes, value };
+    function breakNextIteration() {
+        forceExit = true;
+    }
+    return { times, awaitTimes, value, breakNextIteration };
 }
 exports.repeat = repeat;
-// repeat(8).times((index) => {
+// const {breakNextIteration, times } = repeat(8)
+// times((index) => {
+//   if(index === 3) breakNextIteration()
 //   console.log(index)
 // })
 // repeat(8).value(0) //?

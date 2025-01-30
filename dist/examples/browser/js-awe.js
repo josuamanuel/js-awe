@@ -2414,7 +2414,9 @@ function summarizeError(error) {
 
   const condensedStackTraceString = condensedStackTrace.join(' -> ');
 
-  return `${error.name}: ${error.message}\nStack Trace: ${condensedStackTraceString}`;
+  const ErrorString = `${error.name}: ${error.message} ${error.cause?.message ? `[cause]: ${error.cause.message}` : ''}`;
+
+  return `${ErrorString}\nStack Trace: ${condensedStackTraceString}`;
 }
 
 class CustomError extends Error {
