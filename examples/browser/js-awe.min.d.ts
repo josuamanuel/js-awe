@@ -881,8 +881,9 @@ declare function cleanString(str: any): any;
  * @returns An object with functions to repeat the function.
  */
 declare function repeat(numberOfTimes: any): {
-  times: (funToRepeat: any) => any[];
-  awaitTimes: (funToRepeat: any) => Promise<any[]>;
+  times: (funToRepeat: (index?:number)=>any) => any[];
+  awaitTimes: (funToRepeat: (index?:number)=>any) => Promise<any[]>;
+  breakNextIteration: () => void;
   value: (value: any) => any[];
 };
 
