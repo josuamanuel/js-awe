@@ -1307,6 +1307,23 @@ const sorterByFields = (paths, isAsc = true) => {
 //   {a:undefined,b:6},
 //   {a:0,b:7},
 //   {a:undefined,b:null}].sort(sorterByFields(['a','b'],[true,false])) //?
+function findIndexInSortedArray(arr, item) {
+    if (arr?.length === undefined || arr?.length === 0)
+        return -1;
+    let l = 0, r = arr.length - 1;
+    while (l <= r) {
+        const mid = Math.floor((l + r) / 2);
+        const guess = arr[mid];
+        if (guess === item)
+            return mid;
+        if (guess > item)
+            r = mid - 1;
+        else
+            l = mid + 1;
+    }
+    return -1;
+}
+;
 function findIndexOrPreviousInSortedArray(arr, val) {
     let left = 0;
     let right = arr.length - 1;
@@ -1731,6 +1748,7 @@ const jsUtils = {
     setAt,
     sorterByPaths,
     sorterByFields,
+    findIndexInSortedArray,
     findIndexOrPreviousInSortedArray,
     findIndexOrNextInSortedArray,
     defaultValue,
@@ -1783,4 +1801,4 @@ const jsUtils = {
     processExit
 };
 export default jsUtils;
-export { logWithPrefix, firstCapital, varSubsDoubleBracket, queryObjToStr, summarizeError, CustomError, createCustomErrorClass, isBasicType, urlCompose, urlDecompose, indexOfNthMatch, colors, colorMessage, colorMessageByStatus, colorByStatus, findDeepKey, deepFreeze, getAt, setAt, sorterByPaths, sorterByFields, findIndexOrPreviousInSortedArray, findIndexOrNextInSortedArray, defaultValue, filterFlatMap, arraySorter, isPromise, sleep, sleepWithValue, sleepWithFunction, notTo, arrayToObject, arrayOfObjectsToObject, removeDuplicates, traverse, traverseVertically, project, copyPropsWithValue, copyPropsWithValueUsingRules, EnumMap, Enum, transition, pushUniqueKey, pushUniqueKeyOrChange, pushAt, memoize, fillWith, numberToFixedString, isDate, isEmpty, isStringADate, formatDate, DAYS, MONTHS, dateFormatter, YYYY_MM_DD_hh_mm_ss_ToUtcDate, dateToObj, diffInDaysYYYY_MM_DD, subtractDays, addDays, previousDayOfWeek, getSameDateOrPreviousFridayForWeekends, isDateMidnight, setDateToMidnight, replaceAll, cleanString, repeat, oneIn, loopIndexGenerator, retryWithSleep, processExit };
+export { logWithPrefix, firstCapital, varSubsDoubleBracket, queryObjToStr, summarizeError, CustomError, createCustomErrorClass, isBasicType, urlCompose, urlDecompose, indexOfNthMatch, colors, colorMessage, colorMessageByStatus, colorByStatus, findDeepKey, deepFreeze, getAt, setAt, sorterByPaths, sorterByFields, findIndexInSortedArray, findIndexOrPreviousInSortedArray, findIndexOrNextInSortedArray, defaultValue, filterFlatMap, arraySorter, isPromise, sleep, sleepWithValue, sleepWithFunction, notTo, arrayToObject, arrayOfObjectsToObject, removeDuplicates, traverse, traverseVertically, project, copyPropsWithValue, copyPropsWithValueUsingRules, EnumMap, Enum, transition, pushUniqueKey, pushUniqueKeyOrChange, pushAt, memoize, fillWith, numberToFixedString, isDate, isEmpty, isStringADate, formatDate, DAYS, MONTHS, dateFormatter, YYYY_MM_DD_hh_mm_ss_ToUtcDate, dateToObj, diffInDaysYYYY_MM_DD, subtractDays, addDays, previousDayOfWeek, getSameDateOrPreviousFridayForWeekends, isDateMidnight, setDateToMidnight, replaceAll, cleanString, repeat, oneIn, loopIndexGenerator, retryWithSleep, processExit };

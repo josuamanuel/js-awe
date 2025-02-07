@@ -237,6 +237,16 @@ export function sorterByPaths(paths: string[]|string, isAsc?: boolean): (objA: u
  */
 export function sorterByFields(paths: string[]|string, isAsc?: boolean | boolean[]): (objA: unknown, objB: unknown) => number;
 
+
+/**
+ * Finds the index of a value in a sorted array.
+ * If value is not found, it returns -1
+ * @param arr - The sorted array to search in.
+ * @param val - The value to find in the array.
+ * @returns The index of the value in the array, or -1 if the value is not found.
+ */
+export function findIndexInSortedArray(arr: string[]|number[]|Date[], val: string|number|Date): number;
+
 /**
  * Finds the index of the specified value in a sorted array or the index of the previous value if the specified value is not found.
  * If the value to search for is less than the first value in the array, it returns -1.
