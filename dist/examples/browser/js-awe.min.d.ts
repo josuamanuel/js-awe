@@ -392,6 +392,24 @@ declare function sorterByPaths(paths: string[]|string, isAsc?: boolean): (objA: 
 declare function sorterByFields(paths: string[]|string, isAsc?: boolean | boolean[]): (objA: unknown, objB: unknown) => number;
 
 /**
+ * Finds the index of the specified value in a sorted array or the index of the previous value if the specified value is not found.
+ * If the value to search for is less than the first value in the array, it returns -1.
+ * @param arr - The sorted array to search in.
+ * @param val - The value to search for.
+ * @returns The index of the specified value in the array, or the index of the previous value if the specified value is not found.
+ */
+declare function findIndexOrPreviousInSortedArray(arr: string[]|number[]|Date[], val: string|number|Date): number;
+
+/**
+ * Finds the index of the specified value in the sorted array or the next available index if the value is not found.
+ * If the value to search for is greater than the last value in the array, it returns the length of the array.
+ * @param arr - The sorted array to search in.
+ * @param val - The value to search for in the array.
+ * @returns The index of the value in the array, or the next available index if the value is not found.
+ */
+declare function findIndexOrNextInSortedArray(arr: string[]|number[]|Date[], val: string|number|Date): number;
+
+/**
  * Returns the value if it is not undefined, null or NaN. Otherwise, it returns the default value.
  * @param value   The value to check.
  * @param defaultValue  The default value to return if the value is undefined, null or NaN.
@@ -832,7 +850,7 @@ declare function addDays(daysToSubtract: number, date: Date | StringDate | numbe
 declare function subtractDays(daysToSubtract: number, date: Date | StringDate | number): Date;
 
 /**
- * Calculates the previous or current date at a specific previous day: 0:monday to 6:Sunday.
+ * Returns the closest to param date that could be equal or less and that is of a specific dayOfWeek: 0:monday to 6:Sunday.
  * @param dayOfWeek - The day of the week. 0: Sunday, 1: Monday, 2: Tuesday, 3: Wednesday, 4: Thursday, 5: Friday, 6: Saturday.
  * @param date - The date subject to calculation. If the date requested correspond to the dayOfWeek, the same input date is returned.
  * @returns The calculated date.
@@ -881,8 +899,9 @@ declare function cleanString(str: any): any;
  * @returns An object with functions to repeat the function.
  */
 declare function repeat(numberOfTimes: any): {
-  times: (funToRepeat: any) => any[];
-  awaitTimes: (funToRepeat: any) => Promise<any[]>;
+  times: (funToRepeat: (index?:number)=>any) => any[];
+  awaitTimes: (funToRepeat: (index?:number)=>any) => Promise<any[]>;
+  breakNextIteration: () => void;
   value: (value: any) => any[];
 };
 
@@ -1270,4 +1289,4 @@ declare function Timeline(): {
     };
 };
 
-export { Chrono, CustomError, DAYS, Enum, EnumMap, RE, RLog, Table, Text, Timeline, YYYY_MM_DD_hh_mm_ss_ToUtcDate, _delete, addDays, anonymize, arrayOfObjectsToObject, arraySorter, arrayToObject, bearerSanitizer, between, cleanString, cloneCopy, colorByStatus, colorMessage, colorMessageByStatus, colors, copyPropsWithValue, copyPropsWithValueUsingRules, createCustomErrorClass, dateFormatter, dateToObj, deepFreeze, defaultValue, diffInDaysYYYY_MM_DD, exclude, fetchImproved, ffletchMaker, fillWith, filterFlatMap, filterMap, findDeepKey, findSolution, firstCapital, fletch, formatDate, getAt, getSameDateOrPreviousFridayForWeekends, groupByWithCalc, indexOfNthMatch, innerRightJoinWith, isBasicType, isDate, isDateMidnight, isEmpty, isPromise, isStringADate, lengthSanitizer, log, logWithPrefix, loopIndexGenerator, mapWithNext, mapWithPrevious, matchByPropId, memoize, mergeArrayOfObjectsRenamingProps, notTo, numberToFixedString, oneIn, parallel, partialAtPos, pickPaths, pipe, pipeWhile, pipeWithChain, plan, previousDayOfWeek, processExit, project, promiseAll, promiseFunToFutureFun, pushAt, pushUniqueKey, pushUniqueKeyOrChange, queryObjToStr, removeDuplicates, repeat, replaceAll, retryWithSleep, runFunctionsSyncOrParallel, runFutureFunctionsInParallel, sanitize, setAt, setDateToMidnight, skip, sleep, sleepWithFunction, sleepWithValue, something, sorterByFields, sorterByPaths, splitCond, stop, subtractDays, summarizeError, transition, traverse, traverseVertically, uncurry, unionWithHashKeys, unionWithHashKeysUnc, updateWithHashKeys, urlCompose, urlDecompose, varSubsDoubleBracket, wildcardToRegExp };
+export { Chrono, CustomError, DAYS, Enum, EnumMap, RE, RLog, Table, Text, Timeline, YYYY_MM_DD_hh_mm_ss_ToUtcDate, _delete, addDays, anonymize, arrayOfObjectsToObject, arraySorter, arrayToObject, bearerSanitizer, between, cleanString, cloneCopy, colorByStatus, colorMessage, colorMessageByStatus, colors, copyPropsWithValue, copyPropsWithValueUsingRules, createCustomErrorClass, dateFormatter, dateToObj, deepFreeze, defaultValue, diffInDaysYYYY_MM_DD, exclude, fetchImproved, ffletchMaker, fillWith, filterFlatMap, filterMap, findDeepKey, findIndexOrNextInSortedArray, findIndexOrPreviousInSortedArray, findSolution, firstCapital, fletch, formatDate, getAt, getSameDateOrPreviousFridayForWeekends, groupByWithCalc, indexOfNthMatch, innerRightJoinWith, isBasicType, isDate, isDateMidnight, isEmpty, isPromise, isStringADate, lengthSanitizer, log, logWithPrefix, loopIndexGenerator, mapWithNext, mapWithPrevious, matchByPropId, memoize, mergeArrayOfObjectsRenamingProps, notTo, numberToFixedString, oneIn, parallel, partialAtPos, pickPaths, pipe, pipeWhile, pipeWithChain, plan, previousDayOfWeek, processExit, project, promiseAll, promiseFunToFutureFun, pushAt, pushUniqueKey, pushUniqueKeyOrChange, queryObjToStr, removeDuplicates, repeat, replaceAll, retryWithSleep, runFunctionsSyncOrParallel, runFutureFunctionsInParallel, sanitize, setAt, setDateToMidnight, skip, sleep, sleepWithFunction, sleepWithValue, something, sorterByFields, sorterByPaths, splitCond, stop, subtractDays, summarizeError, transition, traverse, traverseVertically, uncurry, unionWithHashKeys, unionWithHashKeysUnc, updateWithHashKeys, urlCompose, urlDecompose, varSubsDoubleBracket, wildcardToRegExp };

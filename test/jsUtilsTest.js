@@ -3,6 +3,8 @@ import {
   EnumMap,
   Enum,
   sorterByPaths,
+  findIndexOrPreviousInSortedArray,
+  findIndexOrNextInSortedArray,
   formatDate,
   addDays,
   subtractDays,
@@ -443,6 +445,22 @@ describe('jsUtils', () => {
     assert.deepEqual(
       [{a:3},{a:4},{a:undefined},{a:2},{a:1},{a:undefined},{a:0},{a:undefined}].sort(sorterByPaths('a')),
       [{a:0},{a:1},{a:2},{a:3},{a:4},{a:undefined},{a:undefined},{a:undefined}]
+    )
+  })
+
+  it('findIndexOrPreviousInSortedArray', () => {
+    assert.deepEqual(
+      [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((item) => findIndexOrPreviousInSortedArray(
+      [    1, 2,       5, 6, 7, 8, 9, 10    ], item)),
+      [-1, 0, 1, 1, 1, 2, 3, 4, 5, 6,  7,  7]
+    )
+  })
+
+  it('findIndexOrNextInSortedArray', () => {
+    assert.deepEqual(
+      [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9,10,11,12,13].map((item) => findIndexOrNextInSortedArray(
+      [    1, 2       ,5, 6, 7, 8, 9,10,        ], item)),
+      [ 0, 0, 1, 2, 2, 2, 3, 4, 5, 6, 7, 8, 8, 8]
     )
   })
 

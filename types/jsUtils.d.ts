@@ -238,6 +238,24 @@ export function sorterByPaths(paths: string[]|string, isAsc?: boolean): (objA: u
 export function sorterByFields(paths: string[]|string, isAsc?: boolean | boolean[]): (objA: unknown, objB: unknown) => number;
 
 /**
+ * Finds the index of the specified value in a sorted array or the index of the previous value if the specified value is not found.
+ * If the value to search for is less than the first value in the array, it returns -1.
+ * @param arr - The sorted array to search in.
+ * @param val - The value to search for.
+ * @returns The index of the specified value in the array, or the index of the previous value if the specified value is not found.
+ */
+export function findIndexOrPreviousInSortedArray(arr: string[]|number[]|Date[], val: string|number|Date): number;
+
+/**
+ * Finds the index of the specified value in the sorted array or the next available index if the value is not found.
+ * If the value to search for is greater than the last value in the array, it returns the length of the array.
+ * @param arr - The sorted array to search in.
+ * @param val - The value to search for in the array.
+ * @returns The index of the value in the array, or the next available index if the value is not found.
+ */
+export function findIndexOrNextInSortedArray(arr: string[]|number[]|Date[], val: string|number|Date): number;
+
+/**
  * Returns the value if it is not undefined, null or NaN. Otherwise, it returns the default value.
  * @param value   The value to check.
  * @param defaultValue  The default value to return if the value is undefined, null or NaN.
@@ -680,7 +698,7 @@ export function addDays(daysToSubtract: number, date: Date | StringDate | number
 export function subtractDays(daysToSubtract: number, date: Date | StringDate | number): Date;
 
 /**
- * Calculates the previous or current date at a specific previous day: 0:monday to 6:Sunday.
+ * Returns the closest to param date that could be equal or less and that is of a specific dayOfWeek: 0:monday to 6:Sunday.
  * @param dayOfWeek - The day of the week. 0: Sunday, 1: Monday, 2: Tuesday, 3: Wednesday, 4: Thursday, 5: Friday, 6: Saturday.
  * @param date - The date subject to calculation. If the date requested correspond to the dayOfWeek, the same input date is returned.
  * @returns The calculated date.
