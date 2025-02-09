@@ -1176,6 +1176,24 @@ function previousDayOfWeek(dayOfWeek, date) {
 //previousDayOfWeek(6,new Date('2021-05-07')) //?
 //previousDayOfWeek(1,new Date('2021-03-25')) //?
 
+function nextDayOfWeek(dayOfWeek, date) {
+  let dateToProcess = toDate(date)
+
+  if (isDate(dateToProcess) === false) return dateToProcess
+
+  let diffInDaysOfWeek = dayOfWeek - dateToProcess.getUTCDay()
+
+  diffInDaysOfWeek
+  let toAdd = diffInDaysOfWeek >= 0
+    ? diffInDaysOfWeek
+    : 7 + diffInDaysOfWeek
+
+  return addDays(toAdd, dateToProcess)
+}
+// nextDayOfWeek(0,new Date('2025-02-01')) //?
+//nextDayOfWeek(1,new Date('2021-03-25')) //?
+
+
 function currentDayOfWeek(dayOfWeek, date) {
   let dateToProcess = toDate(date)
 
@@ -2148,6 +2166,7 @@ const jsUtils = {
   subtractDays,
   addDays,
   previousDayOfWeek,
+  nextDayOfWeek,
   getSameDateOrPreviousFridayForWeekends,
   isDateMidnight,
   setDateToMidnight,
@@ -2224,6 +2243,7 @@ export {
   subtractDays,
   addDays,
   previousDayOfWeek,
+  nextDayOfWeek,
   getSameDateOrPreviousFridayForWeekends,
   isDateMidnight,
   setDateToMidnight,

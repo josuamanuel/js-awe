@@ -11,6 +11,7 @@ import {
   subtractDays,
   diffInDaysYYYY_MM_DD,
   previousDayOfWeek,
+  nextDayOfWeek,
   CustomError,
   findDeepKey,
   traverse,
@@ -551,7 +552,28 @@ describe('jsUtils', () => {
     )
   })
 
+  it('nextDayOfWeek. day of week same as date input then it will return the same date', () => {
+    assert.strictEqual(
+      nextDayOfWeek(0, '2025-02-09').toISOString(),
+      new Date('2025-02-09').toISOString()
+    )
+  })
 
+  it('nextDayOfWeek. Being on monday returns to 2025-02-09', () => {
+    assert.strictEqual(
+      nextDayOfWeek(0, '2025-02-03').toISOString(),
+      new Date('2025-02-09').toISOString()
+    )
+  })
+
+  it('nextDayOfWeek. find the closest Sunday', () => {
+    assert.strictEqual(
+      nextDayOfWeek(0, new Date('2025-02-07')).toISOString(),
+      new Date('2025-02-09').toISOString()
+    )
+  })
+
+  
   const findDeepKeyObjSubject = {
     house: {
       room: [
