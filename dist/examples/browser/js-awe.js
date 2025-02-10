@@ -3536,6 +3536,21 @@ function previousDayOfWeek(dayOfWeek, date) {
 //previousDayOfWeek(6,new Date('2021-05-07')) //?
 //previousDayOfWeek(1,new Date('2021-03-25')) //?
 
+function nextDayOfWeek(dayOfWeek, date) {
+  let dateToProcess = toDate(date);
+
+  if (isDate(dateToProcess) === false) return dateToProcess
+
+  let diffInDaysOfWeek = dayOfWeek - dateToProcess.getUTCDay();
+  let toAdd = diffInDaysOfWeek >= 0
+    ? diffInDaysOfWeek
+    : 7 + diffInDaysOfWeek;
+
+  return addDays(toAdd, dateToProcess)
+}
+//previousDayOfWeek(6,new Date('2021-05-07')) //?
+//previousDayOfWeek(1,new Date('2021-03-25')) //?
+
 function getSameDateOrPreviousFridayForWeekends(date) {
   let dateToProcess = toDate(date);
 
@@ -4459,6 +4474,7 @@ const jsUtils = {
   subtractDays,
   addDays,
   previousDayOfWeek,
+  nextDayOfWeek,
   getSameDateOrPreviousFridayForWeekends,
   isDateMidnight,
   setDateToMidnight,
@@ -21466,4 +21482,4 @@ function sanitize(obj, sanitizers = ['ibmApis'], noSanitzedUptoLogLevel) {
 
 }
 
-export { Chrono, CustomError, DAYS, Enum, EnumMap, F, Index, MONTHS, index as R, RE, RLog, Table, Text, Timeline, YYYY_MM_DD_hh_mm_ss_ToUtcDate, addDays, anonymize, arrayOfObjectsToObject, arraySorter, arrayToObject, bearerSanitizer, between, cleanString, cloneCopy, colorByStatus, colorMessage, colorMessageByStatus, colors, consoleTable, consoleTableExtended, copyPropsWithValue, copyPropsWithValueUsingRules, createCustomErrorClass, dateFormatter, dateToObj, deepFreeze, defaultValue, diffInDaysYYYY_MM_DD, exclude, fetchImproved, ffletchMaker, fillWith, filterFlatMap, filterMap, findDeepKey, findIndexInSortedArray, findIndexOrNextInSortedArray, findIndexOrPreviousInSortedArray, findSolution, firstCapital, fletch, formatDate, getAt, getSameDateOrPreviousFridayForWeekends, groupByWithCalc, indexOfNthMatch, innerRightJoinWith, isBasicType, isDate, isDateMidnight, isEmpty$1 as isEmpty, isPromise, isStringADate, lengthSanitizer, log, logWithPrefix, loopIndexGenerator, mapWithNext, mapWithPrevious, matchByPropId, memoize, mergeArrayOfObjectsRenamingProps, notTo, numberToFixedString, oneIn, parallel, partialAtPos, pickPaths, pipe, pipeWhile, pipeWithChain, plan, previousDayOfWeek, processExit, project$1 as project, promiseAll, promiseFunToFutureFun, pushAt, pushUniqueKey, pushUniqueKeyOrChange, queryObjToStr, removeDuplicates, repeat$1 as repeat, replaceAll, retryWithSleep, runFunctionsSyncOrParallel, runFutureFunctionsInParallel, sanitize, setAt, setDateToMidnight, sleep, sleepWithFunction, sleepWithValue, something, sorterByFields, sorterByPaths, splitCond, subtractDays, summarizeError, transition, traverse$1 as traverse, traverseVertically, uncurry, unionWithHashKeys, updateWithHashKeys, urlCompose, urlDecompose, varSubsDoubleBracket, wildcardToRegExp };
+export { Chrono, CustomError, DAYS, Enum, EnumMap, F, Index, MONTHS, index as R, RE, RLog, Table, Text, Timeline, YYYY_MM_DD_hh_mm_ss_ToUtcDate, addDays, anonymize, arrayOfObjectsToObject, arraySorter, arrayToObject, bearerSanitizer, between, cleanString, cloneCopy, colorByStatus, colorMessage, colorMessageByStatus, colors, consoleTable, consoleTableExtended, copyPropsWithValue, copyPropsWithValueUsingRules, createCustomErrorClass, dateFormatter, dateToObj, deepFreeze, defaultValue, diffInDaysYYYY_MM_DD, exclude, fetchImproved, ffletchMaker, fillWith, filterFlatMap, filterMap, findDeepKey, findIndexInSortedArray, findIndexOrNextInSortedArray, findIndexOrPreviousInSortedArray, findSolution, firstCapital, fletch, formatDate, getAt, getSameDateOrPreviousFridayForWeekends, groupByWithCalc, indexOfNthMatch, innerRightJoinWith, isBasicType, isDate, isDateMidnight, isEmpty$1 as isEmpty, isPromise, isStringADate, lengthSanitizer, log, logWithPrefix, loopIndexGenerator, mapWithNext, mapWithPrevious, matchByPropId, memoize, mergeArrayOfObjectsRenamingProps, nextDayOfWeek, notTo, numberToFixedString, oneIn, parallel, partialAtPos, pickPaths, pipe, pipeWhile, pipeWithChain, plan, previousDayOfWeek, processExit, project$1 as project, promiseAll, promiseFunToFutureFun, pushAt, pushUniqueKey, pushUniqueKeyOrChange, queryObjToStr, removeDuplicates, repeat$1 as repeat, replaceAll, retryWithSleep, runFunctionsSyncOrParallel, runFutureFunctionsInParallel, sanitize, setAt, setDateToMidnight, sleep, sleepWithFunction, sleepWithValue, something, sorterByFields, sorterByPaths, splitCond, subtractDays, summarizeError, transition, traverse$1 as traverse, traverseVertically, uncurry, unionWithHashKeys, updateWithHashKeys, urlCompose, urlDecompose, varSubsDoubleBracket, wildcardToRegExp };

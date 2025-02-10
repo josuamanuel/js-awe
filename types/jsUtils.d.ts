@@ -716,6 +716,23 @@ export function subtractDays(daysToSubtract: number, date: Date | StringDate | n
 export function previousDayOfWeek(dayOfWeek: 0 | 1 | 2 | 3 | 4 | 5 | 6, date: Date | StringDate | number): Date;
 
 /**
+ * Returns the closest to param date that could be equal or great and that is of a specific dayOfWeek: 0:monday to 6:Sunday.
+ * @param dayOfWeek - The day of the week. 0: Sunday, 1: Monday, 2: Tuesday, 3: Wednesday, 4: Thursday, 5: Friday, 6: Saturday.
+ * @param date - The date subject to calculation. If the date requested correspond to the dayOfWeek, the same input date is returned.
+ * @returns The calculated date.
+ */
+export function nextDayOfWeek(dayOfWeek: 0 | 1 | 2 | 3 | 4 | 5 | 6, date: Date | StringDate | number): Date;
+
+/**
+ * Returns the date in the current week Monday to Sunday that is of a specific day 1:Monday...6:Saturday,0:Sunday
+ * @param dayOfWeek - The day of the week. 0: Sunday, 1: Monday, 2: Tuesday, 3: Wednesday, 4: Thursday, 5: Friday, 6: Saturday.
+ * @param date - The date subject to calculation. If the date requested correspond to the dayOfWeek, the same input date is returned.
+ * @returns The calculated date.
+ */
+export function dayOfWeek(dayOfWeek: 0 | 1 | 2 | 3 | 4 | 5 | 6, date: Date | StringDate | number): Date;
+
+
+/**
  * Gets the same date or the previous Friday for weekends.
  * @param date - The date to get the same date or the previous Friday.
  * @returns The same date or the previous Friday.

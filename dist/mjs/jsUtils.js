@@ -929,15 +929,6 @@ function dateToObj(date) {
 function diffInDaysYYYY_MM_DD(iniDate, endDate) {
     return Math.ceil((new Date(endDate) - new Date(iniDate)) / (1000 * 60 * 60 * 24)); //?
 }
-function subtractDays(daysToSubtract, date) {
-    let dateToProcess = toDate(date);
-    if (isDate(dateToProcess) === false)
-        return dateToProcess;
-    return new Date(dateToProcess.valueOf() - 864E5 * daysToSubtract);
-}
-// subtractDays(2, "2023-03-26").toISOString() //?
-// subtractDays(3, "2023-03-27").toISOString() //?
-// subtractDays(9, "2023-04-02").toISOString() //?
 function addDays(daysToAdd, date) {
     let dateToProcess = toDate(date);
     if (isDate(dateToProcess) === false)
@@ -948,6 +939,15 @@ function addDays(daysToAdd, date) {
 // addDays(2, "2023-03-24").toISOString() //?
 // addDays(3, "2023-03-24").toISOString() //?
 // addDays(9, "2023-03-24").toISOString() //?
+function subtractDays(daysToSubtract, date) {
+    let dateToProcess = toDate(date);
+    if (isDate(dateToProcess) === false)
+        return dateToProcess;
+    return new Date(dateToProcess.valueOf() - 864E5 * daysToSubtract);
+}
+// subtractDays(2, "2023-03-26").toISOString() //?
+// subtractDays(3, "2023-03-27").toISOString() //?
+// subtractDays(9, "2023-04-02").toISOString() //?
 function previousDayOfWeek(dayOfWeek, date) {
     let dateToProcess = toDate(date);
     if (isDate(dateToProcess) === false)
@@ -972,19 +972,22 @@ function nextDayOfWeek(dayOfWeek, date) {
     return addDays(toAdd, dateToProcess);
 }
 // nextDayOfWeek(0,new Date('2025-02-01')) //?
-//nextDayOfWeek(1,new Date('2021-03-25')) //?
-function currentDayOfWeek(dayOfWeek, date) {
+// nextDayOfWeek(1,new Date('2021-03-25')) //?
+function dayOfWeek(dayOfWeek, date) {
     let dateToProcess = toDate(date);
     if (isDate(dateToProcess) === false)
         return dateToProcess;
-    let diffInDaysOfWeek = dateToProcess.getUTCDay() - dayOfWeek;
-    let toSubtract = diffInDaysOfWeek >= 0
-        ? diffInDaysOfWeek
-        : 7 + diffInDaysOfWeek;
-    return subtractDays(toSubtract, dateToProcess);
+    let diffInDaysOfWeek = (dayOfWeek === 0 ? 7 : dayOfWeek) -
+        (dateToProcess.getUTCDay() === 0 ? 7 : dateToProcess.getUTCDay());
+    diffInDaysOfWeek;
+    let toSubtract = diffInDaysOfWeek;
+    // diffInDaysOfWeek >= 0
+    //   ? diffInDaysOfWeek
+    //   : 7 + diffInDaysOfWeek
+    return addDays(toSubtract, dateToProcess);
 }
-//previousDayOfWeek(6,new Date('2021-05-07')) //?
-//previousDayOfWeek(1,new Date('2021-03-25')) //?
+// dayOfWeek(0,new Date('2025-02-06')) //?
+// dayOfWeek(6,new Date('2025-02-09')) //?
 function getSameDateOrPreviousFridayForWeekends(date) {
     let dateToProcess = toDate(date);
     if (isDate(dateToProcess) === false)
@@ -1803,6 +1806,7 @@ const jsUtils = {
     addDays,
     previousDayOfWeek,
     nextDayOfWeek,
+    dayOfWeek,
     getSameDateOrPreviousFridayForWeekends,
     isDateMidnight,
     setDateToMidnight,
@@ -1815,4 +1819,4 @@ const jsUtils = {
     processExit
 };
 export default jsUtils;
-export { logWithPrefix, firstCapital, varSubsDoubleBracket, queryObjToStr, summarizeError, CustomError, createCustomErrorClass, isBasicType, urlCompose, urlDecompose, indexOfNthMatch, colors, colorMessage, colorMessageByStatus, colorByStatus, findDeepKey, deepFreeze, getAt, setAt, sorterByPaths, sorterByFields, findIndexInSortedArray, findIndexOrPreviousInSortedArray, findIndexOrNextInSortedArray, defaultValue, filterFlatMap, arraySorter, isPromise, sleep, sleepWithValue, sleepWithFunction, notTo, arrayToObject, arrayOfObjectsToObject, removeDuplicates, traverse, traverseVertically, project, copyPropsWithValue, copyPropsWithValueUsingRules, EnumMap, Enum, transition, pushUniqueKey, pushUniqueKeyOrChange, pushAt, memoize, fillWith, numberToFixedString, isDate, isEmpty, isStringADate, formatDate, DAYS, MONTHS, dateFormatter, YYYY_MM_DD_hh_mm_ss_ToUtcDate, dateToObj, diffInDaysYYYY_MM_DD, subtractDays, addDays, previousDayOfWeek, nextDayOfWeek, getSameDateOrPreviousFridayForWeekends, isDateMidnight, setDateToMidnight, replaceAll, cleanString, repeat, oneIn, loopIndexGenerator, retryWithSleep, processExit };
+export { logWithPrefix, firstCapital, varSubsDoubleBracket, queryObjToStr, summarizeError, CustomError, createCustomErrorClass, isBasicType, urlCompose, urlDecompose, indexOfNthMatch, colors, colorMessage, colorMessageByStatus, colorByStatus, findDeepKey, deepFreeze, getAt, setAt, sorterByPaths, sorterByFields, findIndexInSortedArray, findIndexOrPreviousInSortedArray, findIndexOrNextInSortedArray, defaultValue, filterFlatMap, arraySorter, isPromise, sleep, sleepWithValue, sleepWithFunction, notTo, arrayToObject, arrayOfObjectsToObject, removeDuplicates, traverse, traverseVertically, project, copyPropsWithValue, copyPropsWithValueUsingRules, EnumMap, Enum, transition, pushUniqueKey, pushUniqueKeyOrChange, pushAt, memoize, fillWith, numberToFixedString, isDate, isEmpty, isStringADate, formatDate, DAYS, MONTHS, dateFormatter, YYYY_MM_DD_hh_mm_ss_ToUtcDate, dateToObj, diffInDaysYYYY_MM_DD, subtractDays, addDays, previousDayOfWeek, nextDayOfWeek, dayOfWeek, getSameDateOrPreviousFridayForWeekends, isDateMidnight, setDateToMidnight, replaceAll, cleanString, repeat, oneIn, loopIndexGenerator, retryWithSleep, processExit };

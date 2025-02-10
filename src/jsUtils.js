@@ -1136,17 +1136,6 @@ function diffInDaysYYYY_MM_DD(iniDate, endDate) {
   ) //?
 }
 
-function subtractDays(daysToSubtract, date) {
-  let dateToProcess = toDate(date)
-
-  if (isDate(dateToProcess) === false) return dateToProcess
-
-  return new Date(dateToProcess.valueOf() - 864E5 * daysToSubtract)
-}
-// subtractDays(2, "2023-03-26").toISOString() //?
-// subtractDays(3, "2023-03-27").toISOString() //?
-// subtractDays(9, "2023-04-02").toISOString() //?
-
 function addDays(daysToAdd, date) {
   let dateToProcess = toDate(date)
 
@@ -1158,6 +1147,18 @@ function addDays(daysToAdd, date) {
 // addDays(2, "2023-03-24").toISOString() //?
 // addDays(3, "2023-03-24").toISOString() //?
 // addDays(9, "2023-03-24").toISOString() //?
+
+function subtractDays(daysToSubtract, date) {
+  let dateToProcess = toDate(date)
+
+  if (isDate(dateToProcess) === false) return dateToProcess
+
+  return new Date(dateToProcess.valueOf() - 864E5 * daysToSubtract)
+}
+// subtractDays(2, "2023-03-26").toISOString() //?
+// subtractDays(3, "2023-03-27").toISOString() //?
+// subtractDays(9, "2023-04-02").toISOString() //?
+
 
 
 function previousDayOfWeek(dayOfWeek, date) {
@@ -1191,24 +1192,28 @@ function nextDayOfWeek(dayOfWeek, date) {
   return addDays(toAdd, dateToProcess)
 }
 // nextDayOfWeek(0,new Date('2025-02-01')) //?
-//nextDayOfWeek(1,new Date('2021-03-25')) //?
+// nextDayOfWeek(1,new Date('2021-03-25')) //?
 
 
-function currentDayOfWeek(dayOfWeek, date) {
+function dayOfWeek(dayOfWeek, date) {
   let dateToProcess = toDate(date)
 
   if (isDate(dateToProcess) === false) return dateToProcess
 
-  let diffInDaysOfWeek = dateToProcess.getUTCDay() - dayOfWeek
+  let diffInDaysOfWeek = 
+    (dayOfWeek === 0 ? 7 : dayOfWeek) - 
+    (dateToProcess.getUTCDay() === 0 ? 7 : dateToProcess.getUTCDay())
 
-  let toSubtract = diffInDaysOfWeek >= 0
-    ? diffInDaysOfWeek
-    : 7 + diffInDaysOfWeek
+  diffInDaysOfWeek
+  let toSubtract = diffInDaysOfWeek
+  // diffInDaysOfWeek >= 0
+  //   ? diffInDaysOfWeek
+  //   : 7 + diffInDaysOfWeek
 
-  return subtractDays(toSubtract, dateToProcess)
+  return addDays(toSubtract, dateToProcess)
 }
-//previousDayOfWeek(6,new Date('2021-05-07')) //?
-//previousDayOfWeek(1,new Date('2021-03-25')) //?
+// dayOfWeek(0,new Date('2025-02-06')) //?
+// dayOfWeek(6,new Date('2025-02-09')) //?
 
 function getSameDateOrPreviousFridayForWeekends(date) {
   let dateToProcess = toDate(date)
@@ -2167,6 +2172,7 @@ const jsUtils = {
   addDays,
   previousDayOfWeek,
   nextDayOfWeek,
+  dayOfWeek,
   getSameDateOrPreviousFridayForWeekends,
   isDateMidnight,
   setDateToMidnight,
@@ -2244,6 +2250,7 @@ export {
   addDays,
   previousDayOfWeek,
   nextDayOfWeek,
+  dayOfWeek,
   getSameDateOrPreviousFridayForWeekends,
   isDateMidnight,
   setDateToMidnight,

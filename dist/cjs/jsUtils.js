@@ -19,7 +19,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 var _EnumMap_instances, _EnumMap_validateAndTransform;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.isDate = exports.numberToFixedString = exports.fillWith = exports.memoize = exports.pushAt = exports.pushUniqueKeyOrChange = exports.pushUniqueKey = exports.transition = exports.Enum = exports.EnumMap = exports.copyPropsWithValueUsingRules = exports.copyPropsWithValue = exports.project = exports.traverseVertically = exports.traverse = exports.removeDuplicates = exports.arrayOfObjectsToObject = exports.arrayToObject = exports.notTo = exports.sleepWithFunction = exports.sleepWithValue = exports.sleep = exports.isPromise = exports.arraySorter = exports.filterFlatMap = exports.defaultValue = exports.findIndexOrNextInSortedArray = exports.findIndexOrPreviousInSortedArray = exports.findIndexInSortedArray = exports.sorterByFields = exports.sorterByPaths = exports.setAt = exports.getAt = exports.deepFreeze = exports.findDeepKey = exports.colorByStatus = exports.colorMessageByStatus = exports.colorMessage = exports.colors = exports.indexOfNthMatch = exports.urlDecompose = exports.urlCompose = exports.isBasicType = exports.createCustomErrorClass = exports.CustomError = exports.summarizeError = exports.queryObjToStr = exports.varSubsDoubleBracket = exports.firstCapital = exports.logWithPrefix = void 0;
-exports.processExit = exports.retryWithSleep = exports.loopIndexGenerator = exports.oneIn = exports.repeat = exports.cleanString = exports.replaceAll = exports.setDateToMidnight = exports.isDateMidnight = exports.getSameDateOrPreviousFridayForWeekends = exports.nextDayOfWeek = exports.previousDayOfWeek = exports.addDays = exports.subtractDays = exports.diffInDaysYYYY_MM_DD = exports.dateToObj = exports.YYYY_MM_DD_hh_mm_ss_ToUtcDate = exports.dateFormatter = exports.MONTHS = exports.DAYS = exports.formatDate = exports.isStringADate = exports.isEmpty = void 0;
+exports.processExit = exports.retryWithSleep = exports.loopIndexGenerator = exports.oneIn = exports.repeat = exports.cleanString = exports.replaceAll = exports.setDateToMidnight = exports.isDateMidnight = exports.getSameDateOrPreviousFridayForWeekends = exports.dayOfWeek = exports.nextDayOfWeek = exports.previousDayOfWeek = exports.addDays = exports.subtractDays = exports.diffInDaysYYYY_MM_DD = exports.dateToObj = exports.YYYY_MM_DD_hh_mm_ss_ToUtcDate = exports.dateFormatter = exports.MONTHS = exports.DAYS = exports.formatDate = exports.isStringADate = exports.isEmpty = void 0;
 const just_clone_1 = __importDefault(require("just-clone"));
 const jsonpath_plus_1 = require("jsonpath-plus");
 const logWithPrefix = (title, displayFunc) => (message) => {
@@ -985,16 +985,6 @@ function diffInDaysYYYY_MM_DD(iniDate, endDate) {
     return Math.ceil((new Date(endDate) - new Date(iniDate)) / (1000 * 60 * 60 * 24)); //?
 }
 exports.diffInDaysYYYY_MM_DD = diffInDaysYYYY_MM_DD;
-function subtractDays(daysToSubtract, date) {
-    let dateToProcess = toDate(date);
-    if (isDate(dateToProcess) === false)
-        return dateToProcess;
-    return new Date(dateToProcess.valueOf() - 864E5 * daysToSubtract);
-}
-exports.subtractDays = subtractDays;
-// subtractDays(2, "2023-03-26").toISOString() //?
-// subtractDays(3, "2023-03-27").toISOString() //?
-// subtractDays(9, "2023-04-02").toISOString() //?
 function addDays(daysToAdd, date) {
     let dateToProcess = toDate(date);
     if (isDate(dateToProcess) === false)
@@ -1006,6 +996,16 @@ exports.addDays = addDays;
 // addDays(2, "2023-03-24").toISOString() //?
 // addDays(3, "2023-03-24").toISOString() //?
 // addDays(9, "2023-03-24").toISOString() //?
+function subtractDays(daysToSubtract, date) {
+    let dateToProcess = toDate(date);
+    if (isDate(dateToProcess) === false)
+        return dateToProcess;
+    return new Date(dateToProcess.valueOf() - 864E5 * daysToSubtract);
+}
+exports.subtractDays = subtractDays;
+// subtractDays(2, "2023-03-26").toISOString() //?
+// subtractDays(3, "2023-03-27").toISOString() //?
+// subtractDays(9, "2023-04-02").toISOString() //?
 function previousDayOfWeek(dayOfWeek, date) {
     let dateToProcess = toDate(date);
     if (isDate(dateToProcess) === false)
@@ -1032,19 +1032,23 @@ function nextDayOfWeek(dayOfWeek, date) {
 }
 exports.nextDayOfWeek = nextDayOfWeek;
 // nextDayOfWeek(0,new Date('2025-02-01')) //?
-//nextDayOfWeek(1,new Date('2021-03-25')) //?
-function currentDayOfWeek(dayOfWeek, date) {
+// nextDayOfWeek(1,new Date('2021-03-25')) //?
+function dayOfWeek(dayOfWeek, date) {
     let dateToProcess = toDate(date);
     if (isDate(dateToProcess) === false)
         return dateToProcess;
-    let diffInDaysOfWeek = dateToProcess.getUTCDay() - dayOfWeek;
-    let toSubtract = diffInDaysOfWeek >= 0
-        ? diffInDaysOfWeek
-        : 7 + diffInDaysOfWeek;
-    return subtractDays(toSubtract, dateToProcess);
+    let diffInDaysOfWeek = (dayOfWeek === 0 ? 7 : dayOfWeek) -
+        (dateToProcess.getUTCDay() === 0 ? 7 : dateToProcess.getUTCDay());
+    diffInDaysOfWeek;
+    let toSubtract = diffInDaysOfWeek;
+    // diffInDaysOfWeek >= 0
+    //   ? diffInDaysOfWeek
+    //   : 7 + diffInDaysOfWeek
+    return addDays(toSubtract, dateToProcess);
 }
-//previousDayOfWeek(6,new Date('2021-05-07')) //?
-//previousDayOfWeek(1,new Date('2021-03-25')) //?
+exports.dayOfWeek = dayOfWeek;
+// dayOfWeek(0,new Date('2025-02-06')) //?
+// dayOfWeek(6,new Date('2025-02-09')) //?
 function getSameDateOrPreviousFridayForWeekends(date) {
     let dateToProcess = toDate(date);
     if (isDate(dateToProcess) === false)
@@ -1906,6 +1910,7 @@ const jsUtils = {
     addDays,
     previousDayOfWeek,
     nextDayOfWeek,
+    dayOfWeek,
     getSameDateOrPreviousFridayForWeekends,
     isDateMidnight,
     setDateToMidnight,

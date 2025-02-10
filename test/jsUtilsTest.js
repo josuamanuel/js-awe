@@ -12,6 +12,7 @@ import {
   diffInDaysYYYY_MM_DD,
   previousDayOfWeek,
   nextDayOfWeek,
+  dayOfWeek,
   CustomError,
   findDeepKey,
   traverse,
@@ -573,7 +574,21 @@ describe('jsUtils', () => {
     )
   })
 
-  
+  it('dayOfWeek. Sunday goes back to Saturday', () => {
+    assert.strictEqual(
+      dayOfWeek(6, new Date('2025-02-09')).toISOString(),
+      new Date('2025-02-08').toISOString()
+    )
+  })
+
+  it('dayOfWeek. Thursday goes to Sunday', () => {
+    assert.strictEqual(
+      dayOfWeek(0, new Date('2025-02-06')).toISOString(),
+      new Date('2025-02-09').toISOString()
+    )
+  })
+
+
   const findDeepKeyObjSubject = {
     house: {
       room: [
