@@ -143,12 +143,12 @@ export function unionWithHashKeysUnc<T,P>(
 * @param hashMaster hash function for the target data
 * @return a function ready to receive the target data
 */
-export function unionWithHashKeys<T,P>(
+export function unionWithHashKeys<Source,Target>(
   isAsc: boolean|undefined,
-  hashAddNoDups: (elem: T) => string,
-  addNoDupsToTheEnd: T[],
-  hashMaster: (elem: T) => string,
-):(master: P[]) => (T|P)[];
+  hashAddNoDups: (elem: Source) => string,
+  addNoDupsToTheEnd: Source[],
+  hashMaster: (elem: Target) => string,
+):(master: Target[]) => (Target|Source)[];
 
 /**
 * Given the input records will replace the target matched records. To match the records
@@ -159,13 +159,13 @@ export function unionWithHashKeys<T,P>(
 * @param getHashOldRecords hash function for the target data
 * @return a function ready to receive the target data
 */
-export function updateWithHashKeys<NewRecord, HashKey, OldRecord, Result>(
+export function updateWithHashKeys<NewRecord, OldRecord>(
   isAsc: boolean | undefined,
-  getHashNewRecords: (elem: NewRecord) => HashKey,
+  getHashNewRecords: (elem: NewRecord) => string,
   newRecords: NewRecord[],
-  getHashOldRecords: (elem: OldRecord) => HashKey
+  getHashOldRecords: (elem: OldRecord) => string
   
-): (oldRecords: OldRecord[]) => Result[]
+): (oldRecords: OldRecord[]) => (NewRecord | OldRecord)[]
 
 export const between: any;
 export const matchByPropId: any;
