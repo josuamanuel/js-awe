@@ -13,6 +13,7 @@ import {
   previousDayOfWeek,
   nextDayOfWeek,
   dayOfWeek,
+  setDateToMidnight,
   CustomError,
   findDeepKey,
   traverse,
@@ -588,6 +589,20 @@ describe('jsUtils', () => {
     )
   })
 
+  it('setDateToMidnight YYYY-MM-DD', () => {
+    const date = setDateToMidnight('2025-07-04')
+    assert.strictEqual(date.toISOString(), '2025-07-04T00:00:00.000Z')
+  })
+
+  it('setDateToMidnight July 4, 2025', () => {
+    const date = setDateToMidnight('July 4, 2025')
+    assert.strictEqual(date.toISOString(), '2025-07-04T00:00:00.000Z')
+  })
+
+  it('setDateToMidnight American MM-DD-YYYY', () => {
+    const date =setDateToMidnight('07-04-2025')
+    assert.strictEqual(date.toISOString(), '2025-07-04T00:00:00.000Z')
+  })
 
   const findDeepKeyObjSubject = {
     house: {

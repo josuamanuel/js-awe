@@ -3605,7 +3605,7 @@ function setDateToMidnight(date) {
     arguments.length === 0
       ? new Date()
       : new Date(date)
-  )
+  );
 
   if (isNaN(+dateToProcess)) return dateToProcess
 

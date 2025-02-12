@@ -868,6 +868,23 @@ declare function subtractDays(daysToSubtract: number, date: Date | StringDate | 
 declare function previousDayOfWeek(dayOfWeek: 0 | 1 | 2 | 3 | 4 | 5 | 6, date: Date | StringDate | number): Date;
 
 /**
+ * Returns the closest to param date that could be equal or great and that is of a specific dayOfWeek: 0:monday to 6:Sunday.
+ * @param dayOfWeek - The day of the week. 0: Sunday, 1: Monday, 2: Tuesday, 3: Wednesday, 4: Thursday, 5: Friday, 6: Saturday.
+ * @param date - The date subject to calculation. If the date requested correspond to the dayOfWeek, the same input date is returned.
+ * @returns The calculated date.
+ */
+declare function nextDayOfWeek(dayOfWeek: 0 | 1 | 2 | 3 | 4 | 5 | 6, date: Date | StringDate | number): Date;
+
+/**
+ * Returns the date in the current week Monday to Sunday that is of a specific day 1:Monday...6:Saturday,0:Sunday
+ * @param dayOfWeek - The day of the week. 0: Sunday, 1: Monday, 2: Tuesday, 3: Wednesday, 4: Thursday, 5: Friday, 6: Saturday.
+ * @param date - The date subject to calculation. If the date requested correspond to the dayOfWeek, the same input date is returned.
+ * @returns The calculated date.
+ */
+declare function dayOfWeek(dayOfWeek: 0 | 1 | 2 | 3 | 4 | 5 | 6, date: Date | StringDate | number): Date;
+
+
+/**
  * Gets the same date or the previous Friday for weekends.
  * @param date - The date to get the same date or the previous Friday.
  * @returns The same date or the previous Friday.
@@ -1299,4 +1316,4 @@ declare function Timeline(): {
     };
 };
 
-export { Chrono, CustomError, DAYS, Enum, EnumMap, RE, RLog, Table, Text, Timeline, YYYY_MM_DD_hh_mm_ss_ToUtcDate, _delete, addDays, anonymize, arrayOfObjectsToObject, arraySorter, arrayToObject, bearerSanitizer, between, cleanString, cloneCopy, colorByStatus, colorMessage, colorMessageByStatus, colors, copyPropsWithValue, copyPropsWithValueUsingRules, createCustomErrorClass, dateFormatter, dateToObj, deepFreeze, defaultValue, diffInDaysYYYY_MM_DD, exclude, fetchImproved, ffletchMaker, fillWith, filterFlatMap, filterMap, findDeepKey, findIndexInSortedArray, findIndexOrNextInSortedArray, findIndexOrPreviousInSortedArray, findSolution, firstCapital, fletch, formatDate, getAt, getSameDateOrPreviousFridayForWeekends, groupByWithCalc, indexOfNthMatch, innerRightJoinWith, isBasicType, isDate, isDateMidnight, isEmpty, isPromise, isStringADate, lengthSanitizer, log, logWithPrefix, loopIndexGenerator, mapWithNext, mapWithPrevious, matchByPropId, memoize, mergeArrayOfObjectsRenamingProps, notTo, numberToFixedString, oneIn, parallel, partialAtPos, pickPaths, pipe, pipeWhile, pipeWithChain, plan, previousDayOfWeek, processExit, project, promiseAll, promiseFunToFutureFun, pushAt, pushUniqueKey, pushUniqueKeyOrChange, queryObjToStr, removeDuplicates, repeat, replaceAll, retryWithSleep, runFunctionsSyncOrParallel, runFutureFunctionsInParallel, sanitize, setAt, setDateToMidnight, skip, sleep, sleepWithFunction, sleepWithValue, something, sorterByFields, sorterByPaths, splitCond, stop, subtractDays, summarizeError, transition, traverse, traverseVertically, uncurry, unionWithHashKeys, unionWithHashKeysUnc, updateWithHashKeys, urlCompose, urlDecompose, varSubsDoubleBracket, wildcardToRegExp };
+export { Chrono, CustomError, DAYS, Enum, EnumMap, RE, RLog, Table, Text, Timeline, YYYY_MM_DD_hh_mm_ss_ToUtcDate, _delete, addDays, anonymize, arrayOfObjectsToObject, arraySorter, arrayToObject, bearerSanitizer, between, cleanString, cloneCopy, colorByStatus, colorMessage, colorMessageByStatus, colors, copyPropsWithValue, copyPropsWithValueUsingRules, createCustomErrorClass, dateFormatter, dateToObj, dayOfWeek, deepFreeze, defaultValue, diffInDaysYYYY_MM_DD, exclude, fetchImproved, ffletchMaker, fillWith, filterFlatMap, filterMap, findDeepKey, findIndexInSortedArray, findIndexOrNextInSortedArray, findIndexOrPreviousInSortedArray, findSolution, firstCapital, fletch, formatDate, getAt, getSameDateOrPreviousFridayForWeekends, groupByWithCalc, indexOfNthMatch, innerRightJoinWith, isBasicType, isDate, isDateMidnight, isEmpty, isPromise, isStringADate, lengthSanitizer, log, logWithPrefix, loopIndexGenerator, mapWithNext, mapWithPrevious, matchByPropId, memoize, mergeArrayOfObjectsRenamingProps, nextDayOfWeek, notTo, numberToFixedString, oneIn, parallel, partialAtPos, pickPaths, pipe, pipeWhile, pipeWithChain, plan, previousDayOfWeek, processExit, project, promiseAll, promiseFunToFutureFun, pushAt, pushUniqueKey, pushUniqueKeyOrChange, queryObjToStr, removeDuplicates, repeat, replaceAll, retryWithSleep, runFunctionsSyncOrParallel, runFutureFunctionsInParallel, sanitize, setAt, setDateToMidnight, skip, sleep, sleepWithFunction, sleepWithValue, something, sorterByFields, sorterByPaths, splitCond, stop, subtractDays, summarizeError, transition, traverse, traverseVertically, uncurry, unionWithHashKeys, unionWithHashKeysUnc, updateWithHashKeys, urlCompose, urlDecompose, varSubsDoubleBracket, wildcardToRegExp };

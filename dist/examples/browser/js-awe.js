@@ -3496,17 +3496,6 @@ function diffInDaysYYYY_MM_DD(iniDate, endDate) {
   ) //?
 }
 
-function subtractDays(daysToSubtract, date) {
-  let dateToProcess = toDate(date);
-
-  if (isDate(dateToProcess) === false) return dateToProcess
-
-  return new Date(dateToProcess.valueOf() - 864E5 * daysToSubtract)
-}
-// subtractDays(2, "2023-03-26").toISOString() //?
-// subtractDays(3, "2023-03-27").toISOString() //?
-// subtractDays(9, "2023-04-02").toISOString() //?
-
 function addDays(daysToAdd, date) {
   let dateToProcess = toDate(date);
 
@@ -3518,6 +3507,18 @@ function addDays(daysToAdd, date) {
 // addDays(2, "2023-03-24").toISOString() //?
 // addDays(3, "2023-03-24").toISOString() //?
 // addDays(9, "2023-03-24").toISOString() //?
+
+function subtractDays(daysToSubtract, date) {
+  let dateToProcess = toDate(date);
+
+  if (isDate(dateToProcess) === false) return dateToProcess
+
+  return new Date(dateToProcess.valueOf() - 864E5 * daysToSubtract)
+}
+// subtractDays(2, "2023-03-26").toISOString() //?
+// subtractDays(3, "2023-03-27").toISOString() //?
+// subtractDays(9, "2023-04-02").toISOString() //?
+
 
 
 function previousDayOfWeek(dayOfWeek, date) {
@@ -3548,8 +3549,27 @@ function nextDayOfWeek(dayOfWeek, date) {
 
   return addDays(toAdd, dateToProcess)
 }
-//previousDayOfWeek(6,new Date('2021-05-07')) //?
-//previousDayOfWeek(1,new Date('2021-03-25')) //?
+// nextDayOfWeek(0,new Date('2025-02-01')) //?
+// nextDayOfWeek(1,new Date('2021-03-25')) //?
+
+
+function dayOfWeek(dayOfWeek, date) {
+  let dateToProcess = toDate(date);
+
+  if (isDate(dateToProcess) === false) return dateToProcess
+
+  let diffInDaysOfWeek = 
+    (dayOfWeek === 0 ? 7 : dayOfWeek) - 
+    (dateToProcess.getUTCDay() === 0 ? 7 : dateToProcess.getUTCDay());
+  let toSubtract = diffInDaysOfWeek;
+  // diffInDaysOfWeek >= 0
+  //   ? diffInDaysOfWeek
+  //   : 7 + diffInDaysOfWeek
+
+  return addDays(toSubtract, dateToProcess)
+}
+// dayOfWeek(0,new Date('2025-02-06')) //?
+// dayOfWeek(6,new Date('2025-02-09')) //?
 
 function getSameDateOrPreviousFridayForWeekends(date) {
   let dateToProcess = toDate(date);
@@ -3578,19 +3598,20 @@ function isDateMidnight(date) {
 
 function setDateToMidnight(date) {
 
-  if (typeof date === 'string') return new Date(date.substring(0, 10))
-
-  let dateToProcess = date === undefined
-    ? new Date()
-    : isDate(date)
-      ? date
-      : new Date(date);
+  if (typeof date === 'string' && date.match(/\d{4}\D\d{2}\D\d{2}/)) return new Date(date.substring(0, 10) + ' UTC')
+  if (typeof date === 'string') return new Date(date + ' UTC')
+  
+  let dateToProcess = (
+    arguments.length === 0
+      ? new Date()
+      : new Date(date)
+  )
 
   if (isNaN(+dateToProcess)) return dateToProcess
 
   if (isDateMidnight(dateToProcess)) return dateToProcess
 
-  return new Date(dateToProcess.toISOString().substring(0, 10))
+  return new Date(dateToProcess.toISOString().substring(0, 10) + ' UTC')
 }
 
 const {
@@ -4475,6 +4496,7 @@ const jsUtils = {
   addDays,
   previousDayOfWeek,
   nextDayOfWeek,
+  dayOfWeek,
   getSameDateOrPreviousFridayForWeekends,
   isDateMidnight,
   setDateToMidnight,
@@ -21482,4 +21504,4 @@ function sanitize(obj, sanitizers = ['ibmApis'], noSanitzedUptoLogLevel) {
 
 }
 
-export { Chrono, CustomError, DAYS, Enum, EnumMap, F, Index, MONTHS, index as R, RE, RLog, Table, Text, Timeline, YYYY_MM_DD_hh_mm_ss_ToUtcDate, addDays, anonymize, arrayOfObjectsToObject, arraySorter, arrayToObject, bearerSanitizer, between, cleanString, cloneCopy, colorByStatus, colorMessage, colorMessageByStatus, colors, consoleTable, consoleTableExtended, copyPropsWithValue, copyPropsWithValueUsingRules, createCustomErrorClass, dateFormatter, dateToObj, deepFreeze, defaultValue, diffInDaysYYYY_MM_DD, exclude, fetchImproved, ffletchMaker, fillWith, filterFlatMap, filterMap, findDeepKey, findIndexInSortedArray, findIndexOrNextInSortedArray, findIndexOrPreviousInSortedArray, findSolution, firstCapital, fletch, formatDate, getAt, getSameDateOrPreviousFridayForWeekends, groupByWithCalc, indexOfNthMatch, innerRightJoinWith, isBasicType, isDate, isDateMidnight, isEmpty$1 as isEmpty, isPromise, isStringADate, lengthSanitizer, log, logWithPrefix, loopIndexGenerator, mapWithNext, mapWithPrevious, matchByPropId, memoize, mergeArrayOfObjectsRenamingProps, nextDayOfWeek, notTo, numberToFixedString, oneIn, parallel, partialAtPos, pickPaths, pipe, pipeWhile, pipeWithChain, plan, previousDayOfWeek, processExit, project$1 as project, promiseAll, promiseFunToFutureFun, pushAt, pushUniqueKey, pushUniqueKeyOrChange, queryObjToStr, removeDuplicates, repeat$1 as repeat, replaceAll, retryWithSleep, runFunctionsSyncOrParallel, runFutureFunctionsInParallel, sanitize, setAt, setDateToMidnight, sleep, sleepWithFunction, sleepWithValue, something, sorterByFields, sorterByPaths, splitCond, subtractDays, summarizeError, transition, traverse$1 as traverse, traverseVertically, uncurry, unionWithHashKeys, updateWithHashKeys, urlCompose, urlDecompose, varSubsDoubleBracket, wildcardToRegExp };
+export { Chrono, CustomError, DAYS, Enum, EnumMap, F, Index, MONTHS, index as R, RE, RLog, Table, Text, Timeline, YYYY_MM_DD_hh_mm_ss_ToUtcDate, addDays, anonymize, arrayOfObjectsToObject, arraySorter, arrayToObject, bearerSanitizer, between, cleanString, cloneCopy, colorByStatus, colorMessage, colorMessageByStatus, colors, consoleTable, consoleTableExtended, copyPropsWithValue, copyPropsWithValueUsingRules, createCustomErrorClass, dateFormatter, dateToObj, dayOfWeek, deepFreeze, defaultValue, diffInDaysYYYY_MM_DD, exclude, fetchImproved, ffletchMaker, fillWith, filterFlatMap, filterMap, findDeepKey, findIndexInSortedArray, findIndexOrNextInSortedArray, findIndexOrPreviousInSortedArray, findSolution, firstCapital, fletch, formatDate, getAt, getSameDateOrPreviousFridayForWeekends, groupByWithCalc, indexOfNthMatch, innerRightJoinWith, isBasicType, isDate, isDateMidnight, isEmpty$1 as isEmpty, isPromise, isStringADate, lengthSanitizer, log, logWithPrefix, loopIndexGenerator, mapWithNext, mapWithPrevious, matchByPropId, memoize, mergeArrayOfObjectsRenamingProps, nextDayOfWeek, notTo, numberToFixedString, oneIn, parallel, partialAtPos, pickPaths, pipe, pipeWhile, pipeWithChain, plan, previousDayOfWeek, processExit, project$1 as project, promiseAll, promiseFunToFutureFun, pushAt, pushUniqueKey, pushUniqueKeyOrChange, queryObjToStr, removeDuplicates, repeat$1 as repeat, replaceAll, retryWithSleep, runFunctionsSyncOrParallel, runFutureFunctionsInParallel, sanitize, setAt, setDateToMidnight, sleep, sleepWithFunction, sleepWithValue, something, sorterByFields, sorterByPaths, splitCond, subtractDays, summarizeError, transition, traverse$1 as traverse, traverseVertically, uncurry, unionWithHashKeys, updateWithHashKeys, urlCompose, urlDecompose, varSubsDoubleBracket, wildcardToRegExp };

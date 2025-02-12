@@ -1010,18 +1010,18 @@ function isDateMidnight(date) {
     return date?.toISOString?.()?.substring(10, 24) === 'T00:00:00.000Z';
 }
 function setDateToMidnight(date) {
+    if (typeof date === 'string' && date.match(/\d{4}\D\d{2}\D\d{2}/))
+        return new Date(date.substring(0, 10) + ' UTC');
     if (typeof date === 'string')
-        return new Date(date.substring(0, 10));
-    let dateToProcess = date === undefined
+        return new Date(date + ' UTC');
+    let dateToProcess = (arguments.length === 0
         ? new Date()
-        : isDate(date)
-            ? date
-            : new Date(date);
+        : new Date(date));
     if (isNaN(+dateToProcess))
         return dateToProcess;
     if (isDateMidnight(dateToProcess))
         return dateToProcess;
-    return new Date(dateToProcess.toISOString().substring(0, 10));
+    return new Date(dateToProcess.toISOString().substring(0, 10) + ' UTC');
 }
 const { colors, colorMessage, colorMessageByStatus, colorByStatus } = (function () {
     //alias
