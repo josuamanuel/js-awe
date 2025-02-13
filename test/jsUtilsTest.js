@@ -453,7 +453,7 @@ describe('jsUtils', () => {
   })
 
   
-  it('findIndexInSortedArray', () => {
+  it('findIndexInSortedArray with numbers', () => {
     assert.deepEqual(
       [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((item) => findIndexInSortedArray(
       [    1, 2,       5, 6, 7, 8, 9, 10    ], item)),
@@ -461,7 +461,16 @@ describe('jsUtils', () => {
     )
   })
 
-  it('findIndexOrPreviousInSortedArray', () => {
+  it('findIndexInSortedArray with Dates', () => {
+    assert.deepEqual(
+      [ new Date('2025-01-30'), new Date('2025-01-31'), new Date('2025-02-01'), new Date('2025-02-02'), new Date('2025-02-03'), new Date('2025-02-04')].map((item) => findIndexInSortedArray(
+      [                         new Date('2025-01-31'),                                                 new Date('2025-02-03')], item)),
+      [                     -1,                      0,                     -1,                     -1,                       1,                    -1]
+    )
+  })
+
+
+  it('findIndexOrPreviousInSortedArray with numbers', () => {
     assert.deepEqual(
       [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((item) => findIndexOrPreviousInSortedArray(
       [    1, 2,       5, 6, 7, 8, 9, 10    ], item)),
@@ -469,11 +478,27 @@ describe('jsUtils', () => {
     )
   })
 
-  it('findIndexOrNextInSortedArray', () => {
+  it('findIndexOrPreviousInSortedArray with dates', () => {
+    assert.deepEqual(
+      [ new Date('2025-01-30'), new Date('2025-01-31'), new Date('2025-02-01'), new Date('2025-02-02'), new Date('2025-02-03'), new Date('2025-02-04')].map((item) => findIndexOrPreviousInSortedArray(
+      [                         new Date('2025-01-31'),                                                 new Date('2025-02-03')], item)),
+      [                     -1,                      0,                      0,                      0,                      1,                      1]
+    )
+  })
+
+  it('findIndexOrNextInSortedArray with numbers', () => {
     assert.deepEqual(
       [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9,10,11,12,13].map((item) => findIndexOrNextInSortedArray(
       [    1, 2       ,5, 6, 7, 8, 9,10,        ], item)),
-      [ 0, 0, 1, 2, 2, 2, 3, 4, 5, 6, 7, 8, 8, 8]
+      [ 0, 0, 1, 2, 2, 2, 3, 4, 5, 6, 7,-1,-1,-1]
+    )
+  })
+
+  it('findIndexOrNextInSortedArray with Dates', () => {
+    assert.deepEqual(
+      [ new Date('2025-01-30'), new Date('2025-01-31'), new Date('2025-02-01'), new Date('2025-02-02'), new Date('2025-02-03'), new Date('2025-02-04')].map((item) => findIndexOrNextInSortedArray(
+      [                         new Date('2025-01-31'),                                                 new Date('2025-02-03')], item)),
+      [                      0,                      0,                      1,                      1,                       1,                   -1]
     )
   })
 
