@@ -1406,52 +1406,56 @@ function findIndexInSortedArray(arr, item) {
     while (l <= r) {
         const mid = Math.floor((l + r) / 2);
         const guess = arr[mid];
-        if (guess === item)
-            return mid;
-        if (guess > item)
-            r = mid - 1;
-        else
+        if (guess > item) {
+            r = (mid - 1);
+        }
+        else if (guess < item) {
             l = mid + 1;
+        }
+        else
+            return mid;
     }
     return -1;
 }
 exports.findIndexInSortedArray = findIndexInSortedArray;
 ;
+// findIndexInSortedArray([new Date('2025-01-31'), new Date('2025-02-03')], new Date('2025-02-05')) //?
 function findIndexOrPreviousInSortedArray(arr, val) {
     let left = 0;
     let right = arr.length - 1;
     while (left <= right) {
         const mid = Math.floor((left + right) / 2);
         const midVal = arr[mid];
-        if (midVal === val) {
-            return mid;
-        }
-        else if (midVal < val) {
+        if (midVal < val) {
             left = mid + 1;
         }
-        else {
+        else if (midVal > val) {
             right = mid - 1;
         }
+        else
+            return mid;
     }
     return right;
 }
 exports.findIndexOrPreviousInSortedArray = findIndexOrPreviousInSortedArray;
+// findIndexOrPreviousInSortedArray([1,2], 0) //?
 function findIndexOrNextInSortedArray(arr, val) {
     let left = 0;
     let right = arr.length - 1;
     while (left <= right) {
         const mid = Math.floor((left + right) / 2);
         const midVal = arr[mid];
-        if (midVal === val) {
-            return mid;
-        }
-        else if (midVal < val) {
+        if (midVal < val) {
             left = mid + 1;
         }
-        else {
+        else if (midVal > val) {
             right = mid - 1;
         }
+        else
+            return mid;
     }
+    if (left === arr.length)
+        return -1;
     return left;
 }
 exports.findIndexOrNextInSortedArray = findIndexOrNextInSortedArray;
