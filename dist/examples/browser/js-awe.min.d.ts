@@ -975,8 +975,14 @@ declare function loopIndexGenerator(initValue: any, iterations: any): Generator<
  * @param {string} logString The fields that the caller to retry wants the retry to Log to show traceability.
  * @returns A Promise that resolves with the result of the function.
  */
-declare function retryWithSleep<T>(times: number, updateSleepTimeFun: (currentSleepTime?:number, index?:number)=>number, funToRun: (...params:T[])=>any, funToRunParams: T[]|undefined, shouldStopRetrying?: (result?:any)=>boolean, logString?:string): Promise<any>;
-
+declare function retryWithSleep<T>(
+  times: number,
+  updateSleepTimeFun: ((currentSleepTime: number, index: number) => number) | ((currentSleepTime: number) => number) | (() => number),
+  funToRun: (...params: T[]) => any,
+  funToRunParams: T[] | undefined,
+  shouldStopRetrying?: (result?: any) => boolean,
+  logString?: string
+): Promise<any>;
 
 /**
  * Processes the exit with the given error.
@@ -1129,12 +1135,12 @@ declare function unionWithHashKeysUnc<T,P>(
 * @param hashMaster hash function for the target data
 * @return a function ready to receive the target data
 */
-declare function unionWithHashKeys<T,P>(
+declare function unionWithHashKeys<Source,Target>(
   isAsc: boolean|undefined,
-  hashAddNoDups: (elem: T) => string,
-  addNoDupsToTheEnd: T[],
-  hashMaster: (elem: T) => string,
-):(master: P[]) => (T|P)[];
+  hashAddNoDups: (elem: Source) => string,
+  addNoDupsToTheEnd: Source[],
+  hashMaster: (elem: Target) => string,
+):(master: Target[]) => (Target|Source)[];
 
 /**
 * Given the input records will replace the target matched records. To match the records
@@ -1145,13 +1151,13 @@ declare function unionWithHashKeys<T,P>(
 * @param getHashOldRecords hash function for the target data
 * @return a function ready to receive the target data
 */
-declare function updateWithHashKeys<NewRecord, HashKey, OldRecord, Result>(
+declare function updateWithHashKeys<NewRecord, OldRecord>(
   isAsc: boolean | undefined,
-  getHashNewRecords: (elem: NewRecord) => HashKey,
+  getHashNewRecords: (elem: NewRecord) => string,
   newRecords: NewRecord[],
-  getHashOldRecords: (elem: OldRecord) => HashKey
+  getHashOldRecords: (elem: OldRecord) => string
   
-): (oldRecords: OldRecord[]) => Result[]
+): (oldRecords: OldRecord[]) => (NewRecord | OldRecord)[]
 
 declare const between: any;
 declare const matchByPropId: any;

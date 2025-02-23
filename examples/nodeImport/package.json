@@ -11,6 +11,7 @@
     "author": "",
     "license": "ISC",
     "dependencies": {
-        "js-awe": "^1.0.90"
+        "js-awe": "^1.0.90",
+        "jsonpath-plus": "^10.3.0"
     }
 }
