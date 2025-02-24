@@ -1,6 +1,7 @@
 import clone from 'just-clone'
 import { JSONPath } from 'jsonpath-plus'
-import { relative } from 'node:path'
+// biome-ignore lint/style/useNodejsImportProtocol: <explanation>
+import { relative } from 'path'
 
 
 const logWithPrefix = (title, displayFunc) => (message) => {

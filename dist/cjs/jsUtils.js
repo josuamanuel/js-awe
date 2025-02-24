@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -22,6 +22,8 @@ exports.isDate = exports.numberToFixedString = exports.fillWith = exports.memoiz
 exports.processExit = exports.retryWithSleep = exports.loopIndexGenerator = exports.oneIn = exports.repeat = exports.cleanString = exports.replaceAll = exports.setDateToMidnight = exports.isDateMidnight = exports.getSameDateOrPreviousFridayForWeekends = exports.dayOfWeek = exports.nextDayOfWeek = exports.previousDayOfWeek = exports.addDays = exports.subtractDays = exports.diffInDaysYYYY_MM_DD = exports.dateToObj = exports.YYYY_MM_DD_hh_mm_ss_ToUtcDate = exports.dateFormatter = exports.MONTHS = exports.DAYS = exports.formatDate = exports.isStringADate = exports.isEmpty = void 0;
 const just_clone_1 = __importDefault(require("just-clone"));
 const jsonpath_plus_1 = require("jsonpath-plus");
+// biome-ignore lint/style/useNodejsImportProtocol: <explanation>
+const path_1 = require("path");
 const logWithPrefix = (title, displayFunc) => (message) => {
     let finalMessage = message;
     if (typeof displayFunc === 'function') {
@@ -31,24 +33,30 @@ const logWithPrefix = (title, displayFunc) => (message) => {
     return message;
 };
 exports.logWithPrefix = logWithPrefix;
-function summarizeError(error) {
+let processCwd;
+function transformStackTraceLine(line) {
+    const processCwd = process.cwd();
+    const startParenthesisIndex = line.indexOf('(') + 1;
+    const endParenthesisIndex = line.indexOf(')', startParenthesisIndex);
+    const pathWithPosition = line.substring(startParenthesisIndex, endParenthesisIndex).replace('file://', '');
+    const resultPositionMatch = pathWithPosition.match(/[0-9]+:[0-9]+/);
+    if (resultPositionMatch === null)
+        return line;
+    const position = resultPositionMatch[0];
+    const filePath = pathWithPosition.substring(0, resultPositionMatch.index - 1);
+    const relativePath = (0, path_1.relative)(processCwd, filePath);
+    return `${line.substring(0, startParenthesisIndex - 1)}${relativePath}:${position}`;
+}
+function summarizeError(error, maxStackTraces = 5) {
     var _a;
     if (error instanceof Error === false)
         return 'Not an error object';
-    const maxStackTraces = 5;
     const stackTraceLines = error.stack.split('\n');
     const filteredStackTrace = stackTraceLines
         .filter(line => !line.includes('node_modules') && !line.includes('node:internal'))
         .map(line => line.trim())
         .filter(line => line.startsWith('at'))
-        .map(line => {
-        const match = line.match(/at .* \((.*\/)?([^\/]+):(\d+):(\d+)\)/) || line.match(/at (.*\/)?([^\/]+):(\d+):(\d+)/);
-        if (match) {
-            const [, , file, line, column] = match;
-            return `${file}:${line}:${column}`;
-        }
-        return line;
-    });
+        .map(transformStackTraceLine);
     const condensedStackTrace = [];
     const totalTraces = filteredStackTrace.length;
     if (totalTraces > maxStackTraces) {
@@ -64,6 +72,20 @@ function summarizeError(error) {
     return `${ErrorString}\nStack Trace: ${condensedStackTraceString}`;
 }
 exports.summarizeError = summarizeError;
+// function a(){b()}
+// function b(){c()}
+// function c(){d()}
+// function d(){e()}
+// function e(){f()}
+// function f(){g()}
+// function g(){throw new Error('This is an error')}
+// try{
+//   a()
+// }catch(e)
+// {
+//   console.log(e)
+//   console.log(summarizeError(e))
+// }
 class CustomError extends Error {
     constructor(name = 'GENERIC', message = name, data = { status: 500 }) {
         super(message);
@@ -126,8 +148,6 @@ exports.isBasicType = isBasicType;
 // isBasicType(Number(2)) //?
 class Enum {
     constructor(values, rules) {
-        // activeObjectKey will be an object with keys from values array and only one current key active: {ON:false,OFF:true}
-        let activeObjectKey;
         // It will contain the active key for example 'OFF'. Once initialized activeObjectKey[activeKey] should be always equal to true
         let activeKey;
         let stateRules;
@@ -135,12 +155,13 @@ class Enum {
             throw new CustomError('NOT_AN_ARRAY', 'Only Array composed of non objects are permitted');
         if (values.filter((elem) => elem === 'object').length > 0)
             throw new CustomError('ARRAY_VALUES_MUST_BE_OF_BASIC_TYPE', 'Only basic types are allowed');
-        let valuesNotAllowed = values.filter(elem => elem === 'get' || elem === 'set' || elem === 'getValue');
+        const valuesNotAllowed = values.filter(elem => elem === 'get' || elem === 'set' || elem === 'getValue');
         if (valuesNotAllowed.length > 0) {
             throw new CustomError('ENUM_INVALID_ENUM_VALUE', `The following ENUM value/s are not allowed: ${valuesNotAllowed} as they are reserved words for enum`);
         }
-        let valuesWithoutDuplicates = removeDuplicates(values);
-        activeObjectKey = arrayToObject(valuesWithoutDuplicates, function defaultValue() { return false; });
+        const valuesWithoutDuplicates = removeDuplicates(values);
+        // activeObjectKey will be an object with keys from values array and only one current key active: {ON:false,OFF:true}
+        const activeObjectKey = arrayToObject(valuesWithoutDuplicates, function defaultValue() { return false; });
         activeKey = values[0];
         activeObjectKey[activeKey] = true;
         if (rules !== undefined)
@@ -148,19 +169,20 @@ class Enum {
         this.get = get;
         this.set = set;
         this.getValue = getValue;
+        // biome-ignore lint/correctness/noConstructorReturn: <explanation>
         return new Proxy(activeObjectKey, this);
         ///
         function setupRules(rules) {
             if (rules === null || typeof rules !== 'object' || Array.isArray(rules) === true) {
-                throw new CustomError('ENUM_RULES_BAD_FORMAT', 'rules is not an object: ' + rules);
+                throw new CustomError('ENUM_RULES_BAD_FORMAT', `rules is not an object: ${rules}`);
             }
-            for (let elem in rules) {
+            for (const elem in rules) {
                 if (activeObjectKey[elem] === undefined || Array.isArray(rules[elem]) === false) {
-                    throw new CustomError('ENUM_RULES_BAD_FORMAT', 'Each attribute of rules must be an element in the ENUM and its value should be an array: ' + activeObjectKey[elem] + rules[elem]);
+                    throw new CustomError('ENUM_RULES_BAD_FORMAT', `Each attribute of rules must be an element in the ENUM and its value should be an array: ${activeObjectKey[elem]}${rules[elem]}`);
                 }
-                let valuesWithProblems = rules[elem].filter(itemTo => activeObjectKey[itemTo] === undefined);
+                const valuesWithProblems = rules[elem].filter(itemTo => activeObjectKey[itemTo] === undefined);
                 if (valuesWithProblems.length > 0) {
-                    throw new CustomError('ENUM_RULES_BAD_FORMAT', 'All elements in a rule entry must be one of the list values in the ENUM. The following values dont exist: ' + valuesWithProblems);
+                    throw new CustomError('ENUM_RULES_BAD_FORMAT', `All elements in a rule entry must be one of the list values in the ENUM. The following values dont exist: ${valuesWithProblems}`);
                 }
             }
             stateRules = (0, just_clone_1.default)(rules);
@@ -234,6 +256,7 @@ class EnumMap {
     constructor(values) {
         _EnumMap_instances.add(this);
         const objLiteral = __classPrivateFieldGet(this, _EnumMap_instances, "m", _EnumMap_validateAndTransform).call(this, (0, just_clone_1.default)(values));
+        // biome-ignore lint/correctness/noConstructorReturn: <explanation>
         return new Proxy(objLiteral, this);
     }
     get(target, prop) {
@@ -247,8 +270,9 @@ class EnumMap {
         throw new CustomError('ENUM_NOT_MODIFIABLE', `Object of .${prop} is not modifiable`);
     }
     invert() {
-        let invertedValues = {};
+        const invertedValues = {};
         for (const elem in this) {
+            // biome-ignore lint/suspicious/noPrototypeBuiltins: <explanation>
             if (this.hasOwnProperty(elem)) {
                 if (isBasicType(this[elem]) === false)
                     throw new CustomError('INVERT_VALUES_NOT_BASIC_TYPE', 'EnumMap values should be basic types');
@@ -270,7 +294,7 @@ _EnumMap_instances = new WeakSet(), _EnumMap_validateAndTransform = function _En
         return values;
     }
     let typeOfValue;
-    let objectResult = [];
+    const objectResult = [];
     if (valuesProtoName === 'Array') {
         for (let i = 0; i < values.length; i++) {
             // basicTypes: ['SUNDAY', 'MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY','SATURDAY']
@@ -289,7 +313,7 @@ _EnumMap_instances = new WeakSet(), _EnumMap_validateAndTransform = function _En
             }
             // elements are object with {key:value} [{SUNDAY:1},{MONDAY:5}, {TUESDAY:2},{WEDNESDAY:3},{THURSDAY:9},{FRIDAY:6},{SATURDAY:4}]
             if (values[i] !== null && typeof values[i] === 'object' && Object.keys(values[i]).length === 1) {
-                let key = Object.keys(values[i])[0];
+                const key = Object.keys(values[i])[0];
                 objectResult[key] = values[i][key];
                 if (typeOfValue !== undefined && typeOfValue !== 'object')
                     throw new CustomError('ENUMMAP_VALUES_NOT_VALID', 'EnumMap values should be consistent...');
@@ -319,7 +343,7 @@ function transition(states, events, transitions) {
     states.forEach(validateStateFormat);
     events.forEach(validateEventFormat);
     let state = states[0];
-    let finalTransitions = Object.entries(transitions).reduce((acum, [stateKey, stateValue]) => {
+    const finalTransitions = Object.entries(transitions).reduce((acum, [stateKey, stateValue]) => {
         // validations
         validateState(stateKey);
         let newStateValue = stateValue;
@@ -331,10 +355,10 @@ function transition(states, events, transitions) {
             }, {});
         }
         else {
-            Object.entries(newStateValue).forEach(([key, value]) => {
+            for (const [key, value] of Object.entries(newStateValue)) {
                 validateEvent(key);
                 validateState(value);
-            });
+            }
         }
         acum[stateKey] = Object.assign(Object.assign({}, acum[stateKey]), newStateValue);
         return acum;
@@ -348,7 +372,8 @@ function transition(states, events, transitions) {
     }, {}));
     function sendEvent(event) {
         validateEvent(event);
-        return state = finalTransitions[state][event];
+        state = finalTransitions[state][event];
+        return state;
     }
     sendEvent.valueOf = () => state;
     return sendEvent;
@@ -407,8 +432,8 @@ function arrayToObject(arr, defaultValueFunction) {
 exports.arrayToObject = arrayToObject;
 function arrayOfObjectsToObject(iterable) {
     if (typeof (iterable === null || iterable === void 0 ? void 0 : iterable[Symbol.iterator]) === 'function') {
-        let acum = {};
-        for (let elem of iterable) {
+        const acum = {};
+        for (const elem of iterable) {
             for (const key in elem) {
                 acum[key] = elem[key];
             }
@@ -444,23 +469,29 @@ function traverse(objIni, reviver, pureFunction = true) {
     const currentPath = ['$'];
     const objClone = pureFunction ? (0, just_clone_1.default)(objIni, reviverPromiseForCloneDeep) : objIni;
     let exitVar = false;
-    let objForReviver = {};
+    const objForReviver = {};
+    // biome-ignore lint/complexity/useLiteralKeys: <explanation>
     objForReviver['$'] = objClone;
-    let isSkipNodeOnce = reviverProcess(reviver, objForReviver, '$', currentPath);
+    const isSkipNodeOnce = reviverProcess(reviver, objForReviver, '$', currentPath);
+    // biome-ignore lint/complexity/useLiteralKeys: <explanation>
     if (objClone !== objForReviver['$'])
         return objForReviver['$'];
+    // biome-ignore lint/complexity/useLiteralKeys: <explanation>
     if (exitVar === true)
         return objForReviver['$'];
     if (isSkipNodeOnce === false) {
+        // biome-ignore lint/complexity/useLiteralKeys: <explanation>
         traverseRec(objForReviver['$']);
     }
+    // biome-ignore lint/complexity/useLiteralKeys: <explanation>
     return objForReviver['$'];
     function traverseRec(obj) {
         if (obj && obj instanceof Object && exitVar === false) {
             for (const prop in obj) {
+                // biome-ignore lint/suspicious/noPrototypeBuiltins: <explanation>
                 if (obj.hasOwnProperty(prop)) {
                     currentPath.push(prop);
-                    let isSkipNodeOnce = reviverProcess(reviver, obj, prop, currentPath);
+                    const isSkipNodeOnce = reviverProcess(reviver, obj, prop, currentPath);
                     if (exitVar === true)
                         return;
                     if (isSkipNodeOnce === false) {
@@ -496,8 +527,8 @@ exports.traverse = traverse;
 traverse.skip = Symbol();
 traverse.stop = Symbol();
 traverse.delete = Symbol();
-traverse.matchPath = function (pathStringQuery, reviverPath) {
-    let pathStringArr = pathStringQuery.split('.');
+traverse.matchPath = (pathStringQuery, reviverPath) => {
+    const pathStringArr = pathStringQuery.split('.');
     if (pathStringArr.length !== reviverPath.length) {
         return false;
     }
@@ -511,7 +542,7 @@ function traverseVertically(functionToRun, verFields, toTraverse) {
     let maxLength = 0;
     let firstTime = true;
     for (let i = 0; firstTime || i < maxLength; i++) {
-        let toReturn = [];
+        const toReturn = [];
         for (let j = 0; j < toTraverse.length; j++) {
             toReturn[j] = Object.assign({}, toTraverse[j]);
             for (const field of verFields) {
@@ -546,15 +577,15 @@ function project(paths, json, removeWithDelete = true) {
         return json;
     else
         return undefined;
-    paths.forEach((pathWithSign) => {
+    for (const pathWithSign of paths) {
         if (pathWithSign[0] !== '+' && pathWithSign[0] !== '-') {
             throw new Error('ivanlid format');
         }
         const isInclude = pathWithSign[0] === '+';
         const path = pathWithSign.substring(1);
         const result = (0, jsonpath_plus_1.JSONPath)({ resultType: 'all', path, json });
-        let pendingToFilter = new Map();
-        result.forEach(({ pointer, value }, index) => {
+        const pendingToFilter = new Map();
+        for (const { pointer, value } of result) {
             const setAtPath = pointer.substring(1).split('/');
             if (setAtPath.length === 1 && setAtPath[0] === '')
                 copy = isInclude ? (0, just_clone_1.default)(value) : undefined;
@@ -577,12 +608,12 @@ function project(paths, json, removeWithDelete = true) {
                 else
                     setAt(copy, setAtPath, isInclude ? (0, just_clone_1.default)(value) : undefined);
             }
-        });
-        pendingToFilter.forEach((parent, parentPath) => {
+        }
+        for (const [parentPath, parent] of pendingToFilter) {
             const compactingDeleteItems = parent.filter(el => el !== toDelete);
             setAt(copy, parentPath.split('/'), compactingDeleteItems);
-        });
-    });
+        }
+    }
     return copy;
 }
 exports.project = project;
@@ -611,15 +642,18 @@ exports.project = project;
 //     },
 //   ]
 //   const pathToSelect = ['+$', '-$[*].age', '-$[*].twoLevels.a', '-$[*].posts[:-1]'] //, '-$[*].age'];
-//   project(pathToSelect, users) //?
-//   project(['+$[*].posts[0,2]', '-$[*].posts[1]'], users) //?
-//   project(['+$.a.b','-$.a.b.d'], {a:{b:{c:3,d:5,e:9}}}) //?
-//   project(['+$'], 2) //?
+//   console.log(
+//     JSON.stringify(project(pathToSelect, users),undefined,2),
+//     JSON.stringify(project(['+$[*].posts[0,2]', '-$[*].posts[1]'], users),undefined, 2),
+//     JSON.stringify(project(['+$.a.b','-$.a.b.d'], {a:{b:{c:3,d:5,e:9}}}),undefined,2),
+//     JSON.stringify(project(['+$'], 2),undefined,2)
+//   )
 // }
 function copyPropsWithValueUsingRules(objDest, copyRules, shouldUpdateOnlyEmptyFields = false) {
-    return function (inputObj) {
+    return (inputObj) => {
         copyRules.map((rule) => {
-            let from, to;
+            let from;
+            let to;
             if (typeof rule === 'object') {
                 from = rule.from;
                 to = rule.to;
@@ -676,7 +710,7 @@ exports.copyPropsWithValueUsingRules = copyPropsWithValueUsingRules;
 //   objTo
 // }
 function copyPropsWithValue(objDest, shouldUpdateOnlyEmptyFields = false) {
-    return function (inputObj) {
+    return (inputObj) => {
         traverse(inputObj, (nodeValue, currentPath) => {
             if (isALeaf(nodeValue) === false)
                 return;
@@ -709,7 +743,7 @@ exports.copyPropsWithValue = copyPropsWithValue;
 // }
 function isALeaf(node) {
     const isABranch = ((node === null || node === void 0 ? void 0 : node.constructor.name) === 'Object' && Object.keys(node).length > 0) ||
-        ((node === null || node === void 0 ? void 0 : node.constructor.name) == 'Array' && node.length > 0);
+        ((node === null || node === void 0 ? void 0 : node.constructor.name) === 'Array' && node.length > 0);
     return !isABranch;
 }
 // isALeaf(undefined) //?
@@ -725,7 +759,7 @@ function isEmpty(value) {
         value === '' ||
         value === 0 ||
         value === 0n ||
-        value !== value ||
+        Number.isNaN(value) ||
         (Array.isArray(value) && (value === null || value === void 0 ? void 0 : value.length) === 0) ||
         (typeof value === 'object' && Object.keys(value).length === 0))
         return true;
@@ -739,8 +773,8 @@ function firstCapital(str) {
 exports.firstCapital = firstCapital;
 function queryObjToStr(query) {
     return Object.keys(query).reduce((acum, current) => {
-        const newAcum = acum ? acum + '&' : acum;
-        return newAcum + current + '=' + query[current];
+        const newAcum = acum ? `${acum}&` : acum;
+        return `${newAcum}${current}=${query[current]}`;
     }, '');
 }
 exports.queryObjToStr = queryObjToStr;
@@ -751,12 +785,12 @@ function varSubsDoubleBracket(strToResolveVars, state, mode) {
     // regex to deal with the case the entire value is a substitution group
     // let regexVar = /"{{(.*?)(?:=(.*?))?}}"/g
     // ask ChatGPT to do a more performant regex without look ahead
-    let regexVar = /"{{([^=}]+)(?:=([^}]+))?}}"/g;
-    let resultStr = strToResolveVars.replace(regexVar, (_notused, group1, group2) => {
+    const regexVar = /"{{([^=}]+)(?:=([^}]+))?}}"/g;
+    const resultStr = strToResolveVars.replace(regexVar, (_notused, group1, group2) => {
         if (state && state[group1] !== undefined) {
             if (typeof state[group1] === 'string')
-                return '"' + state[group1] + '"';
-            else if (typeof state[group1] === 'object') {
+                return `"${state[group1]}"`;
+            if (typeof state[group1] === 'object') {
                 if (mode === 'url' && Array.isArray(state[group1]))
                     return arrayToListQuery(state[group1]);
                 if (mode === 'url' && !Array.isArray(state[group1]))
@@ -764,22 +798,18 @@ function varSubsDoubleBracket(strToResolveVars, state, mode) {
                 if (!mode)
                     return JSON.stringify(state[group1]);
             }
-            else
-                return state[group1];
+            return state[group1];
         }
-        else {
-            if (group2 === undefined)
-                return null;
-            //else if(group2.substring(0,2) === '\\"' && group2.substring([group2.length -1],2) === '\\"') return ('"' + group2 + '"')
-            else
-                return group2.replace(/\\"/g, '"');
-        }
+        if (group2 === undefined)
+            return null;
+        //else if(group2.substring(0,2) === '\\"' && group2.substring([group2.length -1],2) === '\\"') return ('"' + group2 + '"')
+        return group2.replace(/\\"/g, '"');
     });
     // regex to do partial substitution of a group inside of a string value
     // let regexVarPartial = /{{(.*?)(?:=(.*?))?}}/g
     // ask ChatGPT to do a more performant regex without look ahead
-    let regexVarPartial = /{{([^=}]+)(?:=([^}]+))?}}/g;
-    let resultStrFinal = resultStr.replace(regexVarPartial, (_notused, group1, group2) => {
+    const regexVarPartial = /{{([^=}]+)(?:=([^}]+))?}}/g;
+    const resultStrFinal = resultStr.replace(regexVarPartial, (_notused, group1, group2) => {
         if (state && state[group1] !== undefined) {
             if (typeof state[group1] === 'object') {
                 if (mode === 'url' && Array.isArray(state[group1]))
@@ -795,9 +825,7 @@ function varSubsDoubleBracket(strToResolveVars, state, mode) {
         else {
             if (group2 === undefined)
                 return null;
-            //else if(group2.substring(0,2) === '\\"' && group2.substring([group2.length -1],2) === '\\"') return ('"' + group2 + '"')
-            else
-                return group2.replace(/\\"/g, '');
+            return group2.replace(/\\"/g, '');
         }
     });
     return resultStrFinal;
@@ -817,11 +845,11 @@ exports.varSubsDoubleBracket = varSubsDoubleBracket;
 // varSubsDoubleBracket('https://bank.account?{{params=a=1&b=2}}&c=3', {params:{a:'10232-1232',b:'2331-1233'}},'url') //?
 // varSubsDoubleBracket('https://bank.account?{{params=a=1&b=2}}&c=3', {},'url') //?
 function arrayToListQuery(arr) {
-    return arr.reduce((prev, curr) => prev + ',' + curr);
+    return arr.reduce((prev, curr) => `${prev},${curr}`);
 }
 function objToQueryParams(obj) {
     return Object.keys(obj)
-        .reduce((acum, curr) => acum + curr + '=' + obj[curr] + '&', '')
+        .reduce((acum, curr) => `${acum}${curr}=${obj[curr]}&`, '')
         .slice(0, -1);
 }
 function urlCompose(gatewayUrl, serviceName, servicePath) {
@@ -829,7 +857,7 @@ function urlCompose(gatewayUrl, serviceName, servicePath) {
         gatewayUrl,
         serviceName,
         servicePath,
-        url: gatewayUrl + serviceName + servicePath
+        url: `${gatewayUrl}${serviceName}${servicePath}`
     };
 }
 exports.urlCompose = urlCompose;
@@ -873,7 +901,7 @@ function toDate(date) {
         : new Date();
 }
 function isDate(d) {
-    return d instanceof Date && !isNaN(d);
+    return d instanceof Date && !Number.isNaN(d);
 }
 exports.isDate = isDate;
 function isStringADate(stringDate) {
@@ -887,7 +915,7 @@ function dateFormatter(format) {
 }
 exports.dateFormatter = dateFormatter;
 function formatDate(format, date) {
-    let dateToProcess = toDate(date);
+    const dateToProcess = toDate(date);
     if (isDate(dateToProcess) === false)
         return undefined;
     const months = new EnumMap({
@@ -920,9 +948,9 @@ function formatDate(format, date) {
     const YY = dateIsoString.substring(2, 4);
     const MM = dateIsoString.substring(5, 7);
     const DD = dateIsoString.substring(8, 10);
-    const D = parseInt(DD, 10).toString();
+    const D = Number.parseInt(DD, 10).toString();
     const hh = dateIsoString.substring(11, 13);
-    const h = parseInt(hh, 10).toString();
+    const h = Number.parseInt(hh, 10).toString();
     const mm = dateIsoString.substring(14, 16);
     const ss = dateIsoString.substring(17, 19);
     const mil = dateIsoString.substring(20, 23);
@@ -948,12 +976,12 @@ exports.formatDate = formatDate;
 //formatDate('$YYYY-$MM-$DD', new Date('2021-02-28')) //?
 function YYYY_MM_DD_hh_mm_ss_ToUtcDate(dateYYYY_MM_DD_hh_mm_ss) {
     // Input format has 1 char (any could work) between each elements: years, months, days, hours, minutes and seconds
-    const dateYYYY = parseInt(dateYYYY_MM_DD_hh_mm_ss.substring(0, 4));
-    const dateMM = parseInt(dateYYYY_MM_DD_hh_mm_ss.substring(5, 7)) - 1; // Months start with 0
-    const dateDD = parseInt(dateYYYY_MM_DD_hh_mm_ss.substring(8, 10));
-    const datehh = parseInt(dateYYYY_MM_DD_hh_mm_ss.substring(11, 13));
-    const datemm = parseInt(dateYYYY_MM_DD_hh_mm_ss.substring(14, 16));
-    const datess = parseInt(dateYYYY_MM_DD_hh_mm_ss.substring(17, 19));
+    const dateYYYY = Number.parseInt(dateYYYY_MM_DD_hh_mm_ss.substring(0, 4));
+    const dateMM = Number.parseInt(dateYYYY_MM_DD_hh_mm_ss.substring(5, 7)) - 1; // Months start with 0
+    const dateDD = Number.parseInt(dateYYYY_MM_DD_hh_mm_ss.substring(8, 10));
+    const datehh = Number.parseInt(dateYYYY_MM_DD_hh_mm_ss.substring(11, 13));
+    const datemm = Number.parseInt(dateYYYY_MM_DD_hh_mm_ss.substring(14, 16));
+    const datess = Number.parseInt(dateYYYY_MM_DD_hh_mm_ss.substring(17, 19));
     return Date.UTC(dateYYYY, dateMM, dateDD, datehh, datemm, datess);
 }
 exports.YYYY_MM_DD_hh_mm_ss_ToUtcDate = YYYY_MM_DD_hh_mm_ss_ToUtcDate;
@@ -962,18 +990,18 @@ exports.DAYS = DAYS;
 const MONTHS = new EnumMap(['JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE', 'JULY', 'AUGUST', 'SEPTEMBER', 'OCTOBER', 'NOVEMBER', 'DECEMBER']);
 exports.MONTHS = MONTHS;
 function dateToObj(date) {
-    let dateToProcess = toDate(date);
+    const dateToProcess = toDate(date);
     if (isDate(dateToProcess) === false)
         return undefined;
-    let ISODate = dateToProcess.toISOString();
+    const ISODate = dateToProcess.toISOString();
     return {
-        YYYY: parseInt(ISODate.substring(0, 4)),
-        MM: parseInt(ISODate.substring(5, 7)),
-        DD: parseInt(ISODate.substring(8, 10)),
-        hh: parseInt(ISODate.substring(11, 13)),
-        mm: parseInt(ISODate.substring(14, 16)),
-        ss: parseInt(ISODate.substring(17, 19)),
-        mil: parseInt(ISODate.substring(20, 23))
+        YYYY: Number.parseInt(ISODate.substring(0, 4)),
+        MM: Number.parseInt(ISODate.substring(5, 7)),
+        DD: Number.parseInt(ISODate.substring(8, 10)),
+        hh: Number.parseInt(ISODate.substring(11, 13)),
+        mm: Number.parseInt(ISODate.substring(14, 16)),
+        ss: Number.parseInt(ISODate.substring(17, 19)),
+        mil: Number.parseInt(ISODate.substring(20, 23))
     };
 }
 exports.dateToObj = dateToObj;
@@ -986,7 +1014,7 @@ function diffInDaysYYYY_MM_DD(iniDate, endDate) {
 }
 exports.diffInDaysYYYY_MM_DD = diffInDaysYYYY_MM_DD;
 function addDays(daysToAdd, date) {
-    let dateToProcess = toDate(date);
+    const dateToProcess = toDate(date);
     if (isDate(dateToProcess) === false)
         return dateToProcess;
     // 864e5 is a valid JavaScript number that represents the number of milliseconds in a 24h
@@ -997,7 +1025,7 @@ exports.addDays = addDays;
 // addDays(3, "2023-03-24").toISOString() //?
 // addDays(9, "2023-03-24").toISOString() //?
 function subtractDays(daysToSubtract, date) {
-    let dateToProcess = toDate(date);
+    const dateToProcess = toDate(date);
     if (isDate(dateToProcess) === false)
         return dateToProcess;
     return new Date(dateToProcess.valueOf() - 864E5 * daysToSubtract);
@@ -1007,11 +1035,11 @@ exports.subtractDays = subtractDays;
 // subtractDays(3, "2023-03-27").toISOString() //?
 // subtractDays(9, "2023-04-02").toISOString() //?
 function previousDayOfWeek(dayOfWeek, date) {
-    let dateToProcess = toDate(date);
+    const dateToProcess = toDate(date);
     if (isDate(dateToProcess) === false)
         return dateToProcess;
-    let diffInDaysOfWeek = dateToProcess.getUTCDay() - dayOfWeek;
-    let toSubtract = diffInDaysOfWeek >= 0
+    const diffInDaysOfWeek = dateToProcess.getUTCDay() - dayOfWeek;
+    const toSubtract = diffInDaysOfWeek >= 0
         ? diffInDaysOfWeek
         : 7 + diffInDaysOfWeek;
     return subtractDays(toSubtract, dateToProcess);
@@ -1020,12 +1048,12 @@ exports.previousDayOfWeek = previousDayOfWeek;
 //previousDayOfWeek(6,new Date('2021-05-07')) //?
 //previousDayOfWeek(1,new Date('2021-03-25')) //?
 function nextDayOfWeek(dayOfWeek, date) {
-    let dateToProcess = toDate(date);
+    const dateToProcess = toDate(date);
     if (isDate(dateToProcess) === false)
         return dateToProcess;
-    let diffInDaysOfWeek = dayOfWeek - dateToProcess.getUTCDay();
+    const diffInDaysOfWeek = dayOfWeek - dateToProcess.getUTCDay();
     diffInDaysOfWeek;
-    let toAdd = diffInDaysOfWeek >= 0
+    const toAdd = diffInDaysOfWeek >= 0
         ? diffInDaysOfWeek
         : 7 + diffInDaysOfWeek;
     return addDays(toAdd, dateToProcess);
@@ -1034,13 +1062,13 @@ exports.nextDayOfWeek = nextDayOfWeek;
 // nextDayOfWeek(0,new Date('2025-02-01')) //?
 // nextDayOfWeek(1,new Date('2021-03-25')) //?
 function dayOfWeek(dayOfWeek, date) {
-    let dateToProcess = toDate(date);
+    const dateToProcess = toDate(date);
     if (isDate(dateToProcess) === false)
         return dateToProcess;
-    let diffInDaysOfWeek = (dayOfWeek === 0 ? 7 : dayOfWeek) -
+    const diffInDaysOfWeek = (dayOfWeek === 0 ? 7 : dayOfWeek) -
         (dateToProcess.getUTCDay() === 0 ? 7 : dateToProcess.getUTCDay());
     diffInDaysOfWeek;
-    let toSubtract = diffInDaysOfWeek;
+    const toSubtract = diffInDaysOfWeek;
     // diffInDaysOfWeek >= 0
     //   ? diffInDaysOfWeek
     //   : 7 + diffInDaysOfWeek
@@ -1050,7 +1078,7 @@ exports.dayOfWeek = dayOfWeek;
 // dayOfWeek(0,new Date('2025-02-06')) //?
 // dayOfWeek(6,new Date('2025-02-09')) //?
 function getSameDateOrPreviousFridayForWeekends(date) {
-    let dateToProcess = toDate(date);
+    const dateToProcess = toDate(date);
     if (isDate(dateToProcess) === false)
         return dateToProcess;
     const dayOfWeek = dateToProcess.getUTCDay();
@@ -1075,20 +1103,22 @@ function isDateMidnight(date) {
 exports.isDateMidnight = isDateMidnight;
 function setDateToMidnight(date) {
     if (typeof date === 'string' && date.match(/\d{4}\D\d{2}\D\d{2}/))
-        return new Date(date.substring(0, 10) + ' UTC');
+        return new Date(`${date.substring(0, 10)} UTC`);
     if (typeof date === 'string')
-        return new Date(date + ' UTC');
-    let dateToProcess = (arguments.length === 0
+        return new Date(`${date} UTC`);
+    const dateToProcess = (
+    // biome-ignore lint/style/noArguments: <explanation>
+    arguments.length === 0
         ? new Date()
         : new Date(date));
-    if (isNaN(+dateToProcess))
+    if (Number.isNaN(+dateToProcess))
         return dateToProcess;
     if (isDateMidnight(dateToProcess))
         return dateToProcess;
-    return new Date(dateToProcess.toISOString().substring(0, 10) + ' UTC');
+    return new Date(`${dateToProcess.toISOString().substring(0, 10)} UTC`);
 }
 exports.setDateToMidnight = setDateToMidnight;
-const { colors, colorMessage, colorMessageByStatus, colorByStatus } = (function () {
+const { colors, colorMessage, colorMessageByStatus, colorByStatus } = (() => {
     //alias
     const colors = {
         red: '\x1b[31m',
@@ -1122,28 +1152,24 @@ const { colors, colorMessage, colorMessageByStatus, colorByStatus } = (function 
         blink: '\x1b[5m',
         hidden: '\x1b[8m'
     };
-    const colorMessage = (message, color) => colors[color] + message + colors.reset;
-    const colorMessageByStatus = (message, status) => {
-        let colorStatus;
-        (status >= 200) & (status < 300)
-            ? (colorStatus = colors.green)
+    const colorMessage = (message, color) => `${colors[color]}${message}${colors.reset}`;
+    const colorMessageByStatus = (_message, status) => {
+        return (status >= 200) & (status < 300)
+            ? colors.green
             : (status >= 300) & (status < 400)
-                ? (colorStatus = colors.cyan)
+                ? colors.cyan
                 : (status >= 400) & (status < 500)
-                    ? (colorStatus = colors.yellow)
-                    : (colorStatus = colors.red);
-        return colorStatus + message + colors.reset;
+                    ? colors.yellow
+                    : colors.red;
     };
     const colorByStatus = status => {
-        let colorStatus;
-        (status >= 200) & (status < 300)
-            ? (colorStatus = colors.green)
+        return (status >= 200) & (status < 300)
+            ? colors.green
             : (status >= 300) & (status < 400)
-                ? (colorStatus = colors.cyan)
+                ? colors.cyan
                 : (status >= 400) & (status < 500)
-                    ? (colorStatus = colors.yellow)
-                    : (colorStatus = colors.red);
-        return colorStatus;
+                    ? colors.yellow
+                    : colors.red;
     };
     return { colors, colorMessage, colorMessageByStatus, colorByStatus };
 })();
@@ -1162,7 +1188,7 @@ function findDeepKey(objIni, keyToFind) {
                 result[result.length - 1].push(prop);
                 result.push(obj[prop]);
             }
-            if (obj[prop] !== null && typeof obj[prop] == 'object') {
+            if (obj[prop] !== null && typeof obj[prop] === 'object') {
                 currentPath.push(prop);
                 traverse(obj[prop]);
                 currentPath.pop();
@@ -1176,12 +1202,12 @@ exports.findDeepKey = findDeepKey;
 //   findDeepKey([{a:{astra:2}},{astra:5}], 'astra') //?
 // }
 function deepFreeze(o) {
-    Object.getOwnPropertyNames(o).forEach(prop => {
+    for (const prop of Object.getOwnPropertyNames(o)) {
         if (o[prop] !== null &&
             (typeof o[prop] === 'object' || typeof o[prop] === 'function')) {
             deepFreeze(o[prop]);
         }
-    });
+    }
     Object.freeze(o);
     return o;
 }
@@ -1194,7 +1220,7 @@ function getAt(obj, valuePath) {
         return obj;
     let result = obj;
     const valuePathArray = typeof valuePath === 'string' ? valuePath.split('.') : valuePath;
-    for (let o of valuePathArray) {
+    for (const o of valuePathArray) {
         if (result === undefined)
             return result;
         if ((result instanceof Object)) {
@@ -1229,12 +1255,12 @@ function setAt(obj, valuePath, value) {
     let valueReturn = FAILED;
     let valuePathArray;
     if (obj === undefined || obj === null || valuePath === undefined || valuePath === null) {
-        throw { name: 'setAtParamsException', msg: 'obj: ' + obj + ', valuePath: ' + valuePath + ', value: ' + value };
+        throw { name: 'setAtParamsException', msg: `obj: ${obj}, valuePath: ${valuePath}, value: ${value}` };
     }
     try {
         valuePathArray = typeof valuePath === 'string' ? valuePath.split('.') : valuePath;
         for (let i = 0, j = valuePathArray.length; i < j; i++) {
-            let field = nameToIndex(result, valuePathArray[i]);
+            const field = nameToIndex(result, valuePathArray[i]);
             if (i === (valuePathArray.length - 1)) {
                 if ((result === null || result === void 0 ? void 0 : result[valuePathArray[i]]) !== undefined) {
                     if (valueReturn !== CREATED)
@@ -1258,11 +1284,11 @@ function setAt(obj, valuePath, value) {
             }
         }
         if (valueReturn === FAILED) {
-            throw { name: 'setAtException', msg: 'obj: ' + obj + ', valuePath: ' + valuePath + ', value: ' + value };
+            throw { name: 'setAtException', msg: `obj: ${obj}, valuePath: ${valuePath}, value: ${value}` };
         }
     }
     catch (e) {
-        console.log(e + ' Warning: There was an exception in setAt(obj, valuePath, value)... obj: ' + obj + ' valuePath: ' + valuePath + ' value: ' + value);
+        console.log(`${e} Warning: There was an exception in setAt(obj, valuePath, value)... obj: ${obj} valuePath: ${valuePath} value: ${value}`);
         valueReturn = FAILED;
         return valueReturn;
     }
@@ -1274,47 +1300,47 @@ function setAt(obj, valuePath, value) {
         if (Array.isArray(obj) && field === '$push') {
             return obj.length;
         }
-        if (Array.isArray(obj) && parseInt(field) < 0) {
-            return obj.length + parseInt(valuePathArray[i]);
+        if (Array.isArray(obj) && Number.parseInt(field) < 0) {
+            return obj.length + Number.parseInt(valuePathArray[i]);
         }
         return field;
     }
 }
 exports.setAt = setAt;
-{
-    // let obj = {}
-    // setAt(obj, 'a', '8') //?
-    // obj //?
-    // let obj2 = {a:3,b:{c:1}}
-    // setAt(obj2, 'b', '8') //?
-    // setAt(obj2, 'a.b', '8') //?
-    // setAt(obj2, 'd.e', 'a') //?
-    // obj2 //?
-    // setAt(obj2, 'd.f', 'b') //?
-    // setAt(obj2, 'd.e', 'aa') //?
-    // setAt(obj2, 'e.g', 'c') //?
-    // setAt(obj2, 'a.b.0.0.c', 'c') //?
-    // obj2 //?
-    // let obj3 = [1,2,3,4,5]
-    // setAt(obj3,'-2',8) //?
-    // obj3 //?
-    // let obj4 = [1,2,3,4,5]
-    // setAt(obj4,'$last',8) //?
-    // obj4 //?
-    // let obj5 = [1,2,3,4,5]
-    // setAt(obj5,'$push',8) //?
-    // obj5 //?
-    // let obj6 = {
-    //   items: [ 
-    //     {}, 
-    //     { ar: [1, 2] }
-    //   ]
-    // }
-    // setAt(obj6,'items.$last.ar.$push',8) //?
-    // obj6 //?
-}
+// {
+// let obj = {}
+// setAt(obj, 'a', '8') //?
+// obj //?
+// let obj2 = {a:3,b:{c:1}}
+// setAt(obj2, 'b', '8') //?
+// setAt(obj2, 'a.b', '8') //?
+// setAt(obj2, 'd.e', 'a') //?
+// obj2 //?
+// setAt(obj2, 'd.f', 'b') //?
+// setAt(obj2, 'd.e', 'aa') //?
+// setAt(obj2, 'e.g', 'c') //?
+// setAt(obj2, 'a.b.0.0.c', 'c') //?
+// obj2 //?
+// let obj3 = [1,2,3,4,5]
+// setAt(obj3,'-2',8) //?
+// obj3 //?
+// let obj4 = [1,2,3,4,5]
+// setAt(obj4,'$last',8) //?
+// obj4 //?
+// let obj5 = [1,2,3,4,5]
+// setAt(obj5,'$push',8) //?
+// obj5 //?
+// let obj6 = {
+//   items: [ 
+//     {}, 
+//     { ar: [1, 2] }
+//   ]
+// }
+// setAt(obj6,'items.$last.ar.$push',8) //?
+// obj6 //?
+// }
 const defaultValue = (value, defaultVal) => {
-    if (value === undefined || value === null || isNaN(value))
+    if (value === undefined || value === null || Number.isNaN(value))
         return defaultVal;
     return value;
 };
@@ -1322,11 +1348,11 @@ exports.defaultValue = defaultValue;
 const sorterByPaths = (paths, isAsc = true) => {
     let great = 1;
     let less = -1;
-    let nullishValues = Infinity; // In ascending we put nullish values at the end
+    let nullishValues = Number.POSITIVE_INFINITY; // In ascending we put nullish values at the end
     if (isAsc === false) {
         great = -1;
         less = 1;
-        nullishValues = -Infinity; // In descending we put nullish values at the beginning
+        nullishValues = Number.NEGATIVE_INFINITY; // In descending we put nullish values at the beginning
     }
     let pathArr;
     if (typeof paths === 'string')
@@ -1334,7 +1360,7 @@ const sorterByPaths = (paths, isAsc = true) => {
     else
         pathArr = [...paths];
     return (objA, objB) => {
-        for (let currentPath of pathArr) {
+        for (const currentPath of pathArr) {
             if (defaultValue(getAt(objA, currentPath), nullishValues) > defaultValue(getAt(objB, currentPath), nullishValues))
                 return great;
             if (defaultValue(getAt(objA, currentPath), nullishValues) < defaultValue(getAt(objB, currentPath), nullishValues))
@@ -1353,8 +1379,9 @@ exports.sorterByPaths = sorterByPaths;
 //   [{a:3},{a:4},{a:undefined},{a:2},{a:1},{a:undefined},{a:0},{a:undefined}].sort(sorterByPaths(['a']))
 // )
 const sorterByFields = (paths, isAsc = true) => {
+    let isAscArr = isAsc;
     if (Array.isArray(isAsc) === false) {
-        isAsc = Array(paths.length).fill(isAsc);
+        isAscArr = Array(paths.length).fill(isAsc);
     }
     let pathArr;
     if (typeof paths === 'string')
@@ -1362,16 +1389,17 @@ const sorterByFields = (paths, isAsc = true) => {
     else
         pathArr = [...paths];
     return (objA, objB) => {
+        // biome-ignore lint/style/useSingleVarDeclarator: <explanation>
         let great, less, nullishValues, currentPath;
         for (let index = 0; index < pathArr.length; index++) {
             currentPath = pathArr[index];
             great = 1;
             less = -1;
-            nullishValues = Infinity; // In ascending we put nullish values at the end
-            if (isAsc[index] === false) {
+            nullishValues = Number.POSITIVE_INFINITY; // In ascending we put nullish values at the end
+            if (isAscArr[index] === false) {
                 great = -1;
                 less = 1;
-                nullishValues = -Infinity; // In descending we put nullish values at the beginning
+                nullishValues = Number.NEGATIVE_INFINITY; // In descending we put nullish values at the beginning
             }
             if (defaultValue(getAt(objA, currentPath), nullishValues) > defaultValue(getAt(objB, currentPath), nullishValues))
                 return great;
@@ -1402,6 +1430,7 @@ exports.sorterByFields = sorterByFields;
 function findIndexInSortedArray(arr, item) {
     if ((arr === null || arr === void 0 ? void 0 : arr.length) === undefined || (arr === null || arr === void 0 ? void 0 : arr.length) === 0)
         return -1;
+    // biome-ignore lint/style/useSingleVarDeclarator: <explanation>
     let l = 0, r = arr.length - 1;
     while (l <= r) {
         const mid = Math.floor((l + r) / 2);
@@ -1460,7 +1489,7 @@ function findIndexOrNextInSortedArray(arr, val) {
 }
 exports.findIndexOrNextInSortedArray = findIndexOrNextInSortedArray;
 function filterFlatMap(mapWithUndefinedFilterFun, data) {
-    let result = [];
+    const result = [];
     let resultSize = 0;
     let mappedItem;
     for (let index = 0, dataLength = data.length; index < dataLength; index++) {
@@ -1550,20 +1579,20 @@ function retryWithSleep(times, updateSleepTimeFun, funToRun, funToRunParams, sho
                     return result;
             }
             catch (e) {
-                console.log('Called to shouldStopFun failed with params: ', { currentSleepTime, index });
-                console.log('Log from caller to retryFunction: ', logString);
+                console.log(`Called to shouldStopFun failed with params: ${currentSleepTime}, ${index}`);
+                console.log(`Log from caller to retryFunction: ${logString}`);
                 console.log('Throwing exception...');
                 throw e;
             }
             const extractError = (_e = (_d = (_c = (_b = (_a = result === null || result === void 0 ? void 0 : result.message) !== null && _a !== void 0 ? _a : result === null || result === void 0 ? void 0 : result.error) !== null && _b !== void 0 ? _b : result === null || result === void 0 ? void 0 : result.code) !== null && _c !== void 0 ? _c : result === null || result === void 0 ? void 0 : result.status) !== null && _d !== void 0 ? _d : result === null || result === void 0 ? void 0 : result.status) !== null && _e !== void 0 ? _e : result === null || result === void 0 ? void 0 : result.name;
             console.log(`Iteration: ${index + 1} sleepTime: ${currentSleepTime} Error: ${extractError}`);
-            console.log('Log from caller to retryFunction: ', logString);
+            console.log(`Log from caller to retryFunction: ${logString}`);
             try {
                 currentSleepTime = updateSleepTimeFun(currentSleepTime, index);
             }
             catch (e) {
-                console.log('Calling updateSleepTimeFun failed with params: ', { currentSleepTime, index });
-                console.log('Log from caller to retryFunction: ', logString);
+                console.log(`Calling updateSleepTimeFun failed with params: ${currentSleepTime}, ${index}`);
+                console.log(`Log from caller to retryFunction: ${logString}`);
                 throw e;
             }
         }
@@ -1602,7 +1631,7 @@ function pushUniqueKey(row, table, indexes = [0]) {
         //if (Array.isArray(row) === false) return row
         if (typeof row !== 'object')
             return row;
-        return indexes.reduce((acum, current, index) => acum + `-${index}-` + row[current], '');
+        return indexes.reduce((acum, current, index) => `${acum}-${index}-${row[current]}`, '');
     }
 }
 exports.pushUniqueKey = pushUniqueKey;
@@ -1634,6 +1663,7 @@ exports.pushUniqueKey = pushUniqueKey;
 //   [{a:1,b:2},{a:2,b:4},{a:3,b:4}],
 //   ['a','b']
 // ) //?
+// biome-ignore lint/style/useDefaultParameterLast: <explanation>
 function pushUniqueKeyOrChange(newRow, table, indexes = [0], mergeFun) {
     if (pushUniqueKey(newRow, table, indexes) === undefined) {
         const newRowKey = key(newRow, indexes);
@@ -1649,7 +1679,7 @@ function pushUniqueKeyOrChange(newRow, table, indexes = [0], mergeFun) {
         //if (Array.isArray(row) === false) return row
         if (typeof row !== 'object')
             return row;
-        return indexes.reduce((acum, current, index) => acum + `-${index}-` + row[current], '');
+        return indexes.reduce((acum, current, index) => `${acum}-${index}-${row[current]}`, '');
     }
 }
 exports.pushUniqueKeyOrChange = pushUniqueKeyOrChange;
@@ -1667,7 +1697,9 @@ function pushAt(pos, value, arr) {
     //   return arr
     // }
     const length = arr.length;
-    repeat(arr.length - pos).times(index => arr[length - index] = arr[length - index - 1]);
+    repeat(arr.length - pos).times(index => {
+        arr[length - index] = arr[length - index - 1];
+    });
     arr[pos] = value;
     return arr;
 }
@@ -1678,7 +1710,7 @@ exports.pushAt = pushAt;
 function memoize() {
     const resultsMap = new Map();
     function memoizeMap(func, ...params) {
-        let key = JSON.stringify(params);
+        const key = JSON.stringify(params);
         let result = resultsMap.get(key);
         if (result === undefined && resultsMap.has(key) === false) {
             result = func(...params);
@@ -1687,7 +1719,7 @@ function memoize() {
         return result;
     }
     function memoizeWithHashFun(func, hashFunc, ...params) {
-        let key = JSON.stringify(hashFunc(params));
+        const key = JSON.stringify(hashFunc(params));
         let result = resultsMap.get(key);
         if (result === undefined && resultsMap.has(key) === false) {
             result = func(...params);
@@ -1705,8 +1737,8 @@ exports.memoize = memoize;
 // plusMem(plus, 3,3) //?
 //
 function fillWith(mapper, lenOrWhileTruthFun) {
-    let result = [];
-    let isWhileTruthFun = typeof lenOrWhileTruthFun === 'function'
+    const result = [];
+    const isWhileTruthFun = typeof lenOrWhileTruthFun === 'function'
         ? lenOrWhileTruthFun
         : (index) => index < lenOrWhileTruthFun;
     let index = -1;
@@ -1744,19 +1776,20 @@ exports.numberToFixedString = numberToFixedString;
 //console.log(replaceAll('I like red cars and red houses', {from:'red',to:'yellow'},{from:'e',to:'E'}))
 //console.log(replaceAll('I like red cars and red houses', [{from:'red',to:'yellow'},{from:'e',to:'E'}]))
 function replaceAll(str, ...fromTo) {
+    let simpleFrom = fromTo;
     if (fromTo[0][0].from !== undefined)
-        fromTo = fromTo[0];
-    return fromTo.reduce((acum, current) => acum.split(current.from).join(current.to), str);
+        simpleFrom = fromTo[0];
+    return simpleFrom.reduce((acum, current) => acum.split(current.from).join(current.to), str);
 }
 exports.replaceAll = replaceAll;
 function cleanString(str) {
-    return str.replace(/([^a-z0-9 .,]+)/gi, '').replace(/  */g, ' ').trim();
+    return str.replace(/([^a-z0-9 .,]+)/gi, '').replace(/ +/g, ' ').trim();
 }
 exports.cleanString = cleanString;
 //cleanString('  Only let%ters,%% numbers 1,2,3 d@ot &*&an(((d co[mma. Text is trimmed   ')  ===  
 //  'Only letters, numbers 1,2,3 dot and comma. Text is trimmed' //?
 function repeat(numberOfTimes) {
-    let toReturn = [];
+    const toReturn = [];
     let forceExit = false;
     function times(funToRepeat) {
         for (let index = 0; index < numberOfTimes && forceExit === false; index++) {
@@ -1798,10 +1831,11 @@ function oneIn(period, callAtTheBeggining = true) {
             countdown--;
         }
         toExecute.reset = (callAtTheBegginingParam = true) => {
-            callAtTheBeggining = callAtTheBegginingParam;
-            countdown = callAtTheBeggining ? 0 : period - 1;
+            countdown = callAtTheBegginingParam ? 0 : period - 1;
         };
-        toExecute.stop = () => countdown = Infinity;
+        toExecute.stop = () => {
+            countdown = Number.POSITIVE_INFINITY;
+        };
         return toExecute;
     }
     return { call };
