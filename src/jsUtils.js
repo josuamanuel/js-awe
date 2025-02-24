@@ -1,6 +1,7 @@
 'use strict'
 import clone from 'just-clone'
 import { JSONPath } from 'jsonpath-plus'
+import { relative } from 'path'
 
 
 const logWithPrefix = (title, displayFunc) => (message) => {
@@ -17,24 +18,31 @@ const logWithPrefix = (title, displayFunc) => (message) => {
   return message
 }
 
-function summarizeError(error) {
+let processCwd
+function transformStackTraceLine(line) {
+  const processCwd = process.cwd();
+  const startParenthesisIndex = line.indexOf('(') + 1;
+  const endParenthesisIndex = line.indexOf(')', startParenthesisIndex);
+  const pathWithPosition = line.substring(startParenthesisIndex, endParenthesisIndex).replace('file://', '');
+  const resultPositionMatch = pathWithPosition.match(/[0-9]+:[0-9]+/);
+  if(resultPositionMatch === null) return line;
+  const position = resultPositionMatch[0]
+  const filePath = pathWithPosition.substring(0,  resultPositionMatch.index - 1)
+  const relativePath = relative(processCwd, filePath)
+
+  return line.substring(0, startParenthesisIndex - 1) + relativePath + ':' + position;
+}
+
+function summarizeError(error, maxStackTraces = 5) {
 
   if(error instanceof Error === false) return 'Not an error object';
 
-  const maxStackTraces = 5;
   const stackTraceLines = error.stack.split('\n');
   const filteredStackTrace = stackTraceLines
     .filter(line => !line.includes('node_modules') && !line.includes('node:internal'))
     .map(line => line.trim())
     .filter(line => line.startsWith('at'))
-    .map(line => {
-      const match = line.match(/at .* \((.*\/)?([^\/]+):(\d+):(\d+)\)/) || line.match(/at (.*\/)?([^\/]+):(\d+):(\d+)/);
-      if (match) {
-        const [, , file, line, column] = match;
-        return `${file}:${line}:${column}`;
-      }
-      return line;
-    });
+    .map(transformStackTraceLine);
 
   const condensedStackTrace = [];
   const totalTraces = filteredStackTrace.length;
@@ -53,6 +61,20 @@ function summarizeError(error) {
 
   return `${ErrorString}\nStack Trace: ${condensedStackTraceString}`;
 }
+// function a(){b()}
+// function b(){c()}
+// function c(){d()}
+// function d(){e()}
+// function e(){f()}
+// function f(){g()}
+// function g(){throw new Error('This is an error')}
+// try{
+//   a()
+// }catch(e)
+// {
+//   console.log(e)
+//   console.log(summarizeError(e))
+// }
 
 class CustomError extends Error {
   constructor(name = 'GENERIC', message = name, data = { status: 500 }) {

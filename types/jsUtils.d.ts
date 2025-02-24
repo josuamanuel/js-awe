@@ -49,9 +49,10 @@ export function queryObjToStr(query: any): string;
 /**
  * Converts an Error object to a brief string with stacktrace.
  * @param {Error} error - The Error instance to summarize.
+ * @param {number} [maxStackTraces] - The maximum number of stack traces to include in the summary.
  * @returns {string} - A brief string summarizing the error.
  */
-export function summarizeError(error:Error): string;
+export function summarizeError(error:Error, maxStackTraces?:number): string;
 
 /**
  * Custom error class that extends the Error class.
