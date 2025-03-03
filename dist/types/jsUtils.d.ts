@@ -808,7 +808,15 @@ interface ToExecute extends RunFunction {
 interface OneInReturn {
   call: (runFunc: RunFunction) => ToExecute;
 }
-export function oneIn(period: number): OneInReturn;
+
+/**
+ * Execute the function one in period times. The default behaviour will be to call inmediately. otherwise you can use callAtTheBeggining=false
+ *
+ * @param period - The number of calls required to run once the target function.
+ * @param callAtTheBeggining - The flag to indicate if the function should be called at the beginning or at the end of the period.
+ * @returns An object with the call function to be called.
+ */
+export function oneIn(period:number, callAtTheBeggining:boolean): OneInReturn;
 
 
 export function loopIndexGenerator(initValue: any, iterations: any): Generator<any, void, unknown>;

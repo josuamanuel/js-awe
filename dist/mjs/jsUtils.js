@@ -13,16 +13,25 @@ const logWithPrefix = (title, displayFunc) => (message) => {
 let processCwd;
 function transformStackTraceLine(line) {
     const processCwd = process.cwd();
-    const startParenthesisIndex = line.indexOf('(') + 1;
-    const endParenthesisIndex = line.indexOf(')', startParenthesisIndex);
-    const pathWithPosition = line.substring(startParenthesisIndex, endParenthesisIndex).replace('file://', '');
-    const resultPositionMatch = pathWithPosition.match(/[0-9]+:[0-9]+/);
+    let starPathPos = line.indexOf('(file://', '');
+    if (starPathPos === -1)
+        starPathPos = line.indexOf('file://', '');
+    if (starPathPos === -1)
+        starPathPos = line.indexOf('(', '');
+    if (starPathPos === -1)
+        return line;
+    const cleanLine = line
+        .replace('(file://', '')
+        .replace('file://', '')
+        .replace('(', '')
+        .replace(')', '');
+    const resultPositionMatch = cleanLine.match(/[0-9]+:[0-9]+/);
     if (resultPositionMatch === null)
         return line;
     const position = resultPositionMatch[0];
-    const filePath = pathWithPosition.substring(0, resultPositionMatch.index - 1);
+    const filePath = cleanLine.substring(starPathPos, resultPositionMatch.index - 1);
     const relativePath = relative(processCwd, filePath);
-    return `${line.substring(0, startParenthesisIndex - 1)}${relativePath}:${position}`;
+    return `${line.substring(0, starPathPos - 1)} ${relativePath}:${position}`;
 }
 function summarizeError(error, maxStackTraces = 5) {
     if (error instanceof Error === false)
@@ -791,11 +800,11 @@ function varSubsDoubleBracket(strToResolveVars, state, mode) {
 //   "response": {
 //     "id": 1231,
 //     "description": "{{description=\"This is a test\"}}",
-//     "car": "{{plate}}",
+//     "slot": "{{slotNumber}}",
 //     "active": "{{active=true}}",
 //     "ratenumber": "{{rate=10}}"
 //   }
-// }`, {plate:{a:3}, active:false}) //?
+// }`, {slotNumber:{a:3}, active:false}) //?
 // varSubsDoubleBracket('https://bank.account?accounts={{accounts}}&c=3', {accounts:['10232-1232','2331-1233']},'url') //?
 // varSubsDoubleBracket('https://bank.account?{{params=a=1&b=2}}&c=3', {params:{a:'10232-1232',b:'2331-1233'}},'url') //?
 // varSubsDoubleBracket('https://bank.account?{{params=a=1&b=2}}&c=3', {},'url') //?
@@ -1676,8 +1685,8 @@ function numberToFixedString(num, intLength, decLength) {
 //   numberToFixedString(12.345, 5, 2) //?
 // )
 // can be called with list of parameters or with array.
-//console.log(replaceAll('I like red cars and red houses', {from:'red',to:'yellow'},{from:'e',to:'E'}))
-//console.log(replaceAll('I like red cars and red houses', [{from:'red',to:'yellow'},{from:'e',to:'E'}]))
+//console.log(replaceAll('I like red flowers and red houses', {from:'red',to:'yellow'},{from:'e',to:'E'}))
+//console.log(replaceAll('I like red flowers and red houses', [{from:'red',to:'yellow'},{from:'e',to:'E'}]))
 function replaceAll(str, ...fromTo) {
     let simpleFrom = fromTo;
     if (fromTo[0][0].from !== undefined)
