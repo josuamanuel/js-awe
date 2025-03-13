@@ -782,6 +782,16 @@ export function repeat(numberOfTimes: any): {
 };
 
 
+interface CallReset {
+  reset: (callAtTheBegginingParam?: boolean) => void;
+  stop: () => void;
+}
+
+type OneInReturnType = {
+  call<T extends (...args: any[]) => any>(runFunc: T): ((...args: Parameters<T>) => ReturnType<T> | undefined) & CallReset;
+};
+
+
 /**
  * Calls a function one in a specified period. It allows to .reset() the counter, .stop() the counter, or to .setCount(newCount) manually
  * @param {number} period - The period in which the function can only be called once.
@@ -798,25 +808,8 @@ export function repeat(numberOfTimes: any): {
  * callEvery1000.setCount(5); // to Call one In 5 times
  * ```
  */
-type RunFunction = (...args: any[]) => any;
+export function oneIn(period: number, callAtTheBeggining?: boolean): OneInReturnType;
 
-interface ToExecute extends RunFunction {
-  reset: (callAtTheBeggining:boolean) => void
-  stop: () => void
-}
-
-interface OneInReturn {
-  call: (runFunc: RunFunction) => ToExecute;
-}
-
-/**
- * Execute the function one in period times. The default behaviour will be to call inmediately. otherwise you can use callAtTheBeggining=false
- *
- * @param period - The number of calls required to run once the target function.
- * @param callAtTheBeggining - The flag to indicate if the function should be called at the beginning or at the end of the period.
- * @returns An object with the call function to be called.
- */
-export function oneIn(period:number, callAtTheBeggining:boolean): OneInReturn;
 
 
 export function loopIndexGenerator(initValue: any, iterations: any): Generator<any, void, unknown>;
