@@ -2117,7 +2117,7 @@ function oneIn(period, callAtTheBeggining = true) {
   return { call }
 }
 
-// let myRunEvery = oneIn(3, false).call((txt1, txt2, txt3)=>{console.log(txt1, txt2, txt3);return 3})
+// const myRunEvery = oneIn(3, false).call((txt1, txt2, txt3)=>{console.log(txt1, txt2, txt3);return 3})
 // myRunEvery('jose','is great', '...') //?
 // myRunEvery('jose','is great', '...') //?
 // myRunEvery('jose','is great', '...') //?
