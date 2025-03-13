@@ -1,0 +1,30 @@
+@startuml
+allowmixing
+diamond root
+object Contracts
+object Accounts
+object ExtractFamily_CreditCards
+object CreditCards
+object ExtractFamily_DebitCards
+object DebitCards
+object ExtractFamily_Loans
+object Loans
+object IDENTITY
+object MyBankGlobalViewContracts
+legend [\n\t[Contracts,\n\t\t[ExtractFamily_CreditCards, CreditCards],\n\t\t[ExtractFamily_DebitCards, DebitCards],\n\t\t[ExtractFamily_Loans, Loans],\n\t\t[IDENTITY]\n\t],\n\t[Accounts],\n\tMyBankGlobalViewContracts\n]
+
+root --> Contracts
+Contracts --> ExtractFamily_CreditCards
+ExtractFamily_CreditCards --> CreditCards
+Contracts --> ExtractFamily_DebitCards
+ExtractFamily_DebitCards --> DebitCards
+Contracts --> ExtractFamily_Loans
+ExtractFamily_Loans --> Loans
+Contracts --> IDENTITY
+root --> Accounts
+Accounts --> MyBankGlobalViewContracts
+CreditCards --> MyBankGlobalViewContracts
+DebitCards --> MyBankGlobalViewContracts
+Loans --> MyBankGlobalViewContracts
+IDENTITY --> MyBankGlobalViewContracts
+@enduml
