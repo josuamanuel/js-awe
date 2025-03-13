@@ -950,25 +950,27 @@ declare function repeat(numberOfTimes: any): {
  * callEvery1000.setCount(5); // to Call one In 5 times
  * ```
  */
-type RunFunction = (...args: any[]) => any;
 
-interface ToExecute extends RunFunction {
-  reset: (callAtTheBeggining:boolean) => void
-  stop: () => void
+
+interface CallReset {
+  reset: (callAtTheBegginingParam?: boolean) => void;
+  stop: () => void;
 }
 
-interface OneInReturn {
-  call: (runFunc: RunFunction) => ToExecute;
-}
+type OneInReturnType = {
+  call<T extends (...args: any[]) => any>(runFunc: T): ((...args: Parameters<T>) => ReturnType<T> | undefined) & CallReset;
+};
+
 
 /**
- * Execute the function one in period times. The default behaviour will be to call inmediately. otherwise you can use callAtTheBeggining=false
+ * Execute the function one in "param period" times. The default behaviour will be to call inmediately. otherwise you can use callAtTheBeggining=false
  *
- * @param period - The number of calls required to run once the target function.
+ * @param period - The number of calls required to run 1 time the target function.
  * @param callAtTheBeggining - The flag to indicate if the function should be called at the beginning or at the end of the period.
- * @returns An object with the call function to be called.
+ * @returns An object with property call to invoke the function 1 in period.
  */
-declare function oneIn(period:number, callAtTheBeggining:boolean): OneInReturn;
+declare function oneIn(period: number, callAtTheBeggining?: boolean): OneInReturnType;
+
 
 
 declare function loopIndexGenerator(initValue: any, iterations: any): Generator<any, void, unknown>;
