@@ -1,10 +1,11 @@
 import { plan } from 'js-awe'
 
 const { build, map, identity } = plan()
+
 const getCustomerBalances = build([
   [fetchBulkCurrentAccounts],
   [fetchAccounts,
-    identity,
+    [identity],
     [filterSavings, pluck('id'), map(fetchSavingBalance)],
     [filterLoans, pluck('id'), map(fetchLoanBalance)],
   ],

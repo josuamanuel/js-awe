@@ -40,6 +40,7 @@ type Plan = {
    * @returns a function that can be included in the pipeline.
    */
   map: (fun: (data: any ) => any, mapThreads?: number) => (data: any) => any[];
+  identity: <T>(param: T) => T;
 };
 
 /**
