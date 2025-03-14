@@ -311,7 +311,13 @@ function plan({numberOfThreads=Infinity, mockupsObj={}} = {numberOfThreads: Infi
     }
   }
 
-  return { build, map }
+  function identity(...args)
+  {
+    if(args.length > 1) throw new Error('identity function only accepts one argument')
+    return args[0]
+  }
+
+  return { build, map, identity }
 
 }
 
