@@ -1,0 +1,37 @@
+@startuml
+allowmixing
+
+object Symbol_start
+object test1
+object fetchBulkCurrentAccounts
+object test2
+object fetchAccounts
+object identity
+object filterSavings
+object pluck_id
+object map_fetchSavingBalance
+object filterLoans
+object pluck_id_2
+object map_fetchLoanBalance
+object format
+object Symbol_end
+
+Symbol_start --> test1
+Symbol_start --> fetchBulkCurrentAccounts
+Symbol_start --> fetchAccounts
+test1 --> test2
+fetchBulkCurrentAccounts --> test2
+fetchAccounts --> identity
+fetchAccounts --> filterSavings
+fetchAccounts --> filterLoans
+filterSavings --> pluck_id
+pluck_id --> map_fetchSavingBalance
+filterLoans --> pluck_id_2
+pluck_id_2 --> map_fetchLoanBalance
+test2 --> format
+identity --> format
+map_fetchSavingBalance --> format
+map_fetchLoanBalance --> format
+format --> Symbol_end
+
+@enduml
