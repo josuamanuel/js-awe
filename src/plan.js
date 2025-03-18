@@ -2,6 +2,7 @@ import { resolve } from 'fluture'
 import {  R, pipe, pipeWhile, runFunctionsSyncOrParallel } from './ramdaExt.js'
 import compare from 'just-compare'
 import { repeat, traverse } from './jsUtils.js'
+import { Compile } from './planExt.js'
 
 
 const convertPathToStackPath = 
@@ -304,11 +305,14 @@ function plan({numberOfThreads=Infinity, mockupsObj={}} = {numberOfThreads: Infi
 
   function map(fun, mapThreads=numberOfThreads) {
 
-    return (data) => {
+    const toReturn = (data) => {
       if(Array.isArray(data)) return runFunctionsSyncOrParallel(mapThreads)(data.map(param => fun.bind(fun, param)))()
       
       return [fun(data)]
     }
+    
+    Object.defineProperty(toReturn, 'name', { value: `map_${fun.name}` });
+    return toReturn 
   }
 
   function identity(...args)
@@ -322,4 +326,4 @@ function plan({numberOfThreads=Infinity, mockupsObj={}} = {numberOfThreads: Infi
 }
 
 
-export { plan }
+export { plan, Compile }

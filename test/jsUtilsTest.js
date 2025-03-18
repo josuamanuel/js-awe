@@ -705,12 +705,30 @@ describe('jsUtils', () => {
     const subject = clone(subjectBase)
     //expected
     const expected = clone(subjectBase)
-    expected.house.room[0].wardrove.jean = 'red'
+    expected.house.room[0].wardrove.jean = {colourName:'red'}
 
     //Act
     const actual = traverse(subject, (obj, path) => {
       if (path.join('.') === '$.house.room.0.wardrove.jean') {
-        return 'red'
+        return  {colourName:'red'}
+      }
+    })
+
+    //Assert
+    assert.deepStrictEqual(actual, expected)
+  })
+
+  it('traverse with reviver changing a basic type for an object. (test no infinite loops are produced)', () => {
+    //Arrange
+    //subject
+    const subject = [{name:'tra'},'test']
+    //expected
+    const expected = [{name:'tra'},{name:'test'}]
+
+    //Act
+    const actual = traverse(subject, (obj, path, parent, key) => {
+      if (typeof obj === 'string' && Array.isArray(parent) === true) {
+        return  {name:obj}
       }
     })
 

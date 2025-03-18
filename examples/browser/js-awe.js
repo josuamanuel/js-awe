@@ -1,6 +1,7 @@
 let myGlobal = typeof globalThis !== undefined ? globalThis : typeof window !== undefined ? window : typeof global !== undefined ? global : typeof self !== undefined ? self : typeof this !== undefined ? this : {}
 let performance = myGlobal.performance
 if(performance === undefined) performance = {}
+import util from 'node:util';
 
 const dict = {
   upperLetters: ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'],
@@ -3109,6 +3110,10 @@ function traverse$1(objIni, reviver, pureFunction = true) {
       const resultReviver = reviver(obj[prop], currentPath, obj, prop);
       if (resultReviver !== undefined && resultReviver !== traverse$1.stop && resultReviver !== traverse$1.skip && resultReviver !== traverse$1.delete) {
         obj[prop] = resultReviver;
+
+        // to avoid infinite loops of reviver. reviver example: changing a string for an object having a string.
+        // (node)=>{if(typeof node === 'string') return {name:node}}
+        isSkipNodeOnce = true;
       }
 
       if (resultReviver === traverse$1.stop) {
@@ -7132,7 +7137,7 @@ function _cloneRegExp(pattern) {
  *      R.type(undefined); //=> "Undefined"
  */
 
-var type$1 =
+var type$2 =
 /*#__PURE__*/
 _curry1(function type(val) {
   return val === null ? 'Null' : val === undefined ? 'Undefined' : Object.prototype.toString.call(val).slice(8, -1);
@@ -7174,7 +7179,7 @@ function _clone(value, refFrom, refTo, deep) {
     return copiedValue;
   };
 
-  switch (type$1(value)) {
+  switch (type$2(value)) {
     case 'Object':
       return copy(Object.create(Object.getPrototypeOf(value)));
 
@@ -7781,9 +7786,9 @@ function _equals(a, b, stackA, stackB) {
     return true;
   }
 
-  var typeA = type$1(a);
+  var typeA = type$2(a);
 
-  if (typeA !== type$1(b)) {
+  if (typeA !== type$2(b)) {
     return false;
   }
 
@@ -16432,7 +16437,7 @@ var index = /*#__PURE__*/Object.freeze({
   traverse: traverse,
   trim: trim,
   tryCatch: tryCatch,
-  type: type$1,
+  type: type$2,
   unapply: unapply,
   unary: unary,
   uncurryN: uncurryN,
@@ -16644,7 +16649,7 @@ var sanctuaryTypeIdentifiers = {exports: {}};
 } (sanctuaryTypeIdentifiers));
 
 var sanctuaryTypeIdentifiersExports = sanctuaryTypeIdentifiers.exports;
-var type = /*@__PURE__*/getDefaultExportFromCjs(sanctuaryTypeIdentifiersExports);
+var type$1 = /*@__PURE__*/getDefaultExportFromCjs(sanctuaryTypeIdentifiersExports);
 
 var FL = {
   alt: 'fantasy-land/alt',
@@ -16981,7 +16986,7 @@ function raise(x){
 }
 
 function showArg$1(x){
-  return show(x) + ' :: ' + type.parse(type(x)).name;
+  return show(x) + ' :: ' + type$1.parse(type$1(x)).name;
 }
 
 function error(message){
@@ -17039,7 +17044,7 @@ function invalidVersion(m, x){
 }
 
 function invalidFuture(desc, m, s){
-  var id = type.parse(type(m));
+  var id = type$1.parse(type$1(m));
   var info = id.name === name ? '\n' + (
     id.namespace !== namespace ? invalidNamespace(m, id.namespace)
   : id.version !== version ? invalidVersion(m, id.version)
@@ -17204,7 +17209,7 @@ function Future$1(computation){
 }
 
 function isFuture(x){
-  return x instanceof Future$1 || type(x) === $$type$1;
+  return x instanceof Future$1 || type$1(x) === $$type$1;
 }
 
 // Compliance with sanctuary-type-identifiers versions 1 and 2.
@@ -18345,7 +18350,7 @@ function map(f){
   };
 }
 
-var Node = createInterpreter(1, 'node', function Node$interpret(rec, rej, res){
+var Node$1 = createInterpreter(1, 'node', function Node$interpret(rec, rej, res){
   function Node$done(err, val){
     cont = err ? function EncaseN3$rej(){
       open = false;
@@ -18371,7 +18376,7 @@ var Node = createInterpreter(1, 'node', function Node$interpret(rec, rej, res){
 });
 
 function node(f){
-  return new Node(application1(node, func, arguments), f);
+  return new Node$1(application1(node, func, arguments), f);
 }
 
 var ParallelApTransformation =
@@ -18545,7 +18550,7 @@ Par.prototype[FL.alt] = function Par$FL$alt(other){
 };
 
 function isParallel(x){
-  return x instanceof ConcurrentFuture || type(x) === $$type;
+  return x instanceof ConcurrentFuture || type$1(x) === $$type;
 }
 
 function promise(m){
@@ -18961,7 +18966,7 @@ const n0IsNotUnfold =
 const n1IsFunction =
   pipe$1(
     prop('1'),
-    type$1,
+    type$2,
     equals('Function')
   );
 
@@ -21240,6 +21245,306 @@ function compareObjects(value1, value2) {
   return true;
 }
 
+const start = Symbol('start');
+const end = Symbol('end');
+
+const type = new EnumMap(['OPEN_ARRAY','CLOSE_ARRAY','NODE','UNSYNC']);
+
+class Node {
+  constructor(node, path, name) {
+    this.node = node;
+    this.path = [...path];
+    this.name = name;
+  }
+
+  [util.inspect.custom]() {
+    return `typeof node: ${typeof this.node}, path: ${this.path.join('.')} name: ${this.name}`
+  }
+
+}
+
+class Nodes {
+  constructor() {
+    this.nodes = [];
+  }
+
+  add(node, path) {
+    const name = this.calculateNodeName(node, path);
+    if(this.findByName(name)) throw new Error(`Node with name ${name} already exists`)
+    const newNode =new Node(node, path, name);
+    this.nodes.push(newNode);
+    return newNode
+  }
+  
+  findByName(name) {
+    return this.nodes.find(node => node.name === name)
+  }
+
+  calculateNodeName(node, path) {
+    let name = '';
+    if (node.name) {
+      name = node.name;
+    }
+
+    if (typeof node === 'symbol') {
+      name = node.toString().replace('(','_').replace(')','');
+    }
+
+    if(this.findByName(name)) return `${name}__${path.join('_')}`
+    
+    return name
+  }
+
+  getNodes() {
+    return this.nodes
+  }
+
+}
+
+class Word {
+  constructor(type, starts, ends, relations) {
+    this.type = type;
+    this.starts = starts;
+    this.ends = ends;
+    this.relations = relations;
+  }
+
+  [util.inspect.custom]() {
+    return JSON.stringify(this);
+  }
+
+  toString() {
+    JSON.stringify(this);
+  }
+
+  setType(type) {
+    this.type = type;
+    return this
+  }
+
+  getRelations() {
+    return this.relations
+  }
+
+  sync(word) {
+    for(const start of this.ends) {
+      for(const end of word.starts) {
+        if(start !== end) this.relations.push([start, end]);
+      }
+    }
+    return new Word(type.NODE, this.starts, word.ends, [...this.relations, ...word.relations, ])
+
+  }
+  static unsync(word1, word2) {
+    return new Word(
+      type.UNSYNC,
+      [...word1.starts, ...word2.starts],
+      [...word1.ends, ...word2.ends],
+      [...word1.relations, ...word2.relations]
+    )
+  }
+}
+
+function planToTranscript(plan) {
+
+  const nodes = new Nodes();
+  const startNode = nodes.add(start, []);
+  const transcript = [];//[new Word(type.NODE, [startNode], [startNode], [])]
+
+  processPlan(plan, []);
+
+  function processPlan(plan, path) {
+    path.length;
+    for (let i = 0, j = 0; i < plan.length; i++) {
+
+      if (Array.isArray(plan[i])) {
+
+        transcript.push(new Word(type.OPEN_ARRAY));
+        path.push(i);
+        processPlan(plan[i], path);
+        path.pop();
+        transcript.push(new Word(type.CLOSE_ARRAY));
+      } else {
+        // path[pathLevel] = i
+        path.push(i);
+        nodes.add(plan[i], path);
+        path.pop();
+        const currentNode = nodes.getNodes().at(-1);
+        transcript.push(new Word(type.NODE, [currentNode], [currentNode], []));
+      }
+    }
+  }
+
+  const endNode = nodes.add(end, []);
+
+  const transcriptWithStartAndEnd = [
+    new Word(type.NODE, [startNode], [startNode], []),
+    ...transcript,
+    new Word(type.NODE, [endNode], [endNode], [])
+  ];
+  
+  return {transcript: transcriptWithStartAndEnd, nodes}
+}
+
+function compilePrecedenceFirst(transcript) {
+  
+  let previousTranscriptLength = transcript.length;
+
+  while(transcript.length > 1) {
+    // console.log('Before transccompilePrecedenceFirst: ', transcript.length)
+    for(let i=0; transcript[i+1] !== undefined; i++) { // i < transcript.length - 1
+      if(
+          transcript[i].type === type.NODE &&
+          transcript[i+1].type === type.NODE
+      )
+      {
+        transcript.splice(i, 2, transcript[i].sync(transcript[i+1]));
+      }
+
+      if(
+        transcript[i].type === type.UNSYNC &&
+        transcript[i+1].type === type.UNSYNC
+      )
+      {
+        transcript.splice(i, 2, Word.unsync(transcript[i], transcript[i+1]));
+      }
+
+      if(
+        transcript[i]?.type === type.OPEN_ARRAY &&
+        (transcript[i+1]?.type === type.NODE || transcript[i+1]?.type === type.UNSYNC) &&
+        transcript[i+2]?.type === type.CLOSE_ARRAY
+      )
+      {
+        transcript.splice(i, 3, transcript[i+1].setType(type.UNSYNC));
+      }
+
+      if(
+        transcript[i]?.type === type.OPEN_ARRAY &&
+        ( (transcript[i+1]?.type === type.NODE && transcript[i+2]?.type === type.UNSYNC) ||
+          (transcript[i+1]?.type === type.UNSYNC && transcript[i+2]?.type === type.NODE) ) &&
+        transcript[i+3]?.type === type.CLOSE_ARRAY
+      )
+      {
+        transcript.splice(i, 4, transcript[i+1].sync(transcript[i+2]).setType(type.UNSYNC));
+      }
+
+      if(
+        transcript[i]?.type === type.OPEN_ARRAY &&
+        transcript[i+1]?.type === type.UNSYNC &&
+        transcript[i+2]?.type === type.NODE
+      )
+      {
+        transcript.splice(i+1, 2, transcript[i+1].sync(transcript[i+2]));
+      }
+
+      if(
+        transcript[i]?.type === type.NODE &&
+        transcript[i+1]?.type === type.UNSYNC &&
+        transcript[i+2]?.type === type.NODE
+      )
+      {
+        transcript.splice(i, 3, transcript[i].sync(transcript[i+1]).sync(transcript[i+2]));
+      }
+
+      if(
+        transcript[i]?.type === type.NODE &&
+        transcript[i+1]?.type === type.UNSYNC &&
+        transcript[i+2]?.type === type.CLOSE_ARRAY
+      )
+      {
+        transcript.splice(i, 2, transcript[i].sync(transcript[i+1]));
+      }
+
+    }
+
+    // console.log('After transccompilePrecedenceFirst: ', transcript.length)
+    // console.log('transcript: ', transcript)
+    if(transcript.length === previousTranscriptLength) break
+    previousTranscriptLength = transcript.length;
+  }
+
+}
+
+
+
+function compilePrecedenceSecond(transcript) {
+
+  let previousTranscriptLength = transcript.length;
+  while(transcript.length > 1) {
+    // console.log('Before transccompilePrecedenceSecond: ', transcript.length)
+    for(let i=0; transcript[i+1] !== undefined; i++) { // i < transcript.length - 1
+      if(
+        (
+          transcript[i].type === type.NODE &&
+          transcript[i+1].type === type.UNSYNC
+        ) || (
+          transcript[i].type === type.UNSYNC &&
+          transcript[i+1].type === type.NODE
+        )
+      )
+      {
+        transcript.splice(i, 2, transcript[i].sync(transcript[i+1]).setType(type.NODE));
+        // console.log('After transccompilePrecedenceSecond: ', transcript.length)
+        // console.log('transcript: ', transcript)
+        return
+      }
+    }
+
+    // console.log('After transccompilePrecedenceSecond: ', transcript.length)
+    // console.log('transcript: ', transcript)
+    if(transcript.length === previousTranscriptLength) break
+    previousTranscriptLength = transcript.length;
+  }
+}
+
+class Compile {
+  constructor(plan) {
+    const {transcript, nodes} = planToTranscript(plan);
+    this.nodes = nodes.getNodes();
+    while(transcript.length > 1) {
+      compilePrecedenceFirst(transcript);
+      compilePrecedenceSecond(transcript);
+    }
+    this.relations = transcript[0].getRelations();
+  }
+
+  toPlantUML() {
+    let plantUML = '@startuml\n';
+    plantUML += 'allowmixing\n';
+    plantUML += '\n';
+
+    for(const node of this.nodes) {
+      plantUML += `${typeof node === 'symbol'? 'diamond':'object'} ${node.name}\n`;
+    }
+    plantUML += '\n';
+
+    for(const [from, to] of this.relations) {
+      plantUML += `${from.name} --> ${to.name}\n`;    
+    }
+    plantUML += '\n';
+
+    plantUML += '@enduml\n';
+    return plantUML
+  }
+}
+// const complexPlanStrings = [
+//   [[['test1'],[['fetchBulkCurrentAccounts']]], 'test2'],
+//   ['fetchAccounts',
+//     ['identity'],
+//     ['filterSavings', 'pluck_id', 'map_fetchSavingBalance'],
+//     ['filterLoans', 'pluck_id_2', 'map_fetchLoanBalance']
+//   ],
+//   'format',
+// ];
+
+// const complexPlan = traverse(complexPlanStrings, (node, currentPath, parent) => {
+//   if (typeof node === 'string') return {name:node}
+//   //return node;
+// });
+// console.log(
+//   new Compile(complexPlan).toPlantUML()
+// )
+
 const convertPathToStackPath = 
   path => 
     path.map(
@@ -21517,11 +21822,14 @@ function plan({numberOfThreads=Infinity, mockupsObj={}} = {numberOfThreads: Infi
 
   function map(fun, mapThreads=numberOfThreads) {
 
-    return (data) => {
+    const toReturn = (data) => {
       if(Array.isArray(data)) return runFunctionsSyncOrParallel(mapThreads)(data.map(param => fun.bind(fun, param)))()
       
       return [fun(data)]
-    }
+    };
+    
+    Object.defineProperty(toReturn, 'name', { value: `map_${fun.name}` });
+    return toReturn 
   }
 
   function identity(...args)
@@ -21732,4 +22040,4 @@ function sanitize(obj, sanitizers = ['ibmApis'], noSanitzedUptoLogLevel) {
 
 }
 
-export { Chrono, CustomError, DAYS, Enum, EnumMap, F, Index, MONTHS, index as R, RE, RLog, Table, Text, Timeline, YYYY_MM_DD_hh_mm_ss_ToUtcDate, addDays, anonymize, arrayOfObjectsToObject, arraySorter, arrayToObject, bearerSanitizer, between, cleanString, cloneCopy, colorByStatus, colorMessage, colorMessageByStatus, colors, consoleTable, consoleTableExtended, copyPropsWithValue, copyPropsWithValueUsingRules, createCustomErrorClass, dateFormatter, dateToObj, dayOfWeek, deepFreeze, defaultValue, diffInDaysYYYY_MM_DD, exclude, fetchImproved, ffletchMaker, fillWith, filterFlatMap, filterMap, findDeepKey, findIndexInSortedArray, findIndexOrNextInSortedArray, findIndexOrPreviousInSortedArray, findSolution, firstCapital, fletch, formatDate, getAt, getSameDateOrPreviousFridayForWeekends, groupByWithCalc, indexOfNthMatch, innerRightJoinWith, isBasicType, isDate, isDateMidnight, isEmpty$1 as isEmpty, isPromise, isStringADate, lengthSanitizer, log, logWithPrefix, loopIndexGenerator, mapWithNext, mapWithPrevious, matchByPropId, memoize, mergeArrayOfObjectsRenamingProps, nextDayOfWeek, notTo, numberToFixedString, oneIn, parallel, partialAtPos, pickPaths, pipe, pipeWhile, pipeWithChain, plan, previousDayOfWeek, processExit, project$1 as project, promiseAll, promiseFunToFutureFun, pushAt, pushUniqueKey, pushUniqueKeyOrChange, queryObjToStr, removeDuplicates, repeat$1 as repeat, replaceAll, retryWithSleep, runFunctionsSyncOrParallel, runFutureFunctionsInParallel, sanitize, setAt, setDateToMidnight, sleep, sleepWithFunction, sleepWithValue, something, sorterByFields, sorterByPaths, splitCond, subtractDays, summarizeError, transition, traverse$1 as traverse, traverseVertically, uncurry, unionWithHashKeys, updateWithHashKeys, urlCompose, urlDecompose, varSubsDoubleBracket, wildcardToRegExp };
+export { Chrono, Compile, CustomError, DAYS, Enum, EnumMap, F, Index, MONTHS, index as R, RE, RLog, Table, Text, Timeline, YYYY_MM_DD_hh_mm_ss_ToUtcDate, addDays, anonymize, arrayOfObjectsToObject, arraySorter, arrayToObject, bearerSanitizer, between, cleanString, cloneCopy, colorByStatus, colorMessage, colorMessageByStatus, colors, consoleTable, consoleTableExtended, copyPropsWithValue, copyPropsWithValueUsingRules, createCustomErrorClass, dateFormatter, dateToObj, dayOfWeek, deepFreeze, defaultValue, diffInDaysYYYY_MM_DD, exclude, fetchImproved, ffletchMaker, fillWith, filterFlatMap, filterMap, findDeepKey, findIndexInSortedArray, findIndexOrNextInSortedArray, findIndexOrPreviousInSortedArray, findSolution, firstCapital, fletch, formatDate, getAt, getSameDateOrPreviousFridayForWeekends, groupByWithCalc, indexOfNthMatch, innerRightJoinWith, isBasicType, isDate, isDateMidnight, isEmpty$1 as isEmpty, isPromise, isStringADate, lengthSanitizer, log, logWithPrefix, loopIndexGenerator, mapWithNext, mapWithPrevious, matchByPropId, memoize, mergeArrayOfObjectsRenamingProps, nextDayOfWeek, notTo, numberToFixedString, oneIn, parallel, partialAtPos, pickPaths, pipe, pipeWhile, pipeWithChain, plan, previousDayOfWeek, processExit, project$1 as project, promiseAll, promiseFunToFutureFun, pushAt, pushUniqueKey, pushUniqueKeyOrChange, queryObjToStr, removeDuplicates, repeat$1 as repeat, replaceAll, retryWithSleep, runFunctionsSyncOrParallel, runFutureFunctionsInParallel, sanitize, setAt, setDateToMidnight, sleep, sleepWithFunction, sleepWithValue, something, sorterByFields, sorterByPaths, splitCond, subtractDays, summarizeError, transition, traverse$1 as traverse, traverseVertically, uncurry, unionWithHashKeys, updateWithHashKeys, urlCompose, urlDecompose, varSubsDoubleBracket, wildcardToRegExp };

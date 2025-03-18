@@ -2,7 +2,8 @@ import { plan } from 'js-awe'
 
 const { build, map, identity } = plan()
 
-const getCustomerBalances = build([
+
+const complexPlan = [
   [fetchBulkCurrentAccounts],
   [fetchAccounts,
     [identity],
@@ -10,7 +11,9 @@ const getCustomerBalances = build([
     [filterLoans, pluck('id'), map(fetchLoanBalance)],
   ],
   format,
-])
+]
+
+const getCustomerBalances = build(complexPlan)
 
 console.log('result: ', await getCustomerBalances('0396d9b0'))
 
@@ -77,3 +80,5 @@ function fetchLoanBalance(accountId) {
       balance: 24
     })
 }
+
+export { complexPlan }

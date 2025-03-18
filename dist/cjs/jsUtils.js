@@ -517,6 +517,9 @@ function traverse(objIni, reviver, pureFunction = true) {
             const resultReviver = reviver(obj[prop], currentPath, obj, prop);
             if (resultReviver !== undefined && resultReviver !== traverse.stop && resultReviver !== traverse.skip && resultReviver !== traverse.delete) {
                 obj[prop] = resultReviver;
+                // to avoid infinite loops of reviver. reviver example: changing a string for an object having a string.
+                // (node)=>{if(typeof node === 'string') return {name:node}}
+                isSkipNodeOnce = true;
             }
             if (resultReviver === traverse.stop) {
                 exitVar = true;

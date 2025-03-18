@@ -21517,11 +21517,14 @@ function plan({numberOfThreads=Infinity, mockupsObj={}} = {numberOfThreads: Infi
 
   function map(fun, mapThreads=numberOfThreads) {
 
-    return (data) => {
+    const toReturn = (data) => {
       if(Array.isArray(data)) return runFunctionsSyncOrParallel(mapThreads)(data.map(param => fun.bind(fun, param)))()
       
       return [fun(data)]
-    }
+    };
+    
+    Object.defineProperty(toReturn, 'name', { value: `map_${fun.name}` });
+    return toReturn 
   }
 
   function identity(...args)

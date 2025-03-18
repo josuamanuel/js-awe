@@ -3,11 +3,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.plan = void 0;
+exports.Compile = exports.plan = void 0;
 const fluture_1 = require("fluture");
 const ramdaExt_js_1 = require("./ramdaExt.js");
 const just_compare_1 = __importDefault(require("just-compare"));
 const jsUtils_js_1 = require("./jsUtils.js");
+const planExt_js_1 = require("./planExt.js");
+Object.defineProperty(exports, "Compile", { enumerable: true, get: function () { return planExt_js_1.Compile; } });
 const convertPathToStackPath = path => path.map((el, index) => {
     if (index === 0)
         return 0;
@@ -181,11 +183,13 @@ function plan({ numberOfThreads = Infinity, mockupsObj = {} } = { numberOfThread
         ({ numberOfThreads, mockupsObj } = options);
     }
     function map(fun, mapThreads = numberOfThreads) {
-        return (data) => {
+        const toReturn = (data) => {
             if (Array.isArray(data))
                 return (0, ramdaExt_js_1.runFunctionsSyncOrParallel)(mapThreads)(data.map(param => fun.bind(fun, param)))();
             return [fun(data)];
         };
+        Object.defineProperty(toReturn, 'name', { value: `map_${fun.name}` });
+        return toReturn;
     }
     function identity(...args) {
         if (args.length > 1)
