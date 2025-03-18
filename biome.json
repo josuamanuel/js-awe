@@ -5,5 +5,12 @@
         "noExplicitAny": "off"
       }
     }
+  },
+  "files": {
+    "ignore": [
+      "**/Untitled*"
+    ]
   }
 }
+
+
