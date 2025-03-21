@@ -1558,13 +1558,11 @@ function sleep(ms) {
 }
 exports.sleep = sleep;
 function sleepWithValue(ms, value) {
-    const clonedValue = (0, just_clone_1.default)(value);
-    return new Promise(resolve => setTimeout(() => resolve(clonedValue), ms));
+    return new Promise(resolve => setTimeout(() => resolve(value), ms));
 }
 exports.sleepWithValue = sleepWithValue;
 function sleepWithFunction(ms, func, ...params) {
-    const clonedParams = (0, just_clone_1.default)(params);
-    return new Promise(resolve => setTimeout(() => resolve(func(...clonedParams)), ms));
+    return new Promise(resolve => setTimeout(() => resolve(func(...params)), ms));
 }
 exports.sleepWithFunction = sleepWithFunction;
 function retryWithSleep(times, updateSleepTimeFun, funToRun, funToRunParams, shouldStopRetrying, logString) {

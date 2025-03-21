@@ -1474,12 +1474,10 @@ function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 function sleepWithValue(ms, value) {
-    const clonedValue = clone(value);
-    return new Promise(resolve => setTimeout(() => resolve(clonedValue), ms));
+    return new Promise(resolve => setTimeout(() => resolve(value), ms));
 }
 function sleepWithFunction(ms, func, ...params) {
-    const clonedParams = clone(params);
-    return new Promise(resolve => setTimeout(() => resolve(func(...clonedParams)), ms));
+    return new Promise(resolve => setTimeout(() => resolve(func(...params)), ms));
 }
 async function retryWithSleep(times, updateSleepTimeFun, funToRun, funToRunParams, shouldStopRetrying, logString) {
     let result;
