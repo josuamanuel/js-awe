@@ -164,18 +164,18 @@ declare function ffletchMaker(fetchsDef: any, delay: any): (input: any) => F.Fut
 
 /**
  * Logs a message with a prefix.
- * @param {any} title - The prefix for the log message.
- * @param {any} displayFunc - The function to display the log message.
- * @returns {Function} - The log function.
+ * @param {string} title - The prefix for the log message.
+ * @param {(message: T) => string} displayFunc - The function to display the log message.
+ * @returns {(message: T) => string} - The log function.
  */
-declare function logWithPrefix(title: any, displayFunc: any): (message: any) => any;
+declare function logWithPrefix<T>(title: string, displayFunc: (message: T) => string): (message: T) => string;
 
 /**
  * Capitalizes the first letter of a string.
- * @param {any} str - The string to capitalize.
- * @returns {any} - The capitalized string.
+ * @param {string} str - The string to capitalize.
+ * @returns {string} - The capitalized string.
  */
-declare function firstCapital(str: any): any;
+declare function firstCapital(str: string): string;
 
 /**
  * String template functionality. Given a string with "text {{var1}} text2 {{var2}}"
@@ -186,19 +186,19 @@ declare function firstCapital(str: any): any;
  * For mode=url, a state object is converted into query field=value separated by '&'.
  * If mode is different from 'url', the state is stringified.
  * @param {string} strToResolveVars - The string with variables to be substituted. The string can represent a JSON or URL.
- * @param {any} state - The state with the values to substitute the template variables.
+ * @param {Record<string, string>} state - The state with the values to substitute the template variables.
  * @param {string} [mode] - The mode for converting the state. 'url' for converting state arrays into comma-separated field=value1,value2
  * and objects into field=value & field2=value2. If mode is not specified, the state is stringified.
  * @returns {string} - The string after substituting the template variables for their corresponding values from the state object.
  */
-declare function varSubsDoubleBracket(strToResolveVars: string, state: any, mode?: 'url'): string;
+declare function varSubsDoubleBracket(strToResolveVars: string, state: Record<string, string>, mode?: 'url'): string;
 
 /**
  * Converts a query object to a string representation.
- * @param {any} query - The query object to convert.
+ * @param {Record<string, string>} query - The query object to convert.
  * @returns {string} - The string representation of the query object.
  */
-declare function queryObjToStr(query: any): string;
+declare function queryObjToStr(query: Record<string, string>): string;
 
 /**
  * Converts an Error object to a brief string with stacktrace.
@@ -206,7 +206,7 @@ declare function queryObjToStr(query: any): string;
  * @param {number} [maxStackTraces] - The maximum number of stack traces to include in the summary.
  * @returns {string} - A brief string summarizing the error.
  */
-declare function summarizeError(error:Error, maxStackTraces?:number): string;
+declare function summarizeError(error: Error, maxStackTraces?: number): string;
 
 /**
  * Custom error class that extends the Error class.
@@ -222,35 +222,35 @@ declare class CustomError extends Error {
    */
   constructor(name?: string, message?: string, data?: { status: number });
   data: { status: number };
-  summarizeError(error:CustomError): string;
+  summarizeError(error: CustomError): string;
 }
 
 /**
  * Creates a custom error class with the given error name.
  * @param {string} errorName - The name of the custom error class.
- * @returns {object} - The custom error class.
+ * @returns {typeof CustomError} - The custom error class.
  */
 declare function createCustomErrorClass(errorName: string): {
   new (name?: string, message?: string, data?: { status: number }): {
     name: string;
     data: { status: number };
-    map(func: Function): any;
-    chain(func: Function): any;
+    map(func: (value: any) => any): any;
+    chain(func: (value: any) => any): any;
     message: string;
     stack?: string;
   };
   of: typeof CustomError;
-  captureStackTrace(targetObject: object, constructorOpt?: Function): void;
+  captureStackTrace(targetObject: object, constructorOpt?: (...args: any[]) => any): void;
   prepareStackTrace?: (err: Error, stackTraces: NodeJS.CallSite[]) => any;
   stackTraceLimit: number;
 };
 
 /**
  * Checks if a type is a basic type primitive: string, number, boolean, symbol, bigint.
- * @param {any} type - The type to check.
+ * @param {unknown} variableToCheck - The variable to check.
  * @returns {boolean} - true if the type is a basic type primitive, false otherwise.
  */
-declare function isBasicType(type: any): boolean;
+declare function isBasicType(variableToCheck: unknown): boolean;
 
 /**
  * Composes a URL from the gateway URL, service name, and service path.
@@ -259,20 +259,20 @@ declare function isBasicType(type: any): boolean;
  * @param {string} servicePath - The service path.
  * @returns {object} - The composed URL object.
  */
-declare function urlCompose(gatewayUrl: any, serviceName: any, servicePath: any): {
-  gatewayUrl: any;
-  serviceName: any;
-  servicePath: any;
-  url: any;
+declare function urlCompose(gatewayUrl: string, serviceName: string, servicePath: string): {
+  gatewayUrl: string;
+  serviceName: string;
+  servicePath: string;
+  url: string;
 };
 
 /**
  * Decomposes a URL into the gateway URL, service name, and service path.
  * @param {string} url - The URL to decompose.
- * @param {string} listOfServiceNames - The list of service names.
- * @returns {object} - The decomposed URL object.
+ * @param {string[]} listOfServiceNames - The list of service names.
+ * @returns {Array<{ gatewayUrl: string, serviceName: string, servicePath: string }>} - The decomposed URL object.
  */
-declare function urlDecompose(url: any, listOfServiceNames: any): any;
+declare function urlDecompose(url: string, listOfServiceNames: string[]): Array<{ gatewayUrl: string, serviceName: string, servicePath: string }>;
 
 /**
  * Returns the index of the nth match of a substring toMatch in the stringToInspect.
@@ -282,97 +282,64 @@ declare function urlDecompose(url: any, listOfServiceNames: any): any;
  * @param {number} nth - The nth number match to find.
  * @returns {number} - The index of the nth match.
  */
-declare function indexOfNthMatch(string: any, toMatch: any, nth: any): any;
+declare function indexOfNthMatch(stringToInspect: string, toMatch: string, nth: number): number;
 
-/**
- * Namespace for color constants.
- * @namespace colors
- */
-declare namespace colors {
-  const red: string;
-  const green: string;
-  const yellow: string;
-  const cyan: string;
-  const blue: string;
-  const reset: string;
-  const reverse: string;
-  const fgBlack: string;
-  const fgRed: string;
-  const fgGreen: string;
-  const fgYellow: string;
-  const fgBlue: string;
-  const fgMagenta: string;
-  const fgCyan: string;
-  const fgWhite: string;
-  const bgBlack: string;
-  const bgRed: string;
-  const bgGreen: string;
-  const bgYellow: string;
-  const bgBlue: string;
-  const bgMagenta: string;
-  const bgCyan: string;
-  const bgWhite: string;
-  const bright: string;
-  const dim: string;
-  const underscore: string;
-  const blink: string;
-  const hidden: string;
-}
+
 
 /**
  * Colors a message with the specified color.
- * @param {any} message - The message to color.
- * @param {any} color - The color to apply.
+ * @param {string} message - The message to color.
+ * @param {string} color - The color to apply.
  * @returns {string} - The colored message.
  */
-declare function colorMessage(message: any, color: any): string;
+declare function colorMessage(message: string, color: string): string;
 
 /**
  * Colors a message based on the status.
- * @param {any} message - The message to color.
- * @param {any} status - The status to determine the color.
+ * @param {string} message - The message to color.
+ * @param {number} status - The status to determine the color.
  * @returns {string} - The colored message.
  */
-declare function colorMessageByStatus(message: any, status: any): string;
+declare function colorMessageByStatus(message: string, status: number): string;
 
 /**
  * Gets the color based on the status.
- * @param {any} status - The status to determine the color.
+ * @param {number} status - The status to determine the color.
  * @returns {string} - The color.
  */
-declare function colorByStatus(status: any): string;
+declare function colorByStatus(status: number): string;
 
 /**
  * Finds the deep key in an object.
- * @param {any} objIni - The initial object.
- * @param {any} keyToFind - The key to find.
- * @returns {any[]} - The array of found keys.
+ * @param {object} objIni - The initial object.
+ * @param {string} keyToFind - The key to find.
+ * @returns {Array<[string[], any]>} - The array of found keys and their values.
  */
-declare function findDeepKey(objIni: any, keyToFind: any): any[];
+declare function findDeepKey(objIni: object, keyToFind: string): Array<[string[], any]>;
 
 /**
  * Freezes an object deeply.
- * @param {any} o - The object to freeze.
- * @returns {any} - The frozen object.
+ * @param {object} o - The object to freeze.
+ * @returns {object} - The frozen object.
  */
-declare function deepFreeze(o: any): any;
+declare function deepFreeze<T>(o: T): T;
 
 /**
  * Gets the value at the specified path in an object.
- * @param {any} obj - The object to get the value from.
- * @param {any} valuePath - The path to the value.
+ * @param {object} obj - The object to get the value from.
+ * @param {string | string[]} valuePath - The path to the value.
  * @returns {any} - The value at the specified path.
  */
-declare function getAt(obj: any, valuePath: any): any;
+declare function getAt(obj: object, valuePath: string | string[]): any;
 
 /**
  * Sets the value at the specified path in an object.
- * @param {any} obj - The object to set the value in.
- * @param {any} valuePath - The path to the value.
+ * @param {object} obj - The object to set the value in.
+ * @param {string | string[]} valuePath - The path to the value.
  * @param {any} value - The value to set.
  * @returns {string} - The result of setting the value.
  */
-declare function setAt(obj: any, valuePath: any, value: any): string;
+declare function setAt(obj: object, valuePath: string | string[], value: any): string;
 
 /**
  * Creates a sorter function to use as a parameter in array.prototype.sort(sorter).
@@ -381,66 +348,66 @@ declare function setAt(obj: any, valuePath: any, value: any): string;
  * @param {boolean} [isAsc=true] - Optional. Default: true. true: to order ascending. false: to order descending.
  * @returns {Function} - A sorter function to include in array.prototype.sort(sorter).
  */
-declare function sorterByPaths(paths: string[]|string, isAsc?: boolean): (objA: unknown, objB: unknown) => number;
+declare function sorterByPaths(paths: string | string[], isAsc?: boolean): (objA: object, objB: object) => number;
 
 /**
  * Creates a sorter function to use as a parameter in array.prototype.sort(sorter).
  * It can order by several fields and specifying an order by each field.
  * @param {string | string[]} paths - List of paths to sort by. One path for each field to order by. Route path is of the shape 'person.details.age'. If it is only one field, it can be a string.
- * @param {boolean | array} [isAsc=true] - Optional. Default: true. true: to order ascending. false: to order descending. You can specify an array [true, false] to order by each field.  
+ * @param {boolean | boolean[]} [isAsc=true] - Optional. Default: true. true: to order ascending. false: to order descending. You can specify an array [true, false] to order by each field.  
  * @returns {Function} - A sorter function to include in array.prototype.sort(sorter).
  */
-declare function sorterByFields(paths: string[]|string, isAsc?: boolean | boolean[]): (objA: unknown, objB: unknown) => number;
-
+declare function sorterByFields(paths: string | string[], isAsc?: boolean | boolean[]): (objA: object, objB: object) => number;
 
 /**
  * Finds the index of a value in a sorted array.
  * If value is not found, it returns -1
- * @param arr - The sorted array to search in.
- * @param val - The value to find in the array.
- * @returns The index of the value in the array, or -1 if the value is not found.
+ * @param {Array<string | number | Date>} arr - The sorted array to search in.
+ * @param {string | number | Date} val - The value to find in the array.
+ * @returns {number} - The index of the value in the array, or -1 if the value is not found.
  */
-declare function findIndexInSortedArray(arr: string[]|number[]|Date[], val: string|number|Date): number;
+declare function findIndexInSortedArray(arr: Array<string | number | Date>, val: string | number | Date): number;
 
 /**
  * Finds the index of the specified value in a sorted array or the index of the previous value if the specified value is not found.
  * If the value to search for is less than the first value in the array, it returns -1.
- * @param arr - The sorted array to search in.
- * @param val - The value to search for.
- * @returns The index of the specified value in the array, or the index of the previous value if the specified value is not found.
+ * @param {Array<string | number | Date>} arr - The sorted array to search in.
+ * @param {string | number | Date} val - The value to search for.
+ * @returns {number} - The index of the specified value in the array, or the index of the previous value if the specified value is not found.
  */
-declare function findIndexOrPreviousInSortedArray(arr: string[]|number[]|Date[], val: string|number|Date): number;
+declare function findIndexOrPreviousInSortedArray(arr: Array<string | number | Date>, val: string | number | Date): number;
 
 /**
  * Finds the index of the specified value in the sorted array or the next available index if the value is not found.
  * If the value to search for is greater than the last value in the array, it returns the length of the array.
- * @param arr - The sorted array to search in.
- * @param val - The value to search for in the array.
- * @returns The index of the value in the array, or the next available index if the value is not found.
+ * @param {Array<string | number | Date>} arr - The sorted array to search in.
+ * @param {string | number | Date} val - The value to search for in the array.
+ * @returns {number} - The index of the value in the array, or the next available index if the value is not found.
  */
-declare function findIndexOrNextInSortedArray(arr: string[]|number[]|Date[], val: string|number|Date): number;
+declare function findIndexOrNextInSortedArray(arr: Array<string | number | Date>, val: string | number | Date): number;
 
 /**
  * Returns the value if it is not undefined, null or NaN. Otherwise, it returns the default value.
- * @param value   The value to check.
- * @param defaultValue  The default value to return if the value is undefined, null or NaN.
+ * @param {any} value - The value to check.
+ * @param {any} defaultValue - The default value to return if the value is undefined, null or NaN.
+ * @returns {any} - The value or the default value.
  */
-declare function defaultValue(value: any, defaultValue: any): any;
+declare function defaultValue<T>(value: T | undefined | null | number, defaultValue: T): T;
 
 /**
  * Filters and maps an array.
- * @param {any} mapWithUndefinedFilterFun - The array to filter and map.
- * @param {any} data - The data to filter and map.
+ * @param {(value: any, index: number, array: any[]) => any} mapWithUndefinedFilterFun - The function to map and filter the array.
+ * @param {any[]} data - The data to filter and map.
  * @returns {any[]} - The filtered and mapped array.
  */
-declare function filterFlatMap(mapWithUndefinedFilterFun: any, data: any): any[];
+declare function filterFlatMap(mapWithUndefinedFilterFun: (value: any, index: number, array: any[]) => any, data: any[]): any[];
 
 /**
  * Sorts an array in ascending or descending order.
  * @param {boolean} [isAsc=true] - Optional. Default: true. true: to order ascending. false: to order descending.
- * @returns {Function} - A sorter function to use with array.prototype.sort(sorter).
+ * @returns {(a: any, b: any) => number} - A sorter function to use with array.prototype.sort(sorter).
  */
-declare function arraySorter(isAsc?: boolean): (a: any, b: any) => 1 | -1 | 0;
+declare function arraySorter(isAsc?: boolean): (a: any, b: any) => number;
 
 /**
  * Checks if an object is a Promise.
@@ -452,17 +419,17 @@ declare function isPromise(obj: any): boolean;
 /**
  * Sleeps for the specified number of milliseconds.
  * @param {number} ms - The number of milliseconds to sleep.
- * @returns {Promise<any>} - A Promise that resolves after the specified number of milliseconds.
+ * @returns {Promise<void>} - A Promise that resolves after the specified number of milliseconds.
  */
-declare function sleep(ms: number): Promise<any>;
+declare function sleep(ms: number): Promise<void>;
 
 /**
  * Sleeps for the specified number of milliseconds and resolves with the specified value.
  * @param {number} ms - The number of milliseconds to sleep.
- * @param {any} value - The value to resolve with.
- * @returns {Promise<any>} - A Promise that resolves after the specified number of milliseconds with the specified value.
+ * @param {T} value - The value to resolve with.
+ * @returns {Promise<T>} - A Promise that resolves after the specified number of milliseconds with the specified value.
  */
-declare function sleepWithValue(ms: number, value: any): Promise<any>;
+declare function sleepWithValue<T>(ms: number, value: T): Promise<T>;
 
 /**
  * Sleeps for the specified number of milliseconds and executes the specified function with the specified parameters.
@@ -471,82 +438,63 @@ declare function sleepWithValue(ms: number, value: any): Promise<any>;
  * @param {...any} params - The parameters to pass to the function.
  * @returns {Promise<any>} - A Promise that resolves after the specified number of milliseconds with the result of the function.
  */
-declare function sleepWithFunction(ms: number, func: Function, ...params: any[]): Promise<any>;
+declare function sleepWithFunction(ms: number, func: (...args: any[]) => any, ...params: any[]): Promise<any>;
 
 /**
  * Negates a function.
  * @param {Function} funct - The function to negate.
  * @returns {Function} - The negated function.
  */
-declare function notTo(funct: Function): (...params: any[]) => boolean;
+declare function notTo(funct: (...params: any[]) => boolean): (...params: any[]) => boolean;
 
 /**
  * Converts an array to an object using the specified default value function.
- * @param {any} arr - The array to convert.
- * @param {Function} defaultValueFunction - The function to generate the default value.
- * @returns {any} - The converted object.
+ * @param {any[]} arr - The array to convert.
+ * @param {(current: any, index: number) => any} defaultValueFunction - The function to generate the default value.
+ * @returns {object} - The converted object.
  */
-declare function arrayToObject(arr: any, defaultValueFunction: Function): any;
+declare function arrayToObject(arr: any[], defaultValueFunction: (current: any, index: number) => any): object;
 
 /**
  * Converts an array of objects to an object.
- * @param {any} iterable - The array of objects to convert.
- * @returns {any} - The converted object.
+ * @param {any[]} iterable - The array of objects to convert.
+ * @returns {object} - The converted object.
  */
-declare function arrayOfObjectsToObject(iterable: any): any;
+declare function arrayOfObjectsToObject(iterable: any[]): object;
 
 /**
  * Removes duplicates from an array.
- * @param {any} arr - The array to remove duplicates from.
+ * @param {any[]} arr - The array to remove duplicates from.
  * @returns {any[]} - The array without duplicates.
  */
-declare function removeDuplicates(arr: any): any[];
+declare function removeDuplicates(arr: any[]): any[];
 
 /**
  * Traverses an object and applies a reviver function to each node.
- * @param {any} objIni - The object to traverse.
- * @param {Function} reviver - The function to be called for each node.
- * @param {boolean} [pureFunction] - true: work with a deep clone of objIni, false: work with objIni passed as a parameter.
- * @returns {any} - The object after applying the reviver actions.
+ * @param {object} objIni - The object to traverse.
+ * @param {(value: any, path: string[], parent: any, prop: string) => any} reviver - The function to be called for each node.
+ * @param {boolean} [pureFunction=true] - true: work with a deep clone of objIni, false: work with objIni passed as a parameter.
+ * @returns {object} - The object after applying the reviver actions.
  */
-declare function traverse(objIni: any, reviver: (value: any, path: string[], parent: any, prop: string) => any, pureFunction?: boolean): any;
-
-/**
- * Symbol to skip traversing a subtree.
- * @type {symbol}
- */
-declare const skip: symbol;
-
-/**
- * Symbol to stop traversing the object.
- * @type {symbol}
- */
-declare const stop: symbol;
-
-/**
- * Symbol to delete the current node.
- * @type {symbol}
- */
-declare const _delete: symbol;
+declare function traverse(objIni: object, reviver: (value: any, path: string[], parent: any, prop: string) => any, pureFunction?: boolean): object;
 
 /**
  * Takes vertical slices of a two-nested array and calls a function with each slice.
- * @param {Function} functionToRun - The function to run with each vertical slice.
+ * @param {(verticalSlice: object[], runIndex: number) => any} functionToRun - The function to run with each vertical slice.
  * @param {string[]} verFields - The fields inside each item of the traverse array that contains the second nested arrays to iterate vertically.
- * @param {any[]} toTraverse - The array to traverse.
+ * @param {object[]} toTraverse - The array to traverse.
  * @returns {void}
  */
-declare function traverseVertically(functionToRun: (verticalSlice: object, runIndex: number) => any, verFields: string[], toTraverse: any[]): void;
-
+declare function traverseVertically(functionToRun: (verticalSlice: object[], runIndex: number) => any, verFields: string[], toTraverse: object[]): void;
 
 /**
  * Projects a subset of a JSON object based on specified paths, optionally removing properties marked for deletion.
  * 
  * @param {string[]} paths - An array of strings representing the paths to the properties in the JSON object that should be included in the output.
- * @param {Object} json - The JSON object from which the properties specified by paths will be extracted.
+ * @param {object} json - The JSON object from which the properties specified by paths will be extracted.
  * @param {boolean} [removeWithDelete=true] - A boolean indicating whether properties in the JSON object marked with a specific delete flag should be removed from the output. Defaults to true, meaning properties marked for deletion will be removed.
  * 
- * @returns {Object} A new JSON object containing only the properties specified by the paths array. If removeWithDelete is true, any properties marked for deletion will not be included in the returned object.
+ * @returns {object} - A new JSON object containing only the properties specified by the paths array. If removeWithDelete is true, any properties marked for deletion will not be included in the returned object.
  * 
  * @example
  * // Assuming a JSON object `data` as follows:
@@ -814,6 +762,7 @@ declare function dateFormatter(format: string): (date: Date | StringDate | numbe
  * ```
  */
 declare const DAYS: EnumMap;
+
 
 /**
  * Convert a string without timezone as UTC time returning the number representing the date in ms
@@ -1325,4 +1274,4 @@ declare function Timeline(): {
     };
 };
 
-export { Chrono, CustomError, DAYS, Enum, EnumMap, RE, RLog, Table, Text, Timeline, YYYY_MM_DD_hh_mm_ss_ToUtcDate, _delete, addDays, anonymize, arrayOfObjectsToObject, arraySorter, arrayToObject, bearerSanitizer, between, cleanString, cloneCopy, colorByStatus, colorMessage, colorMessageByStatus, colors, copyPropsWithValue, copyPropsWithValueUsingRules, createCustomErrorClass, dateFormatter, dateToObj, dayOfWeek, deepFreeze, defaultValue, diffInDaysYYYY_MM_DD, exclude, fetchImproved, ffletchMaker, fillWith, filterFlatMap, filterMap, findDeepKey, findIndexInSortedArray, findIndexOrNextInSortedArray, findIndexOrPreviousInSortedArray, findSolution, firstCapital, fletch, formatDate, getAt, getSameDateOrPreviousFridayForWeekends, groupByWithCalc, indexOfNthMatch, innerRightJoinWith, isBasicType, isDate, isDateMidnight, isEmpty, isPromise, isStringADate, lengthSanitizer, log, logWithPrefix, loopIndexGenerator, mapWithNext, mapWithPrevious, matchByPropId, memoize, mergeArrayOfObjectsRenamingProps, nextDayOfWeek, notTo, numberToFixedString, oneIn, parallel, partialAtPos, pickPaths, pipe, pipeWhile, pipeWithChain, plan, previousDayOfWeek, processExit, project, promiseAll, promiseFunToFutureFun, pushAt, pushUniqueKey, pushUniqueKeyOrChange, queryObjToStr, removeDuplicates, repeat, replaceAll, retryWithSleep, runFunctionsSyncOrParallel, runFutureFunctionsInParallel, sanitize, setAt, setDateToMidnight, skip, sleep, sleepWithFunction, sleepWithValue, something, sorterByFields, sorterByPaths, splitCond, stop, subtractDays, summarizeError, transition, traverse, traverseVertically, uncurry, unionWithHashKeys, unionWithHashKeysUnc, updateWithHashKeys, urlCompose, urlDecompose, varSubsDoubleBracket, wildcardToRegExp };
+export { Chrono, CustomError, DAYS, Enum, EnumMap, RE, RLog, Table, Text, Timeline, YYYY_MM_DD_hh_mm_ss_ToUtcDate, addDays, anonymize, arrayOfObjectsToObject, arraySorter, arrayToObject, bearerSanitizer, between, cleanString, cloneCopy, colorByStatus, colorMessage, colorMessageByStatus, copyPropsWithValue, copyPropsWithValueUsingRules, createCustomErrorClass, dateFormatter, dateToObj, dayOfWeek, deepFreeze, defaultValue, diffInDaysYYYY_MM_DD, exclude, fetchImproved, ffletchMaker, fillWith, filterFlatMap, filterMap, findDeepKey, findIndexInSortedArray, findIndexOrNextInSortedArray, findIndexOrPreviousInSortedArray, findSolution, firstCapital, fletch, formatDate, getAt, getSameDateOrPreviousFridayForWeekends, groupByWithCalc, indexOfNthMatch, innerRightJoinWith, isBasicType, isDate, isDateMidnight, isEmpty, isPromise, isStringADate, lengthSanitizer, log, logWithPrefix, loopIndexGenerator, mapWithNext, mapWithPrevious, matchByPropId, memoize, mergeArrayOfObjectsRenamingProps, nextDayOfWeek, notTo, numberToFixedString, oneIn, parallel, partialAtPos, pickPaths, pipe, pipeWhile, pipeWithChain, plan, previousDayOfWeek, processExit, project, promiseAll, promiseFunToFutureFun, pushAt, pushUniqueKey, pushUniqueKeyOrChange, queryObjToStr, removeDuplicates, repeat, replaceAll, retryWithSleep, runFunctionsSyncOrParallel, runFutureFunctionsInParallel, sanitize, setAt, setDateToMidnight, sleep, sleepWithFunction, sleepWithValue, something, sorterByFields, sorterByPaths, splitCond, subtractDays, summarizeError, transition, traverse, traverseVertically, uncurry, unionWithHashKeys, unionWithHashKeysUnc, updateWithHashKeys, urlCompose, urlDecompose, varSubsDoubleBracket, wildcardToRegExp };
