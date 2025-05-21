@@ -188,6 +188,14 @@ export function getAt(obj: object, valuePath: string | string[]): any;
 export function setAt(obj: object, valuePath: string | string[], value: any): string;
 
 /**
+ * Replaces array indices in a path string with asterisks.
+ * For example, converts 'users.0.profile.name' to 'users.*.profile.name'.
+ * @param {string} path - The path string to process.
+ * @returns {string} - The path with array indices replaced by asterisks.
+ */
+export function pathReplacingArrayIndexWithAsterisk(path: string): string;
+
+/**
  * Creates a sorter function to use as a parameter in array.prototype.sort(sorter).
  * It can order by several fields. If fields are equal, it will uneven using subsequent fields.
  * @param {string | string[]} paths - List of paths to sort by. One path for each field to order by. Route path is of the shape 'person.details.age'. If it is only one field, it can be a string.

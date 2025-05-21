@@ -416,3 +416,15 @@ N.B.: vscode does not support IntelliSense inside html script tag, at least at c
 * Take Ramda, fluture and JSONPath (project function) to another library so we can have a minimalist light library. Only dependencies allowed: just-*
 * Take logLevelExtension to another library.
 * Taking fluture means we remove flutures from plan()
+
+## In progress
+
+Generation of plantUML from a plan definition:
+
+You can paste the plan definition at the end of src/planExt.js and uncomment, then you can run it:
+
+```sh
+node src/planExt.js
+```
+
+Then copy the log in console to a file.puml and preview with: cmd+shift+p preview current PlantUML

@@ -1561,6 +1561,20 @@ function setAt(obj, valuePath, value) {
   // obj6 //?
 // }
 
+const pathReplacingArrayIndexWithAsterisk = (path) => {
+  // Convert path to asterisk index
+  const parts = path.split('.');
+  const asteriskIndex = parts.map(part => {
+    const toNumber = Number(part);
+    if (Number.isNaN(toNumber)) {
+      return part;
+    }
+
+    return '*';
+  });
+  return asteriskIndex.join('.');
+}
+
 const defaultValue = (value, defaultVal) => {
   if (value === undefined || value === null || Number.isNaN(value)) return defaultVal
 
@@ -2186,6 +2200,7 @@ const jsUtils = {
   deepFreeze,
   getAt,
   setAt,
+  pathReplacingArrayIndexWithAsterisk,
   sorterByPaths,
   sorterByFields,
   findIndexInSortedArray,
@@ -2264,6 +2279,7 @@ export {
   deepFreeze,
   getAt,
   setAt,
+  pathReplacingArrayIndexWithAsterisk,
   sorterByPaths,
   sorterByFields,
   findIndexInSortedArray,

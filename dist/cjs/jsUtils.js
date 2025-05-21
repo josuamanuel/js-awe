@@ -18,8 +18,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 var _EnumMap_instances, _EnumMap_validateAndTransform;
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.isDate = exports.numberToFixedString = exports.fillWith = exports.memoize = exports.pushAt = exports.pushUniqueKeyOrChange = exports.pushUniqueKey = exports.transition = exports.Enum = exports.EnumMap = exports.copyPropsWithValueUsingRules = exports.copyPropsWithValue = exports.project = exports.traverseVertically = exports.traverse = exports.removeDuplicates = exports.arrayOfObjectsToObject = exports.arrayToObject = exports.notTo = exports.sleepWithFunction = exports.sleepWithValue = exports.sleep = exports.isPromise = exports.arraySorter = exports.filterFlatMap = exports.defaultValue = exports.findIndexOrNextInSortedArray = exports.findIndexOrPreviousInSortedArray = exports.findIndexInSortedArray = exports.sorterByFields = exports.sorterByPaths = exports.setAt = exports.getAt = exports.deepFreeze = exports.findDeepKey = exports.colorByStatus = exports.colorMessageByStatus = exports.colorMessage = exports.colors = exports.indexOfNthMatch = exports.urlDecompose = exports.urlCompose = exports.isBasicType = exports.createCustomErrorClass = exports.CustomError = exports.summarizeError = exports.queryObjToStr = exports.varSubsDoubleBracket = exports.firstCapital = exports.logWithPrefix = void 0;
-exports.processExit = exports.retryWithSleep = exports.loopIndexGenerator = exports.oneIn = exports.repeat = exports.cleanString = exports.replaceAll = exports.setDateToMidnight = exports.isDateMidnight = exports.getSameDateOrPreviousFridayForWeekends = exports.dayOfWeek = exports.nextDayOfWeek = exports.previousDayOfWeek = exports.addDays = exports.subtractDays = exports.diffInDaysYYYY_MM_DD = exports.dateToObj = exports.YYYY_MM_DD_hh_mm_ss_ToUtcDate = exports.dateFormatter = exports.MONTHS = exports.DAYS = exports.formatDate = exports.isStringADate = exports.isEmpty = void 0;
+exports.numberToFixedString = exports.fillWith = exports.memoize = exports.pushAt = exports.pushUniqueKeyOrChange = exports.pushUniqueKey = exports.transition = exports.Enum = exports.EnumMap = exports.copyPropsWithValueUsingRules = exports.copyPropsWithValue = exports.project = exports.traverseVertically = exports.traverse = exports.removeDuplicates = exports.arrayOfObjectsToObject = exports.arrayToObject = exports.notTo = exports.sleepWithFunction = exports.sleepWithValue = exports.sleep = exports.isPromise = exports.arraySorter = exports.filterFlatMap = exports.defaultValue = exports.findIndexOrNextInSortedArray = exports.findIndexOrPreviousInSortedArray = exports.findIndexInSortedArray = exports.sorterByFields = exports.sorterByPaths = exports.pathReplacingArrayIndexWithAsterisk = exports.setAt = exports.getAt = exports.deepFreeze = exports.findDeepKey = exports.colorByStatus = exports.colorMessageByStatus = exports.colorMessage = exports.colors = exports.indexOfNthMatch = exports.urlDecompose = exports.urlCompose = exports.isBasicType = exports.createCustomErrorClass = exports.CustomError = exports.summarizeError = exports.queryObjToStr = exports.varSubsDoubleBracket = exports.firstCapital = exports.logWithPrefix = void 0;
+exports.processExit = exports.retryWithSleep = exports.loopIndexGenerator = exports.oneIn = exports.repeat = exports.cleanString = exports.replaceAll = exports.setDateToMidnight = exports.isDateMidnight = exports.getSameDateOrPreviousFridayForWeekends = exports.dayOfWeek = exports.nextDayOfWeek = exports.previousDayOfWeek = exports.addDays = exports.subtractDays = exports.diffInDaysYYYY_MM_DD = exports.dateToObj = exports.YYYY_MM_DD_hh_mm_ss_ToUtcDate = exports.dateFormatter = exports.MONTHS = exports.DAYS = exports.formatDate = exports.isStringADate = exports.isEmpty = exports.isDate = void 0;
 const just_clone_1 = __importDefault(require("just-clone"));
 const jsonpath_plus_1 = require("jsonpath-plus");
 // biome-ignore lint/style/useNodejsImportProtocol: <explanation>
@@ -1351,6 +1351,19 @@ exports.setAt = setAt;
 // setAt(obj6,'items.$last.ar.$push',8) //?
 // obj6 //?
 // }
+const pathReplacingArrayIndexWithAsterisk = (path) => {
+    // Convert path to asterisk index
+    const parts = path.split('.');
+    const asteriskIndex = parts.map(part => {
+        const toNumber = Number(part);
+        if (Number.isNaN(toNumber)) {
+            return part;
+        }
+        return '*';
+    });
+    return asteriskIndex.join('.');
+};
+exports.pathReplacingArrayIndexWithAsterisk = pathReplacingArrayIndexWithAsterisk;
 const defaultValue = (value, defaultVal) => {
     if (value === undefined || value === null || Number.isNaN(value))
         return defaultVal;
@@ -1914,6 +1927,7 @@ const jsUtils = {
     deepFreeze,
     getAt,
     setAt,
+    pathReplacingArrayIndexWithAsterisk,
     sorterByPaths,
     sorterByFields,
     findIndexInSortedArray,
