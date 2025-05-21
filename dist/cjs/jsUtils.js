@@ -18,8 +18,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 var _EnumMap_instances, _EnumMap_validateAndTransform;
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.numberToFixedString = exports.fillWith = exports.memoize = exports.pushAt = exports.pushUniqueKeyOrChange = exports.pushUniqueKey = exports.transition = exports.Enum = exports.EnumMap = exports.copyPropsWithValueUsingRules = exports.copyPropsWithValue = exports.project = exports.traverseVertically = exports.traverse = exports.removeDuplicates = exports.arrayOfObjectsToObject = exports.arrayToObject = exports.notTo = exports.sleepWithFunction = exports.sleepWithValue = exports.sleep = exports.isPromise = exports.arraySorter = exports.filterFlatMap = exports.defaultValue = exports.findIndexOrNextInSortedArray = exports.findIndexOrPreviousInSortedArray = exports.findIndexInSortedArray = exports.sorterByFields = exports.sorterByPaths = exports.pathReplacingArrayIndexWithAsterisk = exports.setAt = exports.getAt = exports.deepFreeze = exports.findDeepKey = exports.colorByStatus = exports.colorMessageByStatus = exports.colorMessage = exports.colors = exports.indexOfNthMatch = exports.urlDecompose = exports.urlCompose = exports.isBasicType = exports.createCustomErrorClass = exports.CustomError = exports.summarizeError = exports.queryObjToStr = exports.varSubsDoubleBracket = exports.firstCapital = exports.logWithPrefix = void 0;
-exports.processExit = exports.retryWithSleep = exports.loopIndexGenerator = exports.oneIn = exports.repeat = exports.cleanString = exports.replaceAll = exports.setDateToMidnight = exports.isDateMidnight = exports.getSameDateOrPreviousFridayForWeekends = exports.dayOfWeek = exports.nextDayOfWeek = exports.previousDayOfWeek = exports.addDays = exports.subtractDays = exports.diffInDaysYYYY_MM_DD = exports.dateToObj = exports.YYYY_MM_DD_hh_mm_ss_ToUtcDate = exports.dateFormatter = exports.MONTHS = exports.DAYS = exports.formatDate = exports.isStringADate = exports.isEmpty = exports.isDate = void 0;
+exports.fillWith = exports.memoize = exports.pushAt = exports.pushUniqueKeyOrChange = exports.pushUniqueKey = exports.transition = exports.Enum = exports.EnumMap = exports.copyPropsWithValueUsingRules = exports.copyPropsWithValue = exports.project = exports.traverseVertically = exports.traverse = exports.removeDuplicates = exports.arrayOfObjectsToObject = exports.arrayToObject = exports.notTo = exports.sleepWithFunction = exports.sleepWithValue = exports.sleep = exports.isPromise = exports.arraySorter = exports.filterFlatMap = exports.defaultValue = exports.findIndexOrNextInSortedArray = exports.findIndexOrPreviousInSortedArray = exports.findIndexInSortedArray = exports.sorterByFields = exports.sorterByPaths = exports.stripDollarRoot = exports.pathReplacingArrayIndexWithAsterisk = exports.setAt = exports.getAt = exports.deepFreeze = exports.findDeepKey = exports.colorByStatus = exports.colorMessageByStatus = exports.colorMessage = exports.colors = exports.indexOfNthMatch = exports.urlDecompose = exports.urlCompose = exports.isBasicType = exports.createCustomErrorClass = exports.CustomError = exports.summarizeError = exports.queryObjToStr = exports.varSubsDoubleBracket = exports.firstCapital = exports.logWithPrefix = void 0;
+exports.processExit = exports.retryWithSleep = exports.loopIndexGenerator = exports.oneIn = exports.repeat = exports.cleanString = exports.replaceAll = exports.setDateToMidnight = exports.isDateMidnight = exports.getSameDateOrPreviousFridayForWeekends = exports.dayOfWeek = exports.nextDayOfWeek = exports.previousDayOfWeek = exports.addDays = exports.subtractDays = exports.diffInDaysYYYY_MM_DD = exports.dateToObj = exports.YYYY_MM_DD_hh_mm_ss_ToUtcDate = exports.dateFormatter = exports.MONTHS = exports.DAYS = exports.formatDate = exports.isStringADate = exports.isALeaf = exports.isEmpty = exports.isDate = exports.numberToFixedString = void 0;
 const just_clone_1 = __importDefault(require("just-clone"));
 const jsonpath_plus_1 = require("jsonpath-plus");
 // biome-ignore lint/style/useNodejsImportProtocol: <explanation>
@@ -758,6 +758,7 @@ function isALeaf(node) {
         ((node === null || node === void 0 ? void 0 : node.constructor.name) === 'Array' && node.length > 0);
     return !isABranch;
 }
+exports.isALeaf = isALeaf;
 // isALeaf(undefined) //?
 // isALeaf({a:'this is a leaf'}.a) //?
 // isALeaf(new Date()) //?
@@ -1364,6 +1365,14 @@ const pathReplacingArrayIndexWithAsterisk = (path) => {
     return asteriskIndex.join('.');
 };
 exports.pathReplacingArrayIndexWithAsterisk = pathReplacingArrayIndexWithAsterisk;
+const stripDollarRoot = (path) => {
+    // Remove $ from the root of the path
+    if (path.substring(0, 2) === '$.') {
+        return path.substring(2);
+    }
+    return path;
+};
+exports.stripDollarRoot = stripDollarRoot;
 const defaultValue = (value, defaultVal) => {
     if (value === undefined || value === null || Number.isNaN(value))
         return defaultVal;
@@ -1928,6 +1937,7 @@ const jsUtils = {
     getAt,
     setAt,
     pathReplacingArrayIndexWithAsterisk,
+    stripDollarRoot,
     sorterByPaths,
     sorterByFields,
     findIndexInSortedArray,
@@ -1960,6 +1970,7 @@ const jsUtils = {
     numberToFixedString,
     isDate,
     isEmpty,
+    isALeaf,
     isStringADate,
     formatDate,
     DAYS,

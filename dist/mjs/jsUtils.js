@@ -1289,6 +1289,13 @@ const pathReplacingArrayIndexWithAsterisk = (path) => {
     });
     return asteriskIndex.join('.');
 };
+const stripDollarRoot = (path) => {
+    // Remove $ from the root of the path
+    if (path.substring(0, 2) === '$.') {
+        return path.substring(2);
+    }
+    return path;
+};
 const defaultValue = (value, defaultVal) => {
     if (value === undefined || value === null || Number.isNaN(value))
         return defaultVal;
@@ -1822,6 +1829,7 @@ const jsUtils = {
     getAt,
     setAt,
     pathReplacingArrayIndexWithAsterisk,
+    stripDollarRoot,
     sorterByPaths,
     sorterByFields,
     findIndexInSortedArray,
@@ -1854,6 +1862,7 @@ const jsUtils = {
     numberToFixedString,
     isDate,
     isEmpty,
+    isALeaf,
     isStringADate,
     formatDate,
     DAYS,
@@ -1879,4 +1888,4 @@ const jsUtils = {
     processExit
 };
 export default jsUtils;
-export { logWithPrefix, firstCapital, varSubsDoubleBracket, queryObjToStr, summarizeError, CustomError, createCustomErrorClass, isBasicType, urlCompose, urlDecompose, indexOfNthMatch, colors, colorMessage, colorMessageByStatus, colorByStatus, findDeepKey, deepFreeze, getAt, setAt, pathReplacingArrayIndexWithAsterisk, sorterByPaths, sorterByFields, findIndexInSortedArray, findIndexOrPreviousInSortedArray, findIndexOrNextInSortedArray, defaultValue, filterFlatMap, arraySorter, isPromise, sleep, sleepWithValue, sleepWithFunction, notTo, arrayToObject, arrayOfObjectsToObject, removeDuplicates, traverse, traverseVertically, project, copyPropsWithValue, copyPropsWithValueUsingRules, EnumMap, Enum, transition, pushUniqueKey, pushUniqueKeyOrChange, pushAt, memoize, fillWith, numberToFixedString, isDate, isEmpty, isStringADate, formatDate, DAYS, MONTHS, dateFormatter, YYYY_MM_DD_hh_mm_ss_ToUtcDate, dateToObj, diffInDaysYYYY_MM_DD, subtractDays, addDays, previousDayOfWeek, nextDayOfWeek, dayOfWeek, getSameDateOrPreviousFridayForWeekends, isDateMidnight, setDateToMidnight, replaceAll, cleanString, repeat, oneIn, loopIndexGenerator, retryWithSleep, processExit };
+export { logWithPrefix, firstCapital, varSubsDoubleBracket, queryObjToStr, summarizeError, CustomError, createCustomErrorClass, isBasicType, urlCompose, urlDecompose, indexOfNthMatch, colors, colorMessage, colorMessageByStatus, colorByStatus, findDeepKey, deepFreeze, getAt, setAt, pathReplacingArrayIndexWithAsterisk, stripDollarRoot, sorterByPaths, sorterByFields, findIndexInSortedArray, findIndexOrPreviousInSortedArray, findIndexOrNextInSortedArray, defaultValue, filterFlatMap, arraySorter, isPromise, sleep, sleepWithValue, sleepWithFunction, notTo, arrayToObject, arrayOfObjectsToObject, removeDuplicates, traverse, traverseVertically, project, copyPropsWithValue, copyPropsWithValueUsingRules, EnumMap, Enum, transition, pushUniqueKey, pushUniqueKeyOrChange, pushAt, memoize, fillWith, numberToFixedString, isDate, isEmpty, isALeaf, isStringADate, formatDate, DAYS, MONTHS, dateFormatter, YYYY_MM_DD_hh_mm_ss_ToUtcDate, dateToObj, diffInDaysYYYY_MM_DD, subtractDays, addDays, previousDayOfWeek, nextDayOfWeek, dayOfWeek, getSameDateOrPreviousFridayForWeekends, isDateMidnight, setDateToMidnight, replaceAll, cleanString, repeat, oneIn, loopIndexGenerator, retryWithSleep, processExit };
