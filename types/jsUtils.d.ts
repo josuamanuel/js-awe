@@ -189,11 +189,19 @@ export function setAt(obj: object, valuePath: string | string[], value: any): st
 
 /**
  * Replaces array indices in a path string with asterisks.
- * For example, converts 'users.0.profile.name' to 'users.*.profile.name'.
+ * For example, converts 'users.0.profiles.0.name' to 'users.*.profiles.*.name'.
  * @param {string} path - The path string to process.
  * @returns {string} - The path with array indices replaced by asterisks.
  */
 export function pathReplacingArrayIndexWithAsterisk(path: string): string;
+
+/**
+ * Remove if exists the '$.' indicating the root of the path.
+ * For example, converts '$.users.0.profiles.0.name' to 'users.0.profiles.0.name'.
+ * @param {string} path - The path string to process.
+ * @returns {string} - The path with array indices replaced by asterisks.
+ */
+export function stripDollarRoot(path: string): string
 
 /**
  * Creates a sorter function to use as a parameter in array.prototype.sort(sorter).

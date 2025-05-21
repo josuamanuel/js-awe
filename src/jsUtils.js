@@ -1575,6 +1575,14 @@ const pathReplacingArrayIndexWithAsterisk = (path) => {
   return asteriskIndex.join('.');
 }
 
+const stripDollarRoot = (path) => {
+  // Remove $ from the root of the path
+  if (path.substring(0, 2) === '$.') {
+    return path.substring(2);
+  }
+  return path
+}
+
 const defaultValue = (value, defaultVal) => {
   if (value === undefined || value === null || Number.isNaN(value)) return defaultVal
 
@@ -2201,6 +2209,7 @@ const jsUtils = {
   getAt,
   setAt,
   pathReplacingArrayIndexWithAsterisk,
+  stripDollarRoot,
   sorterByPaths,
   sorterByFields,
   findIndexInSortedArray,
@@ -2233,6 +2242,7 @@ const jsUtils = {
   numberToFixedString,
   isDate,
   isEmpty,
+  isALeaf,
   isStringADate,
   formatDate,
   DAYS,
@@ -2280,6 +2290,7 @@ export {
   getAt,
   setAt,
   pathReplacingArrayIndexWithAsterisk,
+  stripDollarRoot,
   sorterByPaths,
   sorterByFields,
   findIndexInSortedArray,
@@ -2312,6 +2323,7 @@ export {
   numberToFixedString,
   isDate,
   isEmpty,
+  isALeaf,
   isStringADate,
   formatDate,
   DAYS,
